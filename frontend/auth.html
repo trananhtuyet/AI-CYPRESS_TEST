@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-TestLab | Modern Harmony</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #52b788;         
+            --primary-soft: #b7e4c7;    
+            --primary-dark: #1b4332;    
+            --bg-body: #f7fffb;
+            --text-main: #2d6a4f;
+            --text-muted: #6b9080;
+            --glass-white: rgba(255, 255, 255, 0.8);
+            --border-soft: rgba(82, 183, 136, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-main);
+        }
+
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 15px 60px;
+            display: flex; justify-content: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .logo { font-size: 22px; font-weight: 800; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary); }
+
+        .container {
+            display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px;
+            max-width: 1200px; width: 100%; margin-top: 60px; align-items: center;
+        }
+
+        /* --- PHẦN GIỚI THIỆU (KHÔNG THAY ĐỔI) --- */
+        .left-section h1 {
+            font-size: 54px; font-weight: 800; line-height: 1.1; margin-bottom: 24px;
+            letter-spacing: -1.5px; color: var(--primary-dark);
+        }
+        .left-section p { font-size: 18px; margin-bottom: 40px; color: var(--text-main); opacity: 0.8; line-height: 1.6; }
+        .features { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .feature-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 24px; border-radius: 20px; transition: 0.4s;
+            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
+        }
+        .feature-card i { font-size: 24px; color: var(--primary); margin-bottom: 15px; display: block; }
+        .feature-card h4 { font-size: 16px; margin-bottom: 6px; color: var(--primary-dark); }
+        .feature-card p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+        /* --- PHẦN AUTH (ĐÃ THÊM CHỨC NĂNG CHUYỂN FORM) --- */
+        .right-section {
+            background: white; border-radius: 30px; padding: 50px;
+            box-shadow: 0 25px 70px rgba(27, 67, 50, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            min-height: 580px;
+            display: flex; flex-direction: column;
+        }
+
+        .auth-form { display: none; animation: slideUp 0.4s ease; }
+        .auth-form.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-header h2 { font-size: 32px; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px; }
+        .auth-header p { color: var(--text-muted); margin-bottom: 35px; }
+
+        .social-btns { display: flex; gap: 12px; margin-bottom: 25px; }
+        .btn-social {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 14px; border: 1.5px solid #f0f5f3; border-radius: 14px;
+            background: #fcfdfd; color: var(--text-main); font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+
+        .divider { text-align: center; position: relative; margin-bottom: 25px; color: var(--text-muted); font-size: 13px; }
+        .divider::before, .divider::after { content: ""; position: absolute; top: 50%; width: 30%; border-bottom: 1px solid #f0f5f3; }
+        .divider::before { left: 0; } .divider::after { right: 0; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: var(--primary-dark); }
+        input {
+            width: 100%; padding: 16px; background: #f8faf9;
+            border: 1.5px solid transparent; border-radius: 14px;
+            color: var(--text-main); font-size: 14px; transition: 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 5px rgba(82, 183, 136, 0.1); }
+
+        .btn-main {
+            width: 100%; padding: 16px; 
+            background: linear-gradient(135deg, var(--primary), #40916c);
+            color: white; border: none; border-radius: 14px;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.4s;
+            box-shadow: 0 10px 25px rgba(82, 183, 136, 0.3);
+        }
+
+        .auth-nav { text-align: center; margin-top: 25px; color: var(--text-muted); font-size: 14px; }
+        .auth-nav span { color: var(--primary); font-weight: 800; cursor: pointer; margin-left: 5px; }
+
+        .back-link { 
+            display: inline-flex; align-items: center; gap: 8px; 
+            color: var(--text-muted); font-size: 14px; cursor: pointer; 
+            margin-bottom: 20px; font-weight: 600;
+        }
+        .back-link:hover { color: var(--primary); }
+
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; }
+            .left-section { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-leaf"></i> AI-TestLab</div>
+    </nav>
+
+    <div class="container">
+        <section class="left-section">
+            <h1>Test Smarter</h1>
+            <p>An in-depth AI training system to help you master manual and professional automation testing.</p>
+
+            <div class="features">
+                <div class="feature-card"><i class="fas fa-graduation-cap"></i><h4>Structured Learning</h4><p>International quality courses.</p></div>
+                <div class="feature-card"><i class="fas fa-bolt"></i><h4>AI Generator</h4><p>Auto-generate test code.</p></div>
+                <div class="feature-card"><i class="fas fa-users"></i><h4>Expert Community</h4><p>Connect with QA specialists.</p></div>
+                <div class="feature-card"><i class="fas fa-award"></i><h4>Certificates</h4><p>Prove your expertise.</p></div>
+            </div>
+        </section>
+
+        <section class="right-section">
+            
+            <div id="login-form" class="auth-form active">
+                <div class="auth-header">
+                    <h2>Welcome Back!</h2>
+                    <p>Start your QA mastery journey</p>
+                </div>
+                <div class="social-btns">
+                    <button type="button" id="googleLoginBtn" class="btn-social"><img src="https://img.icons8.com/color/24/000000/google-logo.png" width="18"/> Google</button>
+                    <button type="button" id="facebookLoginBtn" class="btn-social"><i class="fab fa-facebook" style="color:#1877f2; font-size: 18px;"></i> Facebook</button>
+                </div>
+                <div class="divider">Or continue with Email</div>
+                <div id="loginError" style="background: #fee; border-left: 3px solid #c33; color: #c33; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;"></div>
+                <div id="loginSuccess" style="background: #efe; border-left: 3px solid #3c3; color: #3c3; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;"></div>
+                <form id="loginFormEl">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between;">
+                            <label>Password</label>
+                            <span onclick="showForm('forgot-form')" style="color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer;">Forgot password?</span>
+                        </div>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-main">Sign In</button>
+                </form>
+                <div class="auth-nav">Don't have an account? <span onclick="showForm('register-form')">Sign up free</span></div>
+            </div>
+
+            <div id="register-form" class="auth-form">
+                <div class="auth-header">
+                    <h2>Join Us</h2>
+                    <p>Create account to explore AI power</p>
+                </div>
+                <div id="registerError" style="background: #fee; border-left: 3px solid #c33; color: #c33; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;"></div>
+                <div id="registerSuccess" style="background: #efe; border-left: 3px solid #3c3; color: #3c3; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;"></div>
+                <form id="registerFormEl">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="registerUsername" placeholder="At least 3 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="registerEmail" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="registerConfirm" placeholder="Re-enter password" required>
+                    </div>
+                    <button type="submit" class="btn-main">Create Account</button>
+                </form>
+                <div class="auth-nav">Already have an account? <span onclick="showForm('login-form')">Sign in</span></div>
+            </div>
+
+            <div id="forgot-form" class="auth-form">
+                <div class="back-link" onclick="showForm('login-form')">
+                    <i class="fas fa-arrow-left"></i> Back to Sign In
+                </div>
+                <div class="auth-header">
+                    <h2>Forgot Password?</h2>
+                    <p>Enter your email to receive recovery link</p>
+                </div>
+                <div id="forgotError" style="background: #fee; border-left: 3px solid #c33; color: #c33; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;"></div>
+                <div id="forgotSuccess" style="background: #efe; border-left: 3px solid #3c3; color: #3c3; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;"></div>
+                <form id="forgotFormEl">
+                    <div class="form-group">
+                        <label>Recovery Email</label>
+                        <input type="email" id="forgotEmail" placeholder="Enter registered email" required>
+                    </div>
+                    <button type="submit" class="btn-main">Send Request</button>
+                </form>
+            </div>
+
+        </section>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/auth';
+
+        // ===== GOOGLE SIGN-IN =====
+        window.onload = function() {
+            // Google Button Event (Mock)
+            document.getElementById('googleLoginBtn').addEventListener('click', () => {
+                mockSocialLogin({
+                    id: 'google_' + Math.random().toString(36).substr(2, 9),
+                    name: 'Google User',
+                    email: 'user_' + Math.random().toString(36).substr(2, 5) + '@gmail.com',
+                    picture: 'https://lh3.googleusercontent.com/a/default-user',
+                    provider: 'google'
+                });
+            });
+
+            // Facebook Button Event (Mock)
+            document.getElementById('facebookLoginBtn').addEventListener('click', () => {
+                mockSocialLogin({
+                    id: 'fb_' + Math.random().toString(36).substr(2, 9),
+                    name: 'Facebook User',
+                    email: 'user_' + Math.random().toString(36).substr(2, 5) + '@facebook.com',
+                    picture: 'https://platform-lookaside.fbsbx.com/platform/profilepic/default.png',
+                    provider: 'facebook'
+                });
+            });
+        };
+
+        // Mock Social Login
+        function mockSocialLogin(socialUser) {
+            socialAuthLogin(socialUser);
+        }
+
+        // Process Social Auth Login
+        async function socialAuthLogin(socialUser) {
+            try {
+                const response = await fetch(`${API_URL}/social-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(socialUser)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showSuccess('loginSuccess', `✅ Welcome ${data.user.username}! Redirecting...`);
+                    setTimeout(() => window.location.href = 'dashboard.html', 500);
+                } else {
+                    showError('loginError', data.error || 'Social login failed');
+                }
+            } catch (err) {
+                showError('loginError', 'Error: ' + err.message);
+            }
+        }
+
+        // Hàm chuyển đổi giữa các form
+        function showForm(formId) {
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            document.getElementById(formId).classList.add('active');
+            // Clear messages
+            document.querySelectorAll('[id$="Error"], [id$="Success"]').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+        }
+
+        // === LOGIN ===
+        document.getElementById('loginFormEl').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showSuccess('loginSuccess', '✅ Login successful! Redirecting...');
+                    setTimeout(() => window.location.href = 'dashboard.html', 500);
+                } else {
+                    showError('loginError', data.error || 'Login failed');
+                }
+            } catch (err) {
+                showError('loginError', 'Error: ' + err.message);
+            }
+        });
+
+        // === REGISTER ===
+        document.getElementById('registerFormEl').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+
+            if (username.length < 3) {
+                showError('registerError', 'Username must be at least 3 characters');
+                return;
+            }
+            if (password.length < 6) {
+                showError('registerError', 'Password must be at least 6 characters');
+                return;
+            }
+            if (password !== confirm) {
+                showError('registerError', 'Passwords do not match');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showSuccess('registerSuccess', '✅ Registration successful! Redirecting...');
+                    setTimeout(() => window.location.href = 'dashboard.html', 500);
+                } else {
+                    showError('registerError', data.error || 'Registration failed');
+                }
+            } catch (err) {
+                showError('registerError', 'Error: ' + err.message);
+            }
+        });
+
+        // === FORGOT PASSWORD ===
+        document.getElementById('forgotFormEl').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value.trim();
+
+            try {
+                const response = await fetch(`${API_URL}/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    showSuccess('forgotSuccess', data.message || '✅ Reset instructions sent');
+                    document.getElementById('forgotFormEl').reset();
+                } else {
+                    showError('forgotError', data.error || 'Request failed');
+                }
+            } catch (err) {
+                showError('forgotError', 'Error: ' + err.message);
+            }
+        });
+
+        // === UTILITIES ===
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+        }
+
+        function showSuccess(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise QA Studio - Professional Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .code-editor { font-family: 'Fira Code', monospace; }
+        .active-tab { border-bottom: 3px solid #52b788; color: #52b788; background: #f0fdf4; }
+        .step-row:hover .step-actions { opacity: 1; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-[#f1f5f9] min-h-screen">
+
+    <nav class="bg-gradient-to-r from-[#1b4332] to-[#2d6a4f] text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-lg">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2">
+                <div class="bg-[#52b788] p-1.5 rounded-lg"><i class="fas fa-leaf text-white"></i></div>
+                <span class="text-lg font-bold tracking-tight">AI<span class="text-[#52b788]">-TestLab</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-gray-300">
+                <a href="dashboard.html" class="hover:text-white transition">Tổng quan</a>
+                <a href="#" class="text-white border-b-2 border-[#52b788] pb-1">Test Cases</a>
+                <a href="#" class="hover:text-white transition">Phân tích</a>
+                <a href="#" class="hover:text-white transition">Báo cáo</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-gray-300"><i class="far fa-clock mr-1"></i> Tự động lưu</span>
+            <div class="h-8 w-8 bg-gradient-to-tr from-[#52b788] to-[#40916c] rounded-full flex items-center justify-center font-bold text-xs">AD</div>
+        </div>
+    </nav>
+
+    <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-0 shadow-2xl mt-4 rounded-xl overflow-hidden bg-white border border-gray-200">
+        
+        <aside class="col-span-2 border-right border-gray-200 bg-gradient-to-b from-[#f0fdf4] to-white p-4 h-[calc(100vh-100px)] custom-scrollbar overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xs font-bold text-[#52b788] uppercase tracking-widest">Test Cases</h2>
+                <button onclick="toggleAddFeatureInput()" class="text-[#52b788] hover:bg-green-100 p-1 rounded" title="Thêm chức năng mới"><i class="fas fa-plus-circle text-lg"></i></button>
+            </div>
+
+            <!-- Add Feature Input -->
+            <div id="addFeatureInputContainer" style="display: none; margin-bottom: 8px; padding: 8px; background: #f0fdf4; border: 1px solid #d1f5d1; border-radius: 6px;">
+                <div class="flex gap-2">
+                    <input type="text" id="featureInputInline" placeholder="Tên chức năng..." 
+                        class="flex-1 border border-[#52b788] p-2 rounded text-xs focus:outline-none" 
+                        onkeypress="if(event.key==='Enter') addFeatureInline()" />
+                    <button onclick="addFeatureInline()" class="bg-[#52b788] text-white px-2 rounded text-xs font-bold hover:bg-[#40916c]">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button onclick="toggleAddFeatureInput()" class="bg-gray-300 text-gray-700 px-2 rounded text-xs font-bold">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Features List -->
+            <div id="featuresList" class="space-y-1 mb-4">
+                <!-- Features will be displayed here -->
+            </div>
+
+            <div id="testExplorer" class="space-y-1">
+                <!-- Test cases will be loaded here -->
+                <div class="text-xs text-gray-400 p-2 italic">Đang tải...</div>
+            </div>
+        </aside>
+
+        <main class="col-span-7 border-x border-gray-200 h-[calc(100vh-100px)] flex flex-col">
+            <!-- New Test Case Creation Panel (shown when feature selected) -->
+            <div id="newTestCasePanel" style="display: none; padding: 20px; border-b: 2px solid #52b788; background: #f0fdf4;">
+                <h3 style="color: #1b4332; font-weight: 600; margin-bottom: 12px; font-size: 0.95rem;">
+                    Tạo Test Case cho: <span id="selectedFeatureName" style="color: #52b788;"></span>
+                </h3>
+                
+                <!-- Test Case Name Input -->
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="newTestCaseName" placeholder="VD: Đăng nhập thành công, Thanh toán với thẻ hết hạn..." 
+                        style="flex: 1; border: 2px solid #52b788; padding: 10px; border-radius: 6px; font-size: 14px; outline: none;" />
+                    <button onclick="createTestCaseFromFeature()" style="background: #52b788; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                        <i class="fas fa-save"></i> Tạo
+                    </button>
+                    <button onclick="hideNewTestCasePanel()" style="background: #e8e8e8; color: #333; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                        <i class="fas fa-times"></i> Đóng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Demo Header (shown when no feature selected) -->
+            <div id="demoHeader" class="p-4 border-b border-gray-200 flex justify-between items-center bg-white">
+                <div>
+                    <span class="text-xs font-bold text-[#52b788] bg-[#d1f5d1] px-2 py-1 rounded">TC-102</span>
+                    <h2 class="text-lg font-bold inline-block ml-2 text-[#1b4332]">Xác thực đăng nhập hệ thống</h2>
+                </div>
+                <div class="flex gap-2">
+                    <button id="executeBtn" class="flex items-center gap-2 bg-[#52b788] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#40916c] shadow-lg shadow-green-100 transition">
+                        <i class="fas fa-play"></i> Chạy Test
+                    </button>
+                    <button id="editSaveBtn" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition" style="display: none;">
+                        <i class="fas fa-save"></i> Lưu Thay Đổi
+                    </button>
+                    <button id="automationSaveBtn" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition" style="display: none;">
+                        <i class="fas fa-save"></i> Lưu Script
+                    </button>
+                    <button id="uploadSaveBtn" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition" style="display: none;">
+                        <i class="fas fa-save"></i> Lưu File
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex bg-gray-50 border-b border-gray-200">
+                <button onclick="toggleMode('manual')" id="btn-manual" class="px-8 py-3 text-sm font-bold active-tab transition-all flex items-center gap-2">
+                    <i class="fas fa-hand-pointer"></i> Manual Steps
+                </button>
+                <button onclick="toggleMode('auto')" id="btn-auto" class="px-8 py-3 text-sm font-bold text-gray-400 hover:text-[#52b788] transition-all flex items-center gap-2">
+                    <i class="fas fa-code"></i> Automation Script
+                </button>
+                <button onclick="toggleMode('upload')" id="btn-upload" class="px-8 py-3 text-sm font-bold text-gray-400 hover:text-[#52b788] transition-all flex items-center gap-2">
+                    <i class="fas fa-upload"></i> Upload & Auto-Test
+                </button>
+            </div>
+
+            <div id="panel-manual" class="flex-grow overflow-y-auto p-6">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left text-xs text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <th class="pb-4 font-medium w-12 text-center">#</th>
+                            <th class="pb-4 font-medium px-4">Thao tác thực hiện</th>
+                            <th class="pb-4 font-medium px-4">Kết quả mong đợi</th>
+                            <th class="pb-4 font-medium w-32 text-center">Kết quả</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <tr class="step-row group">
+                            <td class="py-4 text-center font-bold text-gray-300">01</td>
+                            <td class="py-4 px-4">
+                                <div class="font-medium text-sm mb-1">Truy cập URL ứng dụng</div>
+                                <div class="text-xs text-gray-400">Env: https://staging.app.com</div>
+                            </td>
+                            <td class="py-4 px-4 text-sm text-gray-600 italic leading-relaxed">Màn hình login hiển thị với logo và 2 trường input Email, Password.</td>
+                            <td class="py-4 px-4">
+                                <div class="flex gap-1 justify-center step-status" data-status="pending">
+                                    <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition"><i class="fas fa-check"></i></button>
+                                    <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button>
+                                </div>
+                                <button onclick="deleteStep(this)" class="mt-2 w-full text-red-500 hover:bg-red-50 p-1 rounded text-xs font-bold transition">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="step-row group bg-red-50/30">
+                            <td class="py-4 text-center font-bold text-gray-300">02</td>
+                            <td class="py-4 px-4">
+                                <div class="font-medium text-sm mb-1 text-red-700">Nhập email hợp lệ và để trống password</div>
+                                <div class="text-xs text-gray-400 underline cursor-pointer">Data: invalid_login_set.csv</div>
+                            </td>
+                            <td class="py-4 px-4 text-sm text-gray-600 italic leading-relaxed text-red-700/70">Hệ thống báo lỗi "Password cannot be blank" màu đỏ.</td>
+                            <td class="py-4 px-4">
+                                <div class="flex gap-1 justify-center step-status" data-status="failed">
+                                    <button class="bg-red-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter">
+                                        <i class="fas fa-times-circle"></i> FAILED
+                                    </button>
+                                    <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <button onclick="deleteStep(this)" class="mt-2 w-full text-red-500 hover:bg-red-50 p-1 rounded text-xs font-bold transition">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button onclick="addNewStep()" class="mt-8 border-2 border-dashed border-[#52b788] w-full py-4 rounded-xl text-[#52b788] hover:border-[#40916c] hover:text-[#40916c] hover:bg-[#f0fdf4] transition font-medium italic text-sm">
+                    + Click để thêm bước thực hiện mới...
+                </button>
+            </div>
+
+            <div id="panel-auto" class="hidden flex-grow flex flex-col bg-white">
+                <!-- Top Toolbar -->
+                <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#f8f9fa] to-white border-b border-gray-200 shadow-sm">
+                    <div class="flex gap-2">
+                        <button onclick="loadExampleCode()" class="text-sm font-semibold text-[#52b788] hover:bg-[#e8f5e9] px-4 py-2 rounded-md transition flex items-center gap-2">
+                            <i class="fas fa-code mr-1"></i>Load Example
+                        </button>
+                        <button onclick="clearCode()" class="text-sm font-semibold text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-md transition flex items-center gap-2">
+                            <i class="fas fa-trash mr-1"></i>Clear
+                        </button>
+                    </div>
+                    <button onclick="reviewAutomationScript()" class="bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-5 py-2 rounded-md font-semibold hover:shadow-md transition flex items-center gap-2">
+                        <i class="fas fa-sparkles"></i> AI Review Code
+                    </button>
+                </div>
+
+                <!-- Main Content: Code Editor and Feedback -->
+                <div class="flex-grow flex gap-4 overflow-hidden p-6">
+                    <!-- Code Editor Section -->
+                    <div class="flex-1 flex flex-col bg-white rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+                        <div class="bg-gradient-to-r from-[#f8f9fa] to-white px-6 py-3 border-b border-gray-200 flex items-center gap-2">
+                            <i class="fas fa-file-code text-[#52b788]"></i>
+                            <span class="text-sm text-gray-700 font-semibold uppercase tracking-wide">Cypress Test Script</span>
+                        </div>
+                        <textarea id="automationScriptCode" class="code-editor flex-grow bg-[#1e1e1e] p-4 text-[#d4d4d4] text-sm outline-none resize-none font-mono" spellcheck="false" style="font-family: 'Fira Code', monospace;">describe('Verify login success with Admin', () => {
+  it('should login with valid credentials', () => {
+    cy.visit('https://staging.app.com/login')
+    cy.get('input[name="email"]').type('admin@example.com')
+    cy.get('input[name="password"]').type('password123')
+    cy.get('button[type="submit"]').click()
+    cy.url().should('include', '/dashboard')
+  })
+})</textarea>
+                    </div>
+
+                    <!-- Feedback Section -->
+                    <div class="flex-1 flex flex-col bg-white rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+                        <div class="bg-gradient-to-r from-[#f8f9fa] to-white px-6 py-3 border-b border-gray-200 flex items-center gap-2">
+                            <i class="fas fa-robot text-[#52b788]"></i>
+                            <span class="text-sm text-gray-700 font-semibold uppercase tracking-wide">AI Feedback</span>
+                        </div>
+                        <div id="automationFeedbackContainer" class="flex-grow overflow-y-auto p-6 space-y-4 custom-scrollbar" style="max-height: calc(100vh - 400px); min-height: 300px;">
+                            <div class="text-center py-12 text-gray-400">
+                                <i class="fas fa-magic text-3xl mb-3 text-[#52b788]"></i>
+                                <p class="text-sm font-medium">Viết script và click "AI Review Code" để nhận feedback</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scoreboard -->
+                <div id="automationScoreboard" style="display: none;" class="border-t border-gray-200 bg-gradient-to-r from-[#f8f9fa] to-white px-6 py-4 grid grid-cols-4 gap-6">
+                    <div class="text-center p-3 bg-white rounded-lg border border-gray-200">
+                        <div id="autoQualityScore" class="text-3xl font-bold text-[#52b788]">--</div>
+                        <div class="text-xs text-gray-600 font-medium mt-1">Chất lượng</div>
+                    </div>
+                    <div class="text-center p-3 bg-white rounded-lg border border-gray-200">
+                        <div id="autoIssuesScore" class="text-3xl font-bold text-red-500">--</div>
+                        <div class="text-xs text-gray-600 font-medium mt-1">Vấn đề</div>
+                    </div>
+                    <div class="text-center p-3 bg-white rounded-lg border border-gray-200">
+                        <div id="autoPointScore" class="text-3xl font-bold text-blue-500">--</div>
+                        <div class="text-xs text-gray-600 font-medium mt-1">Điểm số</div>
+                    </div>
+                    <div class="text-center flex items-center justify-center">
+                        <button onclick="toggleImprovedCodeView()" class="text-sm font-semibold text-white bg-gradient-to-r from-[#52b788] to-[#40916c] hover:from-[#40916c] hover:to-[#2d6a4f] px-4 py-2 rounded-md transition flex items-center gap-2 w-full justify-center">
+                            <i class="fas fa-code mr-1"></i>Code Cải Thiện
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Improved Code Modal -->
+            <div id="improvedCodeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-lg max-w-4xl w-full max-h-96 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-lg font-bold">✅ Code sau khi cải thiện</h3>
+                        <button onclick="toggleImprovedCodeView()" class="text-white hover:bg-white/20 p-1 rounded transition">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="flex-grow overflow-y-auto p-4">
+                        <pre id="improvedCodeDisplay" class="bg-[#1e1e1e] text-[#d4d4d4] p-4 rounded font-mono text-xs overflow-x-auto"></pre>
+                    </div>
+                    <div class="border-t px-4 py-3 flex gap-2">
+                        <button onclick="copyImprovedCode()" class="flex-1 bg-[#52b788] text-white py-2 rounded font-bold hover:bg-[#40916c] transition">
+                            <i class="fas fa-copy mr-2"></i>Copy Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload & Auto-Test Panel -->
+            <div id="panel-upload" class="hidden flex-grow flex flex-col bg-white p-6 overflow-y-auto">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-[#1b4332] mb-4">
+                        <i class="fas fa-upload text-[#52b788] mr-2"></i> Upload HTML UI & Auto-Generate Tests
+                    </h3>
+                    
+                    <!-- Upload Box -->
+                    <div class="border-2 border-dashed border-[#52b788] rounded-lg p-8 text-center cursor-pointer hover:bg-[#f0fdf4] transition" onclick="document.getElementById('htmlFileInput').click()">
+                        <i class="fas fa-cloud-upload-alt text-[#52b788] text-4xl mb-3 block"></i>
+                        <p class="text-[#1b4332] font-bold mb-1">Kéo thả file HTML hoặc nhấp để chọn</p>
+                        <p class="text-gray-500 text-sm">Hỗ trợ: .html, .htm files</p>
+                        <input type="file" id="htmlFileInput" class="hidden" accept=".html,.htm" onchange="handleFileUpload(event)">
+                    </div>
+                </div>
+
+                <!-- File Preview & Analysis -->
+                <div id="fileAnalysisSection" class="hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <p class="text-sm text-blue-700">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <strong id="uploadedFileName"></strong> - <span id="elementCount">0</span> elements detected
+                        </p>
+                    </div>
+
+                    <!-- Detected Elements -->
+                    <div class="mb-4">
+                        <h4 class="font-bold text-[#1b4332] mb-2">Detected Interactive Elements:</h4>
+                        <div id="detectedElements" class="bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto space-y-2 text-sm">
+                            <!-- Elements will be listed here -->
+                        </div>
+                    </div>
+
+                    <!-- Auto-Generated Tests -->
+                    <div class="mb-4">
+                        <h4 class="font-bold text-[#1b4332] mb-2">Auto-Generated Test Cases:</h4>
+                        <div id="autoTestCases" class="bg-gray-50 p-4 rounded-lg max-h-48 overflow-y-auto space-y-2 text-sm">
+                            <!-- Test cases will be listed here -->
+                        </div>
+                    </div>
+
+                    <!-- Run Tests Button -->
+                    <button onclick="runAutoTests()" class="w-full bg-[#52b788] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#40916c] mb-4 flex items-center justify-center gap-2">
+                        <i class="fas fa-play"></i> Run Auto Tests
+                    </button>
+                </div>
+
+                <!-- Test Results -->
+                <div id="testResultsSection" class="hidden">
+                    <h4 class="font-bold text-[#1b4332] mb-3">Test Results:</h4>
+                    <div id="testResults" class="space-y-2">
+                        <!-- Results will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="col-span-3 bg-white p-6 h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar">
+            <h3 class="text-sm font-bold mb-6 flex items-center gap-2 border-b pb-2 text-[#1b4332]">
+                <i class="fas fa-sliders-h text-[#52b788]"></i> Cấu hình Test Run
+            </h3>
+
+            <div class="space-y-6">
+                <!-- Test Case Metadata -->
+                <div class="bg-[#f0fdf4] p-4 rounded-lg border border-[#d1f5d1] space-y-3">
+                    <label class="text-[11px] font-bold text-[#1b4332] uppercase tracking-widest">Thông Tin Test Case</label>
+                    
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-600">Tên Test Case</label>
+                        <input type="text" id="testcaseTitle" class="w-full border border-[#d1f5d1] p-2 rounded text-sm mt-1" placeholder="Tên test case...">
+                    </div>
+                    
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-600">Module</label>
+                        <input type="text" id="testcaseModule" class="w-full border border-[#d1f5d1] p-2 rounded text-sm mt-1" placeholder="Module...">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-600">Type</label>
+                            <select id="testcaseType" class="w-full border border-[#d1f5d1] p-2 rounded text-sm mt-1">
+                                <option value="manual">Manual</option>
+                                <option value="automation">Automation</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-600">Priority</label>
+                            <select id="testcasePriority" class="w-full border border-[#d1f5d1] p-2 rounded text-sm mt-1">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-600">Tags (cách nhau bằng dấu phẩy)</label>
+                        <input type="text" id="testcaseTags" class="w-full border border-[#d1f5d1] p-2 rounded text-sm mt-1" placeholder="tag1, tag2, tag3">
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[11px] font-bold text-[#52b788] uppercase tracking-widest">Môi trường</label>
+                    <select class="w-full border border-[#d1f5d1] p-2 rounded-lg text-sm bg-[#f0fdf4] outline-[#52b788]">
+                        <option>Staging Environment</option>
+                        <option>Production (Read-only)</option>
+                        <option>Localhost</option>
+                    </select>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[11px] font-bold text-[#52b788] uppercase tracking-widest">Trình duyệt</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button class="flex flex-col items-center p-2 rounded-lg border border-[#d1f5d1] bg-[#f0fdf4] text-[#52b788]">
+                            <i class="fab fa-chrome text-lg mb-1"></i>
+                            <span class="text-[10px] font-bold">Chrome</span>
+                        </button>
+                        <button class="flex flex-col items-center p-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-gray-400">
+                            <i class="fab fa-firefox-browser text-lg mb-1"></i>
+                            <span class="text-[10px] font-bold">Firefox</span>
+                        </button>
+                        <button class="flex flex-col items-center p-2 rounded-lg border border-gray-100 hover:bg-gray-50 text-gray-400">
+                            <i class="fab fa-safari text-lg mb-1"></i>
+                            <span class="text-[10px] font-bold">Safari</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-4 border-t">
+                    <label class="text-[11px] font-bold text-[#52b788] uppercase tracking-widest">Phân loại (Tags)</label>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-[#d1f5d1] text-[#1b4332] text-[10px] px-2 py-1 rounded-full font-bold">#Regression</span>
+                        <span class="bg-orange-100 text-orange-600 text-[10px] px-2 py-1 rounded-full font-bold">#Critical_Path</span>
+                        <span class="bg-gray-100 text-[#52b788] text-[10px] px-2 py-1 rounded-full font-bold cursor-pointer hover:bg-[#f0fdf4]">+ Gắn Tag</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-4 border-t">
+                    <label class="text-[11px] font-bold text-[#52b788] uppercase tracking-widest">Lịch sử chạy gần đây</label>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs p-2 bg-[#f0fdf4] rounded border-l-2 border-[#52b788]">
+                            <span class="font-medium text-[#1b4332]">15 Jan - 09:20 AM</span>
+                            <span class="font-bold text-[#52b788]">PASSED</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs p-2 bg-red-50 rounded border-l-2 border-red-500">
+                            <span class="font-medium text-red-700">14 Jan - 02:45 PM</span>
+                            <span class="font-bold text-red-600">FAILED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // ========================
+        // BROWSER DETECTION & AUTO SAVE
+        // ========================
+        let stepCount = 2; // Start from 2 since there are already 2 demo steps
+        let lastSaveTime = null;
+
+        // Detect browser and highlight it
+        function detectBrowser() {
+            const ua = navigator.userAgent.toLowerCase();
+            let browserName = 'Unknown';
+            let browserIcon = 'chrome';
+
+            if (ua.indexOf('edg') > -1) {
+                browserName = 'Edge';
+                browserIcon = 'edge';
+            } else if (ua.indexOf('chrome') > -1 && ua.indexOf('edg') === -1) {
+                browserName = 'Chrome';
+                browserIcon = 'chrome';
+            } else if (ua.indexOf('firefox') > -1) {
+                browserName = 'Firefox';
+                browserIcon = 'firefox';
+            } else if (ua.indexOf('safari') > -1 && ua.indexOf('chrome') === -1) {
+                browserName = 'Safari';
+                browserIcon = 'safari';
+            } else if (ua.indexOf('trident') > -1) {
+                browserName = 'IE';
+                browserIcon = 'ie';
+            }
+
+            // Highlight the detected browser
+            const browserButtons = document.querySelectorAll('[class*="Trình duyệt"] button, .grid.grid-cols-3 button');
+            const allBrowserButtons = document.querySelectorAll('button:has(i[class*="fab fa-"]):has(span:contains("Chrome")), button:has(i[class*="fab fa-"]):has(span:contains("Firefox")), button:has(i[class*="fab fa-"]):has(span:contains("Safari"))');
+            
+            // Find and highlight the correct browser button
+            const buttons = Array.from(document.querySelectorAll('button')).filter(btn => {
+                const text = btn.textContent.toLowerCase();
+                return text.includes('chrome') || text.includes('firefox') || text.includes('safari');
+            });
+
+            // Reset all browser buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-[#f0fdf4]', 'text-[#52b788]', 'border-[#d1f5d1]');
+                btn.classList.add('border-gray-100', 'text-gray-400', 'hover:bg-gray-50');
+            });
+
+            // Highlight the detected browser
+            const detectedBtn = buttons.find(btn => btn.textContent.includes(browserName));
+            if (detectedBtn) {
+                detectedBtn.classList.remove('border-gray-100', 'text-gray-400', 'hover:bg-gray-50');
+                detectedBtn.classList.add('bg-[#f0fdf4]', 'text-[#52b788]', 'border-[#d1f5d1]');
+            }
+
+            console.log('🌐 Detected browser:', browserName);
+            return browserName;
+        }
+
+        // Update auto save time in header
+        function updateSaveTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+
+            lastSaveTime = timeString;
+
+            // Update the header
+            const autoSaveSpan = document.querySelector('nav span:contains("Tự động lưu")');
+            if (autoSaveSpan) {
+                autoSaveSpan.innerHTML = `<i class="far fa-clock mr-1"></i> Tự động lưu lúc ${timeString}`;
+            }
+
+            // Update in the right panel if exists
+            const saveTimeLabel = Array.from(document.querySelectorAll('label')).find(l => 
+                l.textContent.includes('thời gian lưu') || l.textContent.includes('Lần lưu cuối')
+            );
+            if (saveTimeLabel) {
+                saveTimeLabel.textContent = `🕐 Lần lưu cuối: ${timeString}`;
+            }
+        }
+
+        // Initialize browser detection and auto-update save time
+        document.addEventListener('DOMContentLoaded', () => {
+            detectBrowser();
+            updateSaveTime();
+            // Update save time every second
+            setInterval(updateSaveTime, 1000);
+        });
+
+        // Call on page load
+        window.addEventListener('load', () => {
+            detectBrowser();
+            updateSaveTime();
+        });
+
+        function addNewStep() {
+            stepCount++;
+            const tbody = document.querySelector('#panel-manual tbody');
+            const stepNum = String(stepCount).padStart(2, '0');
+
+            const newRow = document.createElement('tr');
+            newRow.className = 'step-row group hover:bg-gray-50';
+            newRow.innerHTML = `
+                <td class="py-4 text-center font-bold text-gray-300">${stepNum}</td>
+                <td class="py-4 px-4">
+                    <input type="text" placeholder="Nhập thao tác..." class="w-full border border-gray-300 p-2 rounded text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/20 font-medium mb-1" />
+                    <input type="text" placeholder="Ghi chú (tuỳ chọn)..." class="w-full border border-gray-300 p-2 rounded text-xs text-gray-500 focus:outline-none focus:border-[#52b788]/50" />
+                </td>
+                <td class="py-4 px-4">
+                    <textarea placeholder="Mô tả kết quả mong đợi..." class="w-full border border-gray-300 p-2 rounded text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/20 resize-none" rows="2"></textarea>
+                </td>
+                <td class="py-4 px-4">
+                    <div class="flex gap-1 justify-center step-status" data-status="pending">
+                        <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition" title="Pass"><i class="fas fa-check"></i></button>
+                        <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition" title="Fail"><i class="fas fa-times"></i></button>
+                    </div>
+                    <button onclick="deleteStep(this)" class="mt-2 w-full text-red-500 hover:bg-red-50 p-1 rounded text-xs font-bold transition">
+                        <i class="fas fa-trash"></i> Xóa
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(newRow);
+            console.log('✅ Thêm step mới thành công!');
+        }
+
+        function markPass(event) {
+            event.preventDefault();
+            const statusDiv = event.target.closest('.step-status');
+            const row = event.target.closest('tr');
+            
+            // Remove previous states
+            row.classList.remove('bg-red-50/30');
+            row.classList.add('bg-green-50/30');
+            
+            statusDiv.setAttribute('data-status', 'passed');
+            statusDiv.innerHTML = `
+                <div class="flex gap-1 justify-center w-full">
+                    <button class="bg-green-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter">
+                        <i class="fas fa-check-circle"></i> PASSED
+                    </button>
+                    <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function markFail(event) {
+            event.preventDefault();
+            const statusDiv = event.target.closest('.step-status');
+            const row = event.target.closest('tr');
+            
+            // Remove previous states
+            row.classList.remove('bg-green-50/30');
+            row.classList.add('bg-red-50/30');
+            
+            statusDiv.setAttribute('data-status', 'failed');
+            statusDiv.innerHTML = `
+                <div class="flex gap-1 justify-center w-full">
+                    <button class="bg-red-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter">
+                        <i class="fas fa-times-circle"></i> FAILED
+                    </button>
+                    <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function clearStatus(event) {
+            event.preventDefault();
+            const statusDiv = event.target.closest('.step-status');
+            const row = event.target.closest('tr');
+            
+            // Remove all background colors
+            row.classList.remove('bg-red-50/30', 'bg-green-50/30');
+            
+            statusDiv.setAttribute('data-status', 'pending');
+            statusDiv.innerHTML = `
+                <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition" title="Pass"><i class="fas fa-check"></i></button>
+                <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition" title="Fail"><i class="fas fa-times"></i></button>
+            `;
+        }
+
+        function deleteStep(btn) {
+            const row = btn.closest('tr');
+            row.style.opacity = '0.5';
+            setTimeout(() => {
+                row.remove();
+                reindexSteps();
+                console.log('✅ Xóa step thành công!');
+            }, 200);
+        }
+
+        function reindexSteps() {
+            const rows = document.querySelectorAll('#panel-manual tbody .step-row');
+            rows.forEach((row, index) => {
+                row.querySelector('td:first-child').textContent = String(index + 1).padStart(2, '0');
+            });
+            stepCount = rows.length;
+        }
+
+        async function saveTestCase() {
+            const testNameEl = document.querySelector('span.text-lg.font-bold');
+            const testName = testNameEl?.textContent?.trim() || 'Test Case';
+            const steps = [];
+            let passCount = 0;
+            let failCount = 0;
+
+            // Collect all steps from the manual panel
+            document.querySelectorAll('#panel-manual .step-row').forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const inputs = row.querySelectorAll('input, textarea');
+                const statusDiv = row.querySelector('.step-status');
+                const status = statusDiv?.getAttribute('data-status') || 'pending';
+
+                // Count pass/fail
+                if (status === 'passed') passCount++;
+                if (status === 'failed') failCount++;
+
+                // Get data from inputs if available (new steps), otherwise from text (demo steps)
+                let action = '';
+                let note = '';
+                let expected = '';
+
+                if (inputs.length >= 2) {
+                    // New step with inputs
+                    action = inputs[0]?.value?.trim() || '';
+                    note = inputs[1]?.value?.trim() || '';
+                    expected = inputs[2]?.value?.trim() || '';
+                } else {
+                    // Demo step - get from cell text
+                    const actionDiv = cells[1]?.querySelector('.font-medium');
+                    const expectedDiv = cells[2];
+                    action = actionDiv?.textContent?.trim() || cells[1]?.textContent?.trim() || '';
+                    expected = expectedDiv?.textContent?.trim() || '';
+                }
+
+                steps.push({
+                    step: index + 1,
+                    stepNum: cells[0]?.textContent?.trim() || String(index + 1).padStart(2, '0'),
+                    action: action,
+                    note: note,
+                    expected: expected,
+                    status: status
+                });
+            });
+
+            if (steps.length === 0) {
+                alert('⚠️ Vui lòng thêm ít nhất một bước test');
+                return;
+            }
+
+            const moduleField = document.getElementById('testcaseModule')?.value || 'General';
+            const typeField = document.getElementById('testcaseType')?.value || 'manual';
+            const priorityField = document.getElementById('testcasePriority')?.value || 'Medium';
+            const tagsField = document.getElementById('testcaseTags')?.value || 'Manual';
+            const featureField = currentFeature !== null ? allFeatures[currentFeature] : 'General';
+
+            const testCaseData = {
+                name: testName,
+                type: typeField,
+                module: moduleField || featureField,
+                priority: priorityField,
+                tags: tagsField,
+                feature: featureField,
+                precondition: 'Precondition',
+                postcondition: 'Postcondition',
+                steps: steps,
+                summary: {
+                    total: steps.length,
+                    passed: passCount,
+                    failed: failCount,
+                    pending: steps.length - passCount - failCount
+                }
+            };
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('❌ Vui lòng đăng nhập trước');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                console.log('Saving test case:', testCaseData);
+
+                const response = await fetch('http://localhost:3000/api/v2/testcases', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(testCaseData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`✅ Test case "${testName}" đã lưu thành công!\nID: ${result.testCaseId}`);
+                    console.log('Test case saved:', result);
+                    
+                    // Reload test cases and refresh explorer
+                    await loadTestCases();
+                    renderTestExplorer(allTestCases);
+                    
+                    // Clear form for new test case
+                    createNewTestCase();
+                    
+                    // Scroll to test explorer to see new test case
+                    document.getElementById('testExplorer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    const errorMsg = result.error || 'Không thể lưu test case';
+                    alert('❌ Lỗi: ' + errorMsg);
+                    console.error('Save error:', result);
+                }
+            } catch (error) {
+                alert('❌ Lỗi kết nối: ' + error.message);
+                console.error('Save error:', error);
+            }
+        }
+
+        // Add event listener to the Execute Run button
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeatures(); // Load features first
+            loadTestCases();
+            const executeBtn = document.getElementById('executeBtn');
+            const editSaveBtn = document.getElementById('editSaveBtn');
+            if (executeBtn) {
+                executeBtn.onclick = saveTestCase;
+            }
+            if (editSaveBtn) {
+                editSaveBtn.onclick = saveEditedTestCase;
+            }
+            const automationSaveBtn = document.getElementById('automationSaveBtn');
+            if (automationSaveBtn) {
+                automationSaveBtn.onclick = saveAutomationScript;
+            }
+            const uploadSaveBtn = document.getElementById('uploadSaveBtn');
+            if (uploadSaveBtn) {
+                uploadSaveBtn.onclick = saveUploadFile;
+            }
+        });
+
+        // Load test cases from backend
+        async function loadTestCases() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    document.getElementById('testExplorer').innerHTML = '<div class="text-xs text-red-500 p-2">Vui lòng đăng nhập</div>';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:3000/api/v2/testcases', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                allTestCases = result.testCases || [];
+                
+                console.log('📦 API Response:', result);
+                console.log('✅ Loaded test cases:', allTestCases.length);
+                console.log('ALL TEST CASES ARRAY:', allTestCases);
+                
+                if (allTestCases.length > 0) {
+                    console.log('First test case:', allTestCases[0]);
+                    console.log('First test case steps:', allTestCases[0].steps);
+                }
+
+                if (allTestCases.length === 0) {
+                    document.getElementById('testExplorer').innerHTML = '<div class="text-xs text-gray-400 p-2 italic">Chưa có test case nào</div>';
+                    return;
+                }
+
+                renderTestExplorer(allTestCases);
+                console.log('✅ Rendered test explorer');
+            } catch (error) {
+                console.error('Error loading test cases:', error);
+                document.getElementById('testExplorer').innerHTML = `<div class="text-xs text-red-500 p-2">Lỗi: ${error.message}</div>`;
+            }
+        }
+
+        // Render test explorer tree
+        function renderTestExplorer(testCases) {
+            const groupedByModule = {};
+
+            testCases.forEach(tc => {
+                const module = tc.metadata?.module || 'General';
+                if (!groupedByModule[module]) {
+                    groupedByModule[module] = [];
+                }
+                groupedByModule[module].push(tc);
+            });
+
+            let html = '';
+            for (const [module, cases] of Object.entries(groupedByModule)) {
+                html += `
+                    <details open class="group">
+                        <summary class="list-none flex items-center cursor-pointer p-2 hover:bg-green-100 rounded text-sm font-medium text-[#2d6a4f]">
+                            <i class="fas fa-chevron-right mr-2 group-open:rotate-90 transition text-[10px]"></i>
+                            <i class="fas fa-folder text-[#52b788] mr-2"></i> ${module}
+                        </summary>
+                        <div class="ml-6 mt-1 space-y-1">
+                `;
+
+                cases.forEach(tc => {
+                    const type = tc.metadata?.type === 'automation' ? '🤖' : '👆';
+                    const isSelected = selectedTestCaseId === tc.id ? 'bg-[#d1f5d1] text-[#1b4332] border-l-4 border-[#52b788]' : 'hover:bg-green-100 text-[#2d6a4f]';
+                    const displayTitle = tc.metadata?.name || tc.title;
+                    html += `
+                        <div class="flex items-center justify-between p-1 rounded ${isSelected}">
+                            <div onclick="selectTestCase(${tc.id})" class="flex-1 p-2 text-xs font-semibold cursor-pointer" title="${displayTitle}">
+                                ${type} TC-${String(tc.id).slice(-3)}: ${displayTitle.substring(0, 18)}${displayTitle.length > 18 ? '...' : ''}
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editTestCase(event, ${tc.id})" class="text-blue-500 hover:text-blue-700 p-1 text-xs rounded hover:bg-blue-100" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteTestCase(event, ${tc.id})" class="text-red-500 hover:text-red-700 p-1 text-xs rounded hover:bg-red-100" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </details>
+                `;
+            }
+
+            document.getElementById('testExplorer').innerHTML = html;
+        }
+
+        // Select test case to view
+        function selectTestCase(testCaseId) {
+            selectedTestCaseId = testCaseId;
+            const testCase = allTestCases.find(tc => tc.id === testCaseId);
+            
+            if (testCase) {
+                console.log('✅ Selected test case ID:', testCaseId);
+                console.log('Selected test case:', testCase);
+                console.log('Steps from API:', testCase.steps);
+                
+                const displayTitle = testCase.metadata?.name || testCase.title;
+                
+                // Update demo header with test case info
+                const demoHeader = document.getElementById('demoHeader');
+                if (demoHeader) {
+                    const tcId = String(testCase.id).padStart(3, '0');
+                    demoHeader.querySelector('span').textContent = `TC-${tcId}`;
+                    demoHeader.querySelector('h2').textContent = displayTitle;
+                    demoHeader.style.display = 'flex';
+                }
+                
+                // Load metadata to form fields (with null checks)
+                const titleEl = document.getElementById('testcaseTitle');
+                const moduleEl = document.getElementById('testcaseModule');
+                const typeEl = document.getElementById('testcaseType');
+                const priorityEl = document.getElementById('testcasePriority');
+                const tagsEl = document.getElementById('testcaseTags');
+                
+                if (titleEl) titleEl.value = displayTitle;
+                if (moduleEl) moduleEl.value = testCase.metadata?.module || 'General';
+                if (typeEl) typeEl.value = testCase.metadata?.type || 'manual';
+                if (priorityEl) priorityEl.value = testCase.metadata?.priority || 'Medium';
+                if (tagsEl) tagsEl.value = Array.isArray(testCase.metadata?.tags) ? testCase.metadata.tags.join(', ') : testCase.metadata?.tags || '';
+                
+                // Load automation code
+                const codeEditor = document.querySelector('.code-editor');
+                if (codeEditor) {
+                    codeEditor.value = testCase.automationCode || '// No automation script available';
+                }
+                
+                loadTestCaseSteps(testCase);
+                
+                // Auto-detect which tab to show based on what data exists
+                const hasManualSteps = testCase.steps && testCase.steps.length > 0;
+                const hasAutomationCode = testCase.automationCode && testCase.automationCode.trim() !== '';
+                const hasHtmlContent = testCase.htmlContent && testCase.htmlContent.trim() !== '';
+                
+                let tabToShow = 'manual'; // default
+                if (hasAutomationCode && !hasManualSteps) {
+                    tabToShow = 'auto';
+                } else if (hasHtmlContent && !hasManualSteps && !hasAutomationCode) {
+                    tabToShow = 'upload';
+                }
+                
+                // Switch to appropriate tab
+                if (tabToShow !== 'manual') {
+                    toggleMode(tabToShow);
+                }
+                
+                // Show appropriate save button based on current tab
+                const btnManual = document.getElementById('btn-manual');
+                const btnAuto = document.getElementById('btn-auto');
+                const btnUpload = document.getElementById('btn-upload');
+                const editSaveBtn = document.getElementById('editSaveBtn');
+                const automationSaveBtn = document.getElementById('automationSaveBtn');
+                const uploadSaveBtn = document.getElementById('uploadSaveBtn');
+                
+                if (btnManual.classList.contains('active-tab')) {
+                    editSaveBtn.style.display = 'flex';
+                } else if (btnAuto.classList.contains('active-tab')) {
+                    automationSaveBtn.style.display = 'flex';
+                } else if (btnUpload.classList.contains('active-tab')) {
+                    uploadSaveBtn.style.display = 'flex';
+                }
+            } else {
+                console.error('❌ Test case not found:', testCaseId);
+                alert('❌ Không tìm thấy test case ID: ' + testCaseId);
+            }
+
+            renderTestExplorer(allTestCases);
+        }
+
+        // Load test case steps into the form
+        function loadTestCaseSteps(testCase) {
+            console.log('Loading steps for:', testCase);
+            console.log('Steps array:', testCase.steps);
+            console.log('Steps length:', testCase.steps?.length);
+            
+            const tbody = document.querySelector('#panel-manual tbody');
+            tbody.innerHTML = '';
+            stepCount = 0;
+
+            if (testCase.steps && testCase.steps.length > 0) {
+                testCase.steps.forEach((step, index) => {
+                    stepCount = index + 1;
+                    const stepNum = String(stepCount).padStart(2, '0');
+                    const status = step.status || 'pending';
+
+                    const newRow = document.createElement('tr');
+                    newRow.className = `step-row group ${status === 'passed' ? 'bg-green-50/30' : status === 'failed' ? 'bg-red-50/30' : ''}`;
+                    
+                    let statusHtml = '';
+                    if (status === 'passed') {
+                        statusHtml = `<div class="flex gap-1 justify-center step-status" data-status="passed"><button class="bg-green-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter"><i class="fas fa-check-circle"></i> PASSED</button><button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs"><i class="fas fa-times"></i></button></div>`;
+                    } else if (status === 'failed') {
+                        statusHtml = `<div class="flex gap-1 justify-center step-status" data-status="failed"><button class="bg-red-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter"><i class="fas fa-times-circle"></i> FAILED</button><button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs"><i class="fas fa-times"></i></button></div>`;
+                    } else {
+                        statusHtml = `<div class="flex gap-1 justify-center step-status" data-status="pending"><button onclick="markPass(event)" class="w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition"><i class="fas fa-check"></i></button><button onclick="markFail(event)" class="w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button></div>`;
+                    }
+
+                    newRow.innerHTML = `
+                        <td class="py-4 text-center font-bold text-gray-300">${stepNum}</td>
+                        <td class="py-4 px-4"><div class="font-medium text-sm mb-1">${step.action || ''}</div><div class="text-xs text-gray-400">${step.note || ''}</div></td>
+                        <td class="py-4 px-4 text-sm text-gray-600 italic leading-relaxed">${step.expected || ''}</td>
+                        <td class="py-4 px-4">${statusHtml}<button onclick="deleteStep(this)" class="mt-2 w-full text-red-500 hover:bg-red-50 p-1 rounded text-xs font-bold transition"><i class="fas fa-trash"></i> Xóa</button></td>
+                    `;
+
+                    tbody.appendChild(newRow);
+                });
+                console.log('✅ Loaded', testCase.steps.length, 'steps');
+            } else {
+                console.log('⚠️ No steps found for test case');
+                console.log('testCase.steps value:', testCase.steps);
+                console.log('testCase object keys:', Object.keys(testCase));
+            }
+        }
+
+        // Create new test case
+        function createNewTestCase() {
+            selectedTestCaseId = null;
+            currentFeature = null;
+            renderFeaturesList();
+            document.querySelector('span.text-lg.font-bold').textContent = 'Test Case Mới';
+            const tbody = document.querySelector('#panel-manual tbody');
+            tbody.innerHTML = '';
+            stepCount = 0;
+            addNewStep();
+            document.getElementById('editSaveBtn').style.display = 'none';
+            alert('✅ Tạo test case mới! Hãy nhập chi tiết và ấn "Chạy Test" để lưu.');
+        }
+
+        let allTestCases = [];
+        let selectedTestCaseId = null;
+        let currentFeature = null; // Track currently selected feature
+        let allFeatures = []; // Store all features
+
+        // Load features from localStorage on page load
+        function loadFeatures() {
+            const saved = localStorage.getItem('features');
+            allFeatures = saved ? JSON.parse(saved) : [];
+            renderFeatures();
+        }
+
+        function renderFeatures() {
+            const container = document.getElementById('featuresList');
+            if (allFeatures.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = allFeatures.map((feature, idx) => `
+                <div class="flex items-center justify-between p-2 rounded text-xs font-semibold bg-white border border-[#d1f5d1] text-[#2d6a4f] hover:bg-[#f0fdf4] transition group">
+                    <div onclick="selectFeature(${idx})" class="flex-1 cursor-pointer flex items-center gap-1">
+                        <i class="fas fa-folder text-[#52b788]"></i> ${feature}
+                    </div>
+                    <button onclick="deleteFeature(event, ${idx})" class="text-red-500 hover:text-red-700 p-1 opacity-0 group-hover:opacity-100 transition" title="Xóa chức năng">
+                        <i class="fas fa-trash text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleAddFeatureInput() {
+            const container = document.getElementById('addFeatureInputContainer');
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                setTimeout(() => document.getElementById('featureInputInline').focus(), 100);
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function addFeatureInline() {
+            const featureName = document.getElementById('featureInputInline').value.trim();
+            
+            if (!featureName) {
+                alert('Vui lòng nhập tên chức năng');
+                return;
+            }
+
+            if (allFeatures.includes(featureName)) {
+                alert('Chức năng này đã tồn tại!');
+                return;
+            }
+
+            allFeatures.push(featureName);
+            localStorage.setItem('features', JSON.stringify(allFeatures));
+            renderFeatures();
+            
+            // Auto-select the new feature and scroll to it
+            setTimeout(() => {
+                selectFeature(allFeatures.length - 1);
+            }, 100);
+
+            toggleAddFeatureInput();
+        }
+
+        function selectFeature(idx) {
+            currentFeature = idx;
+            const featureName = allFeatures[idx];
+            
+            // Show new test case creation panel
+            document.getElementById('selectedFeatureName').textContent = featureName;
+            document.getElementById('newTestCaseName').value = '';
+            document.getElementById('newTestCasePanel').style.display = 'block';
+            document.getElementById('demoHeader').style.display = 'none';
+            document.getElementById('newTestCaseName').focus();
+            
+            // Clear manual steps table for new test case
+            document.querySelector('#panel-manual tbody').innerHTML = '';
+            
+            // Add one empty step to start
+            addNewStep();
+            
+            // Auto-suggest test cases for this feature
+            document.getElementById('featureName').value = featureName;
+            suggestTestCases();
+            
+            // Scroll to test cases section
+            setTimeout(() => {
+                const sidebar = document.querySelector('aside');
+                const testCasesHeader = Array.from(document.querySelectorAll('aside h2')).find(h => h.textContent.includes('TEST CASES'));
+                if (testCasesHeader && sidebar) {
+                    const offsetTop = testCasesHeader.offsetTop - sidebar.offsetTop - 50;
+                    sidebar.scrollTop = offsetTop;
+                }
+            }, 100);
+        }
+
+        function hideNewTestCasePanel() {
+            document.getElementById('newTestCasePanel').style.display = 'none';
+            document.getElementById('demoHeader').style.display = 'block';
+            currentFeature = null;
+        }
+
+        async function createTestCaseFromFeature() {
+            const testCaseName = document.getElementById('newTestCaseName').value.trim();
+            
+            if (!testCaseName) {
+                alert('Vui lòng nhập tên test case');
+                return;
+            }
+
+            if (currentFeature === null) {
+                alert('Vui lòng chọn chức năng trước');
+                return;
+            }
+
+            const featureName = allFeatures[currentFeature];
+            
+            // Collect all steps from the table
+            const steps = [];
+            let passCount = 0;
+            let failCount = 0;
+            
+            const stepRows = document.querySelectorAll('#panel-manual .step-row');
+            console.log('Found step rows:', stepRows.length);
+
+            stepRows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const inputs = row.querySelectorAll('input, textarea');
+                const statusDiv = row.querySelector('.step-status');
+                const status = statusDiv?.getAttribute('data-status') || 'pending';
+
+                console.log(`Row ${index}: inputs=${inputs.length}, cells=${cells.length}`);
+
+                // Count pass/fail
+                if (status === 'passed') passCount++;
+                if (status === 'failed') failCount++;
+
+                // Get data from inputs - ALWAYS from inputs for new steps
+                let action = '';
+                let note = '';
+                let expected = '';
+
+                // New step rows have inputs
+                if (inputs.length >= 2) {
+                    action = inputs[0]?.value?.trim() || '';
+                    note = inputs[1]?.value?.trim() || '';
+                    expected = inputs[2]?.value?.trim() || '';
+                    console.log(`Step ${index+1} (from inputs): action="${action}", note="${note}", expected="${expected}"`);
+                } else {
+                    // Demo step rows (no inputs) - get text from cells
+                    const actionDiv = cells[1]?.querySelector('.font-medium');
+                    const expectedDiv = cells[2];
+                    action = actionDiv?.textContent?.trim() || cells[1]?.textContent?.trim() || '';
+                    expected = expectedDiv?.textContent?.trim() || '';
+                    console.log(`Step ${index+1} (from text): action="${action}", expected="${expected}"`);
+                }
+
+                steps.push({
+                    step: index + 1,
+                    stepNum: cells[0]?.textContent?.trim() || String(index + 1).padStart(2, '0'),
+                    action: action,
+                    note: note,
+                    expected: expected,
+                    status: status
+                });
+            });
+
+            if (steps.length === 0) {
+                alert('⚠️ Vui lòng thêm ít nhất một bước test');
+                return;
+            }
+            
+            console.log('All steps collected:', steps);
+
+
+            const testCaseData = {
+                name: testCaseName,
+                type: 'manual',
+                module: featureName,
+                priority: 'Medium',
+                tags: featureName,
+                feature: featureName,
+                precondition: 'Precondition',
+                postcondition: 'Postcondition',
+                steps: steps,
+                summary: {
+                    total: steps.length,
+                    passed: passCount,
+                    failed: failCount,
+                    pending: steps.length - passCount - failCount
+                }
+            };
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('❌ Vui lòng đăng nhập trước');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                console.log('Saving test case from feature:', testCaseData);
+
+                const response = await fetch('http://localhost:3000/api/v2/testcases', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(testCaseData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`✅ Test case "${testCaseName}" đã lưu thành công!`);
+                    console.log('Test case created:', result);
+                    
+                    // Reload test cases and refresh explorer
+                    await loadTestCases();
+                    renderTestExplorer(allTestCases);
+                    
+                    // Hide panel and reset
+                    hideNewTestCasePanel();
+                    
+                    // Scroll to test explorer to see new test case
+                    setTimeout(() => {
+                        document.getElementById('testExplorer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                } else {
+                    const errorMsg = result.error || 'Không thể tạo test case';
+                    alert('❌ Lỗi: ' + errorMsg);
+                    console.error('Create error:', result);
+                }
+            } catch (error) {
+                alert('❌ Lỗi kết nối: ' + error.message);
+                console.error('Create error:', error);
+            }
+        }
+
+        function deleteFeature(event, idx) {
+            event.stopPropagation();
+            if (confirm('Xóa chức năng "' + allFeatures[idx] + '"?')) {
+                allFeatures.splice(idx, 1);
+                localStorage.setItem('features', JSON.stringify(allFeatures));
+                if (currentFeature === idx) currentFeature = null;
+                renderFeatures();
+            }
+        }
+
+        // Delete test case
+        async function deleteTestCase(event, testCaseId) {
+            event.stopPropagation();
+            
+            const testCase = allTestCases.find(tc => tc.id === testCaseId);
+            if (!testCase) return;
+            
+            if (!confirm(`Xóa test case "${testCase.title}"?\n\nHành động này không thể hoàn tác!`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('❌ Vui lòng đăng nhập');
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:3000/api/v2/testcases/${testCaseId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert(`✅ Xóa test case thành công!`);
+                    
+                    // Remove from array and reload
+                    allTestCases = allTestCases.filter(tc => tc.id !== testCaseId);
+                    if (selectedTestCaseId === testCaseId) {
+                        selectedTestCaseId = null;
+                        document.querySelector('#panel-manual tbody').innerHTML = '';
+                    }
+                    renderTestExplorer(allTestCases);
+                } else {
+                    const result = await response.json();
+                    alert('❌ Lỗi: ' + (result.error || 'Không thể xóa'));
+                }
+            } catch (error) {
+                alert('❌ Lỗi kết nối: ' + error.message);
+                console.error('Delete error:', error);
+            }
+        }
+
+        // Edit test case
+        function editTestCase(event, testCaseId) {
+            event.stopPropagation();
+            
+            const testCase = allTestCases.find(tc => tc.id === testCaseId);
+            if (!testCase) return;
+
+            // Populate the form with current test case data
+            selectedTestCaseId = testCaseId;
+            document.getElementById('testcaseTitle').value = testCase.title;
+            document.getElementById('testcaseModule').value = testCase.metadata?.module || 'General';
+            document.getElementById('testcaseType').value = testCase.metadata?.type || 'manual';
+            document.getElementById('testcasePriority').value = testCase.metadata?.priority || 'Medium';
+            document.getElementById('testcaseTags').value = Array.isArray(testCase.metadata?.tags) ? testCase.metadata.tags.join(', ') : '';
+            
+            // Show steps
+            loadTestCaseSteps(testCase);
+            
+            // Focus on title for editing
+            setTimeout(() => {
+                document.getElementById('testcaseTitle').focus();
+                document.getElementById('testcaseTitle').select();
+            }, 100);
+        }
+
+        // Save edited test case
+        async function saveEditedTestCase() {
+            const testCaseId = selectedTestCaseId;
+            if (!testCaseId) {
+                alert('❌ Chưa chọn test case để sửa');
+                return;
+            }
+
+            const testCaseName = document.getElementById('testcaseTitle').value.trim();
+            const module = document.getElementById('testcaseModule').value.trim();
+            const type = document.getElementById('testcaseType').value;
+            const priority = document.getElementById('testcasePriority').value;
+            const tags = document.getElementById('testcaseTags').value;
+
+            if (!testCaseName) {
+                alert('Vui lòng nhập tên test case');
+                return;
+            }
+
+            // Collect steps from table
+            const steps = [];
+            const stepRows = document.querySelectorAll('#panel-manual .step-row');
+            
+            stepRows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const statusDiv = row.querySelector('.step-status');
+                const status = statusDiv?.getAttribute('data-status') || 'pending';
+
+                // Get data from cells (display mode after loading)
+                const actionDiv = cells[1]?.querySelector('.font-medium');
+                const noteDiv = cells[1]?.querySelector('.text-gray-400');
+                const expectedDiv = cells[2];
+                
+                const action = actionDiv?.textContent?.trim() || '';
+                const note = noteDiv?.textContent?.trim() || '';
+                const expected = expectedDiv?.textContent?.trim() || '';
+
+                if (action || expected) {
+                    steps.push({
+                        stepNum: cells[0]?.textContent?.trim() || String(index + 1).padStart(2, '0'),
+                        action: action,
+                        note: note,
+                        expected: expected,
+                        status: status
+                    });
+                }
+            });
+
+            if (steps.length === 0) {
+                alert('Vui lòng thêm ít nhất một bước test');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('❌ Vui lòng đăng nhập');
+                    return;
+                }
+
+                const testCaseData = {
+                    name: testCaseName,
+                    module: module,
+                    type: type,
+                    priority: priority,
+                    tags: tags.split(',').map(t => t.trim()).filter(t => t),
+                    steps: steps
+                };
+
+                const response = await fetch(`http://localhost:3000/api/v2/testcases/${testCaseId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(testCaseData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`✅ Cập nhật test case thành công!`);
+                    console.log('Test case updated:', result);
+                    
+                    // Reload test cases
+                    await loadTestCases();
+                    renderTestExplorer(allTestCases);
+                    
+                    // Reselect the test case
+                    selectTestCase(testCaseId);
+                } else {
+                    const errorMsg = result.error || 'Không thể cập nhật test case';
+                    alert('❌ Lỗi: ' + errorMsg);
+                    console.error('Update error:', result);
+                }
+            } catch (error) {
+                alert('❌ Lỗi kết nối: ' + error.message);
+                console.error('Update error:', error);
+            }
+        }
+
+        // Save Automation Script
+        async function saveAutomationScript() {
+            const testCaseId = selectedTestCaseId;
+            if (!testCaseId) {
+                alert('❌ Chưa chọn test case để sửa');
+                return;
+            }
+
+            const automationCode = document.getElementById('automationScriptCode')?.value || '';
+            
+            if (!automationCode.trim()) {
+                alert('Vui lòng nhập automation script');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('❌ Vui lòng đăng nhập');
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:3000/api/v2/testcases/${testCaseId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        automationCode: automationCode,
+                        type: 'automation'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`✅ Lưu automation script thành công!`);
+                    console.log('Automation script saved:', result);
+                    
+                    // Reload test cases
+                    await loadTestCases();
+                    renderTestExplorer(allTestCases);
+                } else {
+                    const errorMsg = result.error || 'Không thể lưu script';
+                    alert('❌ Lỗi: ' + errorMsg);
+                    console.error('Save error:', result);
+                }
+            } catch (error) {
+                alert('❌ Lỗi kết nối: ' + error.message);
+                console.error('Save error:', error);
+            }
+        }
+
+        // Save Upload File
+        async function saveUploadFile() {
+            const testCaseId = selectedTestCaseId;
+            if (!testCaseId) {
+                alert('❌ Chưa chọn test case để sửa');
+                return;
+            }
+
+            if (!uploadedHtmlContent) {
+                alert('Vui lòng upload file HTML trước');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('❌ Vui lòng đăng nhập');
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:3000/api/v2/testcases/${testCaseId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        htmlContent: uploadedHtmlContent,
+                        analyzedElements: analyzedElements,
+                        type: 'upload'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`✅ Lưu HTML file thành công!`);
+                    console.log('Upload file saved:', result);
+                    
+                    // Reload test cases
+                    await loadTestCases();
+                    renderTestExplorer(allTestCases);
+                } else {
+                    const errorMsg = result.error || 'Không thể lưu file';
+                    alert('❌ Lỗi: ' + errorMsg);
+                    console.error('Save error:', result);
+                }
+            } catch (error) {
+                alert('❌ Lỗi kết nối: ' + error.message);
+                console.error('Save error:', error);
+            }
+        }
+
+        const featureSuggestions = {
+            'đăng nhập|login': [
+                { name: 'Login với email hợp lệ', module: 'Authentication' },
+                { name: 'Login với password sai', module: 'Authentication' },
+                { name: 'Login với email không tồn tại', module: 'Authentication' },
+                { name: 'Login khi chưa nhập email', module: 'Authentication' }
+            ],
+            'đăng ký|register': [
+                { name: 'Register với thông tin hợp lệ', module: 'Authentication' },
+                { name: 'Register với email đã tồn tại', module: 'Authentication' },
+                { name: 'Register với password không khớp', module: 'Authentication' }
+            ],
+            'thanh toán|payment|checkout': [
+                { name: 'Checkout thành công', module: 'Payment' },
+                { name: 'Checkout với thẻ hết hạn', module: 'Payment' },
+                { name: 'Checkout với địa chỉ không hợp lệ', module: 'Payment' }
+            ],
+            'tìm kiếm|search': [
+                { name: 'Search thành công', module: 'Search' },
+                { name: 'Search không có kết quả', module: 'Search' },
+                { name: 'Search với ký tự đặc biệt', module: 'Search' }
+            ],
+            'quên mật khẩu|forgot password': [
+                { name: 'Reset password với email hợp lệ', module: 'Authentication' },
+                { name: 'Reset password với email không tồn tại', module: 'Authentication' }
+            ],
+            'giỏ hàng|cart': [
+                { name: 'Thêm sản phẩm vào giỏ', module: 'Cart' },
+                { name: 'Xóa sản phẩm khỏi giỏ', module: 'Cart' },
+                { name: 'Cập nhật số lượng sản phẩm', module: 'Cart' }
+            ]
+        };
+
+        function suggestTestCases() {
+            const featureName = document.getElementById('featureName').value.trim().toLowerCase();
+            
+            if (!featureName) {
+                alert('Vui lòng nhập tên chức năng');
+                return;
+            }
+
+            let suggestions = [];
+            
+            // Search through feature suggestions
+            for (const [keywords, testcases] of Object.entries(featureSuggestions)) {
+                const keywordArray = keywords.split('|');
+                if (keywordArray.some(keyword => featureName.includes(keyword))) {
+                    suggestions = testcases;
+                    break;
+                }
+            }
+
+            // If no match found, generate generic suggestions
+            if (suggestions.length === 0) {
+                const capitalizedFeature = document.getElementById('featureName').value.trim();
+                suggestions = [
+                    { name: `${capitalizedFeature} - Test thành công`, module: capitalizedFeature },
+                    { name: `${capitalizedFeature} - Test thất bại`, module: capitalizedFeature },
+                    { name: `${capitalizedFeature} - Test với dữ liệu không hợp lệ`, module: capitalizedFeature },
+                    { name: `${capitalizedFeature} - Test timeout`, module: capitalizedFeature }
+                ];
+            }
+
+            // Create and display suggestions modal
+            showSuggestionModal(suggestions, featureName);
+        }
+
+        function showSuggestionModal(suggestions, featureName) {
+            // Remove existing modal if any
+            const existingModal = document.getElementById('suggestionModal');
+            if (existingModal) existingModal.remove();
+
+            const modalHTML = `
+                <div id="suggestionModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                        <h2 style="color: #1b4332; margin-bottom: 20px; font-size: 1.3rem;">Gợi ý Test Cases cho "${featureName}"</h2>
+                        <div style="border-top: 2px solid #e8f5e9; padding-top: 15px;">
+                            ${suggestions.map((tc, idx) => `
+                                <div style="padding: 12px; margin: 8px 0; background: #f0fdf4; border-left: 4px solid #52b788; cursor: pointer; border-radius: 4px; transition: all 0.3s;" 
+                                    onmouseover="this.style.background='#e8f5e9'; this.style.transform='translateX(5px)'"
+                                    onmouseout="this.style.background='#f0fdf4'; this.style.transform='translateX(0)'"
+                                    onclick="createFromSuggestion('${tc.name.replace(/'/g, "\\'")}', '${tc.module.replace(/'/g, "\\'")}')">
+                                    <div style="font-weight: 600; color: #1b4332;">${tc.name}</div>
+                                    <div style="font-size: 0.85rem; color: #52b788; margin-top: 5px;">Module: ${tc.module}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="document.getElementById('suggestionModal').remove()" style="width: 100%; margin-top: 20px; padding: 10px; background: #e8e8e8; border: none; border-radius: 6px; cursor: pointer; color: #333; font-weight: 600;">Đóng</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function createFromSuggestion(testcaseName, moduleName) {
+            // Clear form
+            selectedTestCaseId = null;
+            document.querySelector('span.text-lg.font-bold').textContent = testcaseName;
+            const tbody = document.querySelector('#panel-manual tbody');
+            tbody.innerHTML = '';
+            stepCount = 0;
+
+            // Fill in suggestion data - use feature name as module
+            const featureName = currentFeature !== null ? allFeatures[currentFeature] : moduleName;
+            document.getElementById('testcaseTitle').value = testcaseName;
+            document.getElementById('testcaseModule').value = featureName;
+            document.getElementById('featureName').value = '';
+            
+            // Add first step as example
+            addNewStep();
+            
+            // Close modal
+            const modal = document.getElementById('suggestionModal');
+            if (modal) modal.remove();
+            
+            // Focus on first step and provide hint
+            setTimeout(() => {
+                const firstAction = document.querySelector('input[placeholder="Action/Step"]');
+                if (firstAction) {
+                    firstAction.focus();
+                    firstAction.placeholder = "VD: Mở trang " + featureName + "...";
+                }
+            }, 100);
+        }
+
+        // ========================
+        // AUTO-TEST FROM HTML
+        // ========================
+        let uploadedHtmlContent = '';
+        let analyzedElements = [];
+
+        function toggleMode(mode) {
+            const btnManual = document.getElementById('btn-manual');
+            const btnAuto = document.getElementById('btn-auto');
+            const btnUpload = document.getElementById('btn-upload');
+            const panelManual = document.getElementById('panel-manual');
+            const panelAuto = document.getElementById('panel-auto');
+            const panelUpload = document.getElementById('panel-upload');
+            const editSaveBtn = document.getElementById('editSaveBtn');
+            const automationSaveBtn = document.getElementById('automationSaveBtn');
+            const uploadSaveBtn = document.getElementById('uploadSaveBtn');
+
+            // Remove all active states
+            [btnManual, btnAuto, btnUpload].forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-gray-400');
+            });
+            [panelManual, panelAuto, panelUpload].forEach(panel => {
+                panel.classList.add('hidden');
+                panel.style.display = 'none';
+            });
+
+            // Hide all save buttons
+            editSaveBtn.style.display = 'none';
+            automationSaveBtn.style.display = 'none';
+            uploadSaveBtn.style.display = 'none';
+
+            // Set active mode
+            if (mode === 'manual') {
+                btnManual.classList.add('active-tab');
+                btnManual.classList.remove('text-gray-400');
+                panelManual.classList.remove('hidden');
+                panelManual.style.display = 'flex';
+                if (selectedTestCaseId) editSaveBtn.style.display = 'flex';
+            } else if (mode === 'auto') {
+                btnAuto.classList.add('active-tab');
+                btnAuto.classList.remove('text-gray-400');
+                panelAuto.classList.remove('hidden');
+                panelAuto.style.display = 'flex';
+                if (selectedTestCaseId) automationSaveBtn.style.display = 'flex';
+            } else if (mode === 'upload') {
+                btnUpload.classList.add('active-tab');
+                btnUpload.classList.remove('text-gray-400');
+                panelUpload.classList.remove('hidden');
+                panelUpload.style.display = 'flex';
+                if (selectedTestCaseId) uploadSaveBtn.style.display = 'flex';
+            }
+            
+            console.log('🔄 Tab switched to:', mode);
+        }
+
+        // ========================
+        // AUTOMATION SCRIPT REVIEW
+        // ========================
+        const API_URL = 'http://localhost:3000';
+
+        function loadExampleCode() {
+            const exampleCode = `describe('Verify login success with Admin', () => {
+  it('should login with valid credentials', () => {
+    cy.visit('https://staging.app.com/login')
+    cy.get('input[name="email"]', { timeout: 5000 }).type('admin@test.com', { delay: 100 })
+    cy.get('input[name="password"]').type('Password123', { delay: 100 })
+    cy.get('button[type="submit"]').click()
+    cy.url().should('include', '/dashboard')
+    cy.get('[data-testid="user-profile"]').should('be.visible')
+  })
+  
+  it('should show error for invalid password', () => {
+    cy.visit('https://staging.app.com/login')
+    cy.fillLoginForm('test@example.com', 'wrongpass')
+    cy.contains('Invalid credentials').should('be.visible')
+  })
+})`;
+            document.getElementById('automationScriptCode').value = exampleCode;
+        }
+
+        function clearCode() {
+            if (confirm('Xóa tất cả code?')) {
+                document.getElementById('automationScriptCode').value = '';
+            }
+        }
+
+        async function reviewAutomationScript() {
+            const code = document.getElementById('automationScriptCode').value.trim();
+            
+            if (!code) {
+                showAutoError('Vui lòng nhập test script');
+                return;
+            }
+
+            const reviewBtn = event.target.closest('button');
+            const originalText = reviewBtn.innerHTML;
+            reviewBtn.innerHTML = '<i class="fas fa-spinner spinner"></i> Đang review...';
+            reviewBtn.disabled = true;
+
+            try {
+                console.log('📤 Sending request to:', `${API_URL}/api/review-test-script`);
+                const response = await fetch(`${API_URL}/api/review-test-script`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                console.log('📥 Response status:', response.status);
+                const data = await response.json();
+                console.log('📊 Response data:', data);
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `Server error: ${response.status}`);
+                }
+
+                displayAutomationFeedback(data);
+            } catch (error) {
+                console.error('❌ Error:', error);
+                showAutoError('❌ Lỗi: ' + error.message);
+            } finally {
+                reviewBtn.innerHTML = originalText;
+                reviewBtn.disabled = false;
+            }
+        }
+
+        function displayAutomationFeedback(data) {
+            const container = document.getElementById('automationFeedbackContainer');
+            container.innerHTML = '';
+
+            // Show scoreboard
+            document.getElementById('automationScoreboard').style.display = 'grid';
+            document.getElementById('autoQualityScore').textContent = data.quality || '--';
+            document.getElementById('autoIssuesScore').textContent = (data.issues?.length || 0);
+            document.getElementById('autoPointScore').textContent = (data.score || 0).toFixed(1) + '/10';
+
+            // Add status indicator if fallback or mock
+            if (data.status === 'fallback' || data.status === 'mock') {
+                const statusDiv = document.createElement('div');
+                const isMock = data.status === 'mock';
+                const bgColor = isMock ? 'bg-purple-50 border-purple-500' : 'bg-orange-50 border-orange-500';
+                const textColor = isMock ? 'text-purple-900' : 'text-orange-800';
+                const icon = isMock ? 'robot' : 'clock';
+                const message = isMock 
+                  ? '✨ Sử dụng phân tích tự động (không cần AI). Kết quả vẫn hữu ích!'
+                  : 'AI đang bị quá tải. Sử dụng phân tích cơ bản. Vui lòng thử lại sau vài phút.';
+                
+                statusDiv.className = `${bgColor} border-l-4 p-3 rounded text-sm mb-2`;
+                statusDiv.innerHTML = `
+                    <h3 class="font-bold ${textColor} mb-1"><i class="fas fa-${icon} mr-2"></i>Trạng thái</h3>
+                    <p class="${textColor}">${message}</p>
+                `;
+                container.appendChild(statusDiv);
+            }
+
+            // Add general feedback
+            if (data.summary) {
+                const summaryDiv = document.createElement('div');
+                summaryDiv.className = 'bg-blue-50 border-l-4 border-blue-500 p-3 rounded text-sm';
+                summaryDiv.innerHTML = `
+                    <h3 class="font-bold text-blue-900 mb-1"><i class="fas fa-lightbulb mr-2"></i>Tóm tắt</h3>
+                    <p class="text-blue-800">${data.summary}</p>
+                `;
+                container.appendChild(summaryDiv);
+            }
+
+            // Add issues
+            if (data.issues && data.issues.length > 0) {
+                data.issues.forEach((issue) => {
+                    const issueDiv = document.createElement('div');
+                    let bgColor = 'bg-red-50 border-red-500';
+                    let textColor = 'text-red-900';
+                    if (issue.type === 'warning') {
+                        bgColor = 'bg-yellow-50 border-yellow-500';
+                        textColor = 'text-yellow-900';
+                    } else if (issue.type === 'info') {
+                        bgColor = 'bg-blue-50 border-blue-500';
+                        textColor = 'text-blue-900';
+                    } else if (issue.type === 'error') {
+                        bgColor = 'bg-red-50 border-red-500';
+                        textColor = 'text-red-900';
+                    }
+                    
+                    issueDiv.className = `${bgColor} border-l-4 p-3 rounded text-sm`;
+                    issueDiv.innerHTML = `
+                        <h4 class="font-bold ${textColor} mb-1">
+                            <i class="fas fa-${issue.type === 'error' ? 'times-circle' : issue.type === 'warning' ? 'exclamation-triangle' : 'info-circle'} mr-2"></i>
+                            ${issue.title || 'Issue'}
+                        </h4>
+                        <p class="${textColor}">${issue.description || ''}</p>
+                        ${issue.suggestion ? `<p class="text-blue-600 font-semibold mt-1"><i class="fas fa-arrow-right mr-1"></i>${issue.suggestion}</p>` : ''}
+                    `;
+                    container.appendChild(issueDiv);
+                });
+            }
+
+            // Add recommendations
+            if (data.recommendations && data.recommendations.length > 0) {
+                const recDiv = document.createElement('div');
+                recDiv.className = 'bg-green-50 border-l-4 border-green-500 p-3 rounded text-sm';
+                recDiv.innerHTML = `
+                    <h3 class="font-bold text-green-900 mb-2"><i class="fas fa-star mr-2"></i>Gợi ý cải thiện</h3>
+                    <ul class="space-y-1">
+                        ${data.recommendations.map(rec => `<li class="text-green-800"><i class="fas fa-check text-green-600 mr-2"></i>${rec}</li>`).join('')}
+                    </ul>
+                `;
+                container.appendChild(recDiv);
+            }
+
+            // Add details
+            if (data.details && Object.keys(data.details).length > 0) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'bg-gray-50 border-l-4 border-gray-400 p-3 rounded text-sm';
+                detailsDiv.innerHTML = `
+                    <h3 class="font-bold text-gray-900 mb-2"><i class="fas fa-info-circle mr-2"></i>Chi tiết phân tích</h3>
+                    <ul class="space-y-2">
+                        ${Object.entries(data.details).map(([key, value]) => `<li class="text-gray-800"><strong>${key}:</strong> ${value}</li>`).join('')}
+                    </ul>
+                `;
+                container.appendChild(detailsDiv);
+            }
+
+            // Show improved code if available
+            if (data.improvedCode) {
+                document.getElementById('improvedCodeDisplay').textContent = data.improvedCode;
+            }
+        }
+
+        function showAutoError(message) {
+            const container = document.getElementById('automationFeedbackContainer');
+            container.innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded text-center">
+                    <i class="fas fa-exclamation-circle text-2xl text-red-500 mb-2"></i>
+                    <p class="text-red-700 font-semibold text-sm">${message}</p>
+                </div>
+            `;
+        }
+
+        function toggleImprovedCodeView() {
+            const modal = document.getElementById('improvedCodeModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function copyImprovedCode() {
+            const code = document.getElementById('improvedCodeDisplay').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Đã copy code!');
+            });
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                uploadedHtmlContent = e.target.result;
+                
+                // Call backend API to analyze HTML
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('❌ Please login first');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/autotest/analyze-html', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            htmlContent: uploadedHtmlContent,
+                            fileName: file.name
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        console.log('✅ Analysis Result:', result);
+                        displayFileAnalysis(result.fileName, result.elements);
+                        
+                        // Generate tests from backend
+                        generateTestsFromAPI(result.elements, file.name, token);
+                    } else {
+                        alert('❌ Error analyzing HTML: ' + (result.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('❌ Error:', error);
+                    alert('❌ Connection error: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function generateTestsFromAPI(elements, fileName, token) {
+            try {
+                const response = await fetch('http://localhost:3000/api/autotest/generate-tests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        elements: elements,
+                        fileName: fileName,
+                        htmlContent: uploadedHtmlContent
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    console.log('✅ Generated Tests:', result.tests);
+                    displayAutoTestCases(result.tests);
+                } else {
+                    alert('❌ Error generating tests: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                // Fallback to client-side generation
+                const testCases = generateAutoTestCases([], fileName);
+                displayAutoTestCases(testCases);
+            }
+        }
+
+        function analyzeHtmlContent(htmlContent, fileName) {
+            // Parse HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+
+            // Find interactive elements
+            const buttons = doc.querySelectorAll('button');
+            const inputs = doc.querySelectorAll('input');
+            const links = doc.querySelectorAll('a');
+            const forms = doc.querySelectorAll('form');
+            const selects = doc.querySelectorAll('select');
+
+            analyzedElements = [];
+
+            // Analyze buttons
+            buttons.forEach((btn, idx) => {
+                const text = btn.textContent?.trim() || `Button ${idx + 1}`;
+                const id = btn.id || `btn_${idx}`;
+                const className = btn.className || '';
+                analyzedElements.push({
+                    type: 'button',
+                    selector: `button:${text}`,
+                    text: text,
+                    id: id,
+                    class: className
+                });
+            });
+
+            // Analyze inputs
+            inputs.forEach((input, idx) => {
+                const type = input.type || 'text';
+                const id = input.id || `input_${idx}`;
+                const placeholder = input.placeholder || `Input ${idx + 1}`;
+                analyzedElements.push({
+                    type: `input[${type}]`,
+                    selector: `input[id="${id}"]`,
+                    placeholder: placeholder,
+                    id: id
+                });
+            });
+
+            // Analyze links
+            links.forEach((link, idx) => {
+                const text = link.textContent?.trim() || `Link ${idx + 1}`;
+                const href = link.href || '#';
+                analyzedElements.push({
+                    type: 'link',
+                    selector: `a:${text}`,
+                    text: text,
+                    href: href
+                });
+            });
+
+            // Analyze forms
+            forms.forEach((form, idx) => {
+                const id = form.id || `form_${idx}`;
+                analyzedElements.push({
+                    type: 'form',
+                    selector: `form[id="${id}"]`,
+                    id: id
+                });
+            });
+
+            // Display results
+            displayFileAnalysis(fileName, analyzedElements);
+        }
+
+        function displayFileAnalysis(fileName, elementsData) {
+            document.getElementById('uploadedFileName').textContent = fileName;
+            
+            // Handle both array format (client-side) and object format (from API)
+            let elementsList = [];
+            let totalCount = 0;
+
+            if (Array.isArray(elementsData)) {
+                // Client-side format
+                elementsList = elementsData;
+                totalCount = elementsData.length;
+            } else if (elementsData.buttons !== undefined) {
+                // API format - flatten the object
+                elementsList = [
+                    ...(elementsData.buttons || []),
+                    ...(elementsData.inputs || []),
+                    ...(elementsData.links || []),
+                    ...(elementsData.forms || []),
+                    ...(elementsData.selects || []),
+                    ...(elementsData.textareas || [])
+                ];
+                totalCount = elementsList.length;
+            }
+
+            document.getElementById('elementCount').textContent = totalCount;
+            document.getElementById('fileAnalysisSection').classList.remove('hidden');
+
+            // Show detected elements
+            const elementsDisplay = document.getElementById('detectedElements');
+            elementsDisplay.innerHTML = elementsList.map((el, idx) => `
+                <div class="p-2 bg-white border-l-2 border-blue-400 rounded">
+                    <span class="font-bold text-blue-600">${el.type}</span>
+                    <span class="text-gray-600">: ${el.text || el.placeholder || el.id || 'unnamed'}</span>
+                </div>
+            `).join('');
+
+            // Generate test cases
+            const testCases = generateAutoTestCases(elementsData, fileName);
+            displayAutoTestCases(testCases);
+        }
+
+        function generateAutoTestCases(elementsData, fileName) {
+            const tests = [];
+
+            // Handle both array format (client-side) and object format (from API)
+            let buttons = [];
+            let inputs = [];
+            let links = [];
+            let forms = [];
+            let selects = [];
+
+            if (Array.isArray(elementsData)) {
+                // Client-side format - elementsData is array
+                buttons = elementsData.filter(el => el.type === 'button');
+                inputs = elementsData.filter(el => el.type.includes('input'));
+                links = elementsData.filter(el => el.type === 'link');
+                forms = elementsData.filter(el => el.type === 'form');
+                selects = elementsData.filter(el => el.type === 'select');
+            } else if (elementsData.buttons !== undefined) {
+                // API format - elementsData has buttons, inputs, links keys
+                buttons = elementsData.buttons || [];
+                inputs = elementsData.inputs || [];
+                links = elementsData.links || [];
+                forms = elementsData.forms || [];
+                selects = elementsData.selects || [];
+            }
+
+            const totalElements = buttons.length + inputs.length + links.length + forms.length + selects.length;
+
+            // Test 1: Page load
+            tests.push({
+                name: 'Page loads successfully',
+                steps: [
+                    `Visit the HTML page`,
+                    `Verify page title/heading is displayed`,
+                    `Check all ${totalElements} interactive elements are visible`
+                ]
+            });
+
+            // Test 2: Button interactions
+            if (buttons.length > 0) {
+                tests.push({
+                    name: 'Button interactions',
+                    steps: [
+                        `Click on first button (${buttons[0].text || 'unnamed'})`,
+                        `Wait for response/action`,
+                        `Verify expected behavior occurs`
+                    ]
+                });
+            }
+
+            // Test 3: Form submission
+            if (inputs.length > 0) {
+                tests.push({
+                    name: 'Form input and validation',
+                    steps: [
+                        `Fill form input fields with valid data`,
+                        `Click submit button`,
+                        `Verify form submission is successful`
+                    ]
+                });
+            }
+
+            // Test 4: Link navigation
+            if (links.length > 0) {
+                tests.push({
+                    name: 'Link navigation',
+                    steps: [
+                        `Click on first link (${links[0].text || 'unnamed'})`,
+                        `Verify navigation occurs`,
+                        `Verify correct page is loaded`
+                    ]
+                });
+            }
+
+            // Test 5: Select Dropdown
+            if (selects.length > 0) {
+                tests.push({
+                    name: 'Select dropdown functionality',
+                    steps: [
+                        'Click on select dropdown',
+                        'Select an option from the list',
+                        'Verify selection is applied'
+                    ]
+                });
+            }
+
+            // Test 6: Error handling
+            tests.push({
+                name: 'Error handling and validation',
+                steps: [
+                    `Submit form with invalid/empty data`,
+                    `Verify error messages are displayed`,
+                    `Verify form doesn't submit with invalid data`
+                ]
+            });
+
+            return tests;
+        }
+
+        function displayAutoTestCases(testCases) {
+            // Store tests globally so we can use them in runAutoTests
+            window.lastGeneratedTests = testCases;
+            console.log('📝 Stored tests:', testCases.length);
+            
+            const testsList = document.getElementById('autoTestCases');
+            testsList.innerHTML = testCases.map((test, idx) => `
+                <div class="p-3 bg-white border-l-4 border-green-500 rounded cursor-pointer hover:bg-green-50" data-test-id="${idx}" onclick="toggleTestSteps(${idx})">
+                    <p class="font-bold text-[#1b4332]">${idx + 1}. ${test.name}</p>
+                    <p class="text-xs text-gray-500 mt-1">${test.priority || 'Medium'} Priority • ${test.steps?.length || 0} steps</p>
+                    <p class="text-xs text-gray-400 mt-1">${test.type || 'Functional'}</p>
+                    <div id="steps-${idx}" class="hidden mt-2 text-xs text-gray-700 space-y-1">
+                        ${(test.steps || []).map((step, stepIdx) => `
+                            <div class="pl-3 border-l border-gray-300">• ${step}</div>
+                        `).join('')}
+                        <div class="pl-3 border-l border-gray-300 text-blue-600 mt-2"><strong>Expected:</strong> ${test.expectedResult || 'Test passed'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleTestSteps(idx) {
+            const stepsDiv = document.getElementById(`steps-${idx}`);
+            stepsDiv.classList.toggle('hidden');
+        }
+
+        function runAutoTests() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('❌ Please login first');
+                return;
+            }
+
+            // Show results section
+            document.getElementById('testResultsSection').classList.remove('hidden');
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<p class="text-blue-500"><i class="fas fa-spinner fa-spin mr-2"></i>Running tests via Cypress...</p>';
+
+            // Call backend API to run tests
+            runAutoTestsViaAPI(token);
+        }
+
+        async function runAutoTestsViaAPI(token) {
+            try {
+                const resultsDiv = document.getElementById('testResults');
+
+                // Step 1: Get the file name from analyzed elements
+                const fileName = document.getElementById('uploadedFileName').textContent || 'test.html';
+
+                // Step 2: Get the generated tests from the current display
+                let generatedTests = [];
+                
+                // Try to get tests from the auto-test cases container
+                const autoTestCasesDiv = document.getElementById('autoTestCases');
+                if (autoTestCasesDiv) {
+                    // Extract test data from what's displayed
+                    const testItems = autoTestCasesDiv.querySelectorAll('[data-test-id]');
+                    if (testItems.length > 0) {
+                        generatedTests = Array.from(testItems).map((item, idx) => ({
+                            id: idx + 1,
+                            name: item.querySelector('.font-bold')?.textContent || `Test ${idx + 1}`,
+                            description: item.querySelector('p')?.textContent || '',
+                            steps: [],
+                            expectedResult: 'Test passed',
+                            priority: 'Medium',
+                            type: 'Functional'
+                        }));
+                        console.log('📋 Extracted tests from UI:', generatedTests.length);
+                    }
+                }
+
+                // If no tests extracted from UI, use the globally stored tests
+                if (generatedTests.length === 0 && window.lastGeneratedTests) {
+                    generatedTests = window.lastGeneratedTests;
+                    console.log('📋 Using stored tests:', generatedTests.length);
+                }
+
+                console.log('🧪 Running tests with:', {
+                    fileName,
+                    htmlContentLength: uploadedHtmlContent?.length || 0,
+                    testsCount: generatedTests.length
+                });
+
+                // Step 3: Call backend to run tests with generated tests
+                const response = await fetch('http://localhost:3000/api/autotest/run-tests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        htmlContent: uploadedHtmlContent,
+                        tests: generatedTests,  // Pass generated tests!
+                        fileName: fileName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    console.log('✅ Test Results:', result.results);
+                    displayTestResults(result.results.testResults, result.results);
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <p class="text-red-700 font-bold">❌ Error running tests:</p>
+                            <p class="text-red-600 text-sm mt-2">${result.error || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                const resultsDiv = document.getElementById('testResults');
+                resultsDiv.innerHTML = `
+                    <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-red-700 font-bold">❌ Connection Error:</p>
+                        <p class="text-red-600 text-sm mt-2">${error.message}</p>
+                        <p class="text-gray-600 text-xs mt-3">Make sure backend server is running on http://localhost:3000</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayTestResults(testResults, summary) {
+            const resultsDiv = document.getElementById('testResults');
+            
+            if (!testResults || testResults.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-blue-700">Test results not available yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const passed = testResults.filter(r => r.status === 'PASSED').length;
+            const failed = testResults.filter(r => r.status === 'FAILED').length;
+            const pending = testResults.filter(r => r.status === 'PENDING').length;
+
+            // Check if we have Cypress specs
+            let hasCypressSpecs = summary && summary.cypressSpecs && summary.cypressSpecs.length > 0;
+
+            resultsDiv.innerHTML = `
+                <div class="mb-4 p-4 rounded-lg ${failed === 0 ? 'bg-green-50 border border-green-200' : 'bg-orange-50 border border-orange-200'}">
+                    <p class="font-bold ${failed === 0 ? 'text-green-700' : 'text-orange-700'}">
+                        <i class="fas ${failed === 0 ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-2"></i>
+                        ${passed}/${testResults.length} tests passed
+                        ${failed > 0 ? ` | ${failed} failed` : ''}
+                        ${pending > 0 ? ` | ${pending} pending` : ''}
+                    </p>
+                    ${summary && summary.duration ? `<p class="text-xs text-gray-600 mt-2">Duration: ${summary.duration}</p>` : ''}
+                </div>
+                
+                ${hasCypressSpecs ? `
+                    <div class="mb-4 p-3 rounded-lg bg-purple-50 border border-purple-200">
+                        <button onclick="toggleCypressSpecs()" class="text-purple-700 font-bold hover:text-purple-900 flex items-center gap-2 w-full">
+                            <i class="fas fa-code"></i> View Cypress Code (${summary.cypressSpecs.length} specs)
+                        </button>
+                        <div id="cypressSpecsView" class="hidden mt-3 space-y-2 max-h-96 overflow-y-auto">
+                            ${summary.cypressSpecs.map((spec, idx) => `
+                                <div class="bg-white p-2 rounded border border-purple-200">
+                                    <button onclick="toggleCypressCode(${idx})" class="font-mono text-xs text-purple-600 hover:text-purple-900 w-full text-left">
+                                        📄 ${spec.testName}
+                                    </button>
+                                    <pre id="cypress-code-${idx}" class="hidden bg-gray-900 text-green-400 p-2 rounded text-xs overflow-x-auto mt-2 code-editor" style="max-height: 200px;"><code>${escapeHtml(spec.cypressCode)}</code></pre>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${testResults.map(result => `
+                    <div class="p-3 mb-2 rounded-lg ${result.status === 'PASSED' ? 'bg-green-50 border-l-4 border-green-500' : result.status === 'FAILED' ? 'bg-red-50 border-l-4 border-red-500' : 'bg-yellow-50 border-l-4 border-yellow-500'}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <p class="font-bold ${result.status === 'PASSED' ? 'text-green-700' : result.status === 'FAILED' ? 'text-red-700' : 'text-yellow-700'}">
+                                    <i class="fas ${result.status === 'PASSED' ? 'fa-check-circle' : result.status === 'FAILED' ? 'fa-times-circle' : 'fa-clock'} mr-2"></i>
+                                    ${result.testName || result.name || 'Unknown Test'}
+                                </p>
+                                ${result.error ? `<p class="text-xs text-red-600 mt-1 ml-6"><strong>Error:</strong> ${result.error}</p>` : ''}
+                                ${result.method ? `<p class="text-xs text-gray-500 mt-1 ml-6"><strong>Method:</strong> ${result.method}</p>` : ''}
+                            </div>
+                            <span class="text-xs ${result.status === 'PASSED' ? 'text-green-600' : result.status === 'FAILED' ? 'text-red-600' : 'text-yellow-600'} font-mono whitespace-nowrap ml-2">${result.duration || 'N/A'}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function toggleCypressSpecs() {
+            const view = document.getElementById('cypressSpecsView');
+            view.classList.toggle('hidden');
+        }
+
+        function toggleCypressCode(idx) {
+            const codeBlock = document.getElementById(`cypress-code-${idx}`);
+            codeBlock.classList.toggle('hidden');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+
+</body>
+</html>

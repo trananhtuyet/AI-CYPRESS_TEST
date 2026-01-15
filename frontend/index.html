@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Testing Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-body: #f8fafc;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            display: flex;
+        }
+
+        /* Sidebar Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-brand {
+            padding: 2rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 0 1rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: var(--secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .menu-item i { margin-right: 12px; width: 20px; }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            height: 70px;
+            background: #fff;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-body { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .label { color: var(--secondary); font-size: 0.875rem; }
+        .stat-card .value { font-size: 1.5rem; font-weight: 700; margin-top: 5px; }
+
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .feature-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary);
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .btn-action i { font-size: 1.5rem; color: var(--primary); margin-bottom: 10px; }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-leaf"></i> AI-TestLab
+        </div>
+        <nav class="sidebar-menu">
+            <a href="#" class="menu-item active"><i class="fas fa-home"></i> Tổng quan</a>
+            <a href="javascript:goTo('test-creation.html')" class="menu-item"><i class="fas fa-pen"></i> Tạo Test Case</a>
+            <a href="javascript:goTo('script-review.html')" class="menu-item"><i class="fas fa-code-review"></i> AI Review Code</a>
+            <a href="javascript:goTo('website-analysis.html')" class="menu-item"><i class="fas fa-search"></i> Phân tích Web</a>
+            <a href="javascript:goTo('learning.html')" class="menu-item"><i class="fas fa-book"></i> Khóa học</a>
+            <a href="javascript:goTo('test-results.html')" class="menu-item"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <nav class="top-nav">
+            <div class="user-info">
+                <span id="userName" style="font-weight: 600; margin-right: 15px;"></span>
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </nav>
+
+        <div class="content-body">
+            <header style="margin-bottom: 2rem;">
+                <h1 style="margin: 0; font-size: 1.75rem;">Chào mừng quay trở lại, <span id="userEmail" style="color: var(--primary);"></span></h1>
+                <p style="color: var(--secondary);">Hệ thống đã sẵn sàng để kiểm thử.</p>
+            </header>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">Tổng Test Cases</div>
+                    <div id="totalTests" class="value">0</div>
+                </div>
+                <div class="stat-card" style="border-bottom: 3px solid var(--success);">
+                    <div class="label">Vượt qua</div>
+                    <div id="passedTests" class="value" style="color: var(--success);">0</div>
+                </div>
+                <div class="stat-card" style="border-bottom: 3px solid var(--danger);">
+                    <div class="label">Thất bại</div>
+                    <div id="failedTests" class="value" style="color: var(--danger);">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Điểm tích lũy</div>
+                    <div id="totalPoints" class="value">0</div>
+                </div>
+            </section>
+
+            <div class="action-grid">
+                <section class="card">
+                    <h3 style="margin-top:0">Thao tác nhanh</h3>
+                    <div class="feature-buttons">
+                        <div class="btn-action" onclick="goTo('test-creation.html')">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Tạo Manual Test</span>
+                        </div>
+                        <div class="btn-action" onclick="goTo('website-analysis.html')">
+                            <i class="fas fa-robot"></i>
+                            <span>AI Scan Website</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h3 style="margin-top:0">Lộ trình học</h3>
+                    <div style="padding: 10px; background: #f0fdf4; border-radius: 8px; color: #166534; font-size: 0.9rem;">
+                        <i class="fas fa-graduation-cap"></i> Bạn có 1 khóa học chưa hoàn thành.
+                        <a href="#" style="display:block; margin-top: 5px; color: var(--primary);">Tiếp tục học ngay →</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Giữ nguyên logic JS của bạn
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            if (!token || !user) { window.location.href = 'auth.html'; return; }
+            const userData = JSON.parse(user);
+            document.getElementById('userName').textContent = userData.username;
+            document.getElementById('userEmail').textContent = userData.email;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'auth.html';
+        });
+
+        function goTo(page) { window.location.href = page; }
+        checkAuth();
+    </script>
+</body>
+</html>

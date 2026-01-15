@@ -1,0 +1,25 @@
+{
+  "name": "ai-cypress-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "cypress run",
+    "test:open": "cypress open"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "groq-sdk": "^0.37.0",
+    "openai": "^6.16.0",
+    "puppeteer": "^24.35.0"
+  },
+  "devDependencies": {
+    "cypress": "^15.8.2"
+  }
+}

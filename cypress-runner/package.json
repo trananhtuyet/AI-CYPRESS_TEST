@@ -1,0 +1,19 @@
+{
+  "name": "cypress-runner",
+  "version": "1.0.0",
+  "description": "Cypress runner for AI-generated tests",
+  "main": "index.js",
+  "scripts": {
+    "test:headless": "cypress run --headless",
+    "test:headed": "cypress open"
+  },
+  "keywords": [
+    "cypress",
+    "ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.17.0"
+  }
+}

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Testing Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #52b788;
+            --primary-dark: #1b4332;
+            --primary-soft: #b7e4c7;
+            --bg-body: #f7fffb;
+            --text-main: #2d6a4f;
+            --text-muted: #6b9080;
+            --glass-white: rgba(255, 255, 255, 0.8);
+            --border-soft: rgba(82, 183, 136, 0.15);
+            --success: #40916c;
+            --danger: #d62828;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid rgba(82, 183, 136, 0.15);
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .sidebar-brand i {
+            font-size: 1.6rem;
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 1.5rem 0.8rem;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+        }
+
+        .sidebar-footer {
+            padding: 1rem 0.8rem;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(27, 67, 50, 0.05);
+            position: relative;
+            z-index: 100;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .user-info span {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(82, 183, 136, 0.3);
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.4);
+        }
+
+        /* User Profile Dropdown */
+        .user-profile-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 50px rgba(27, 67, 50, 0.3);
+            border: 1px solid rgba(82, 183, 136, 0.1);
+            display: none;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+            z-index: 1001;
+            margin-top: 10px;
+        }
+
+        .user-profile-menu.active {
+            display: flex;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            padding: 2rem 1.5rem;
+            border-radius: 16px 16px 0 0;
+            text-align: center;
+        }
+
+        .profile-avatar-large {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 3px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 12px;
+        }
+
+        .profile-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .profile-header p {
+            margin: 4px 0 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .profile-content {
+            padding: 1.5rem;
+        }
+
+        .profile-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f9fdfb;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .profile-info-item i {
+            color: var(--primary);
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-info-item span {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            word-break: break-all;
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(82, 183, 136, 0.1);
+        }
+
+        .profile-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .profile-action-btn:hover {
+            background: #f0fdf4;
+            color: var(--primary);
+        }
+
+        .profile-action-btn i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-action-btn.logout {
+            color: var(--danger);
+            margin-top: 8px;
+        }
+
+        .profile-action-btn.logout:hover {
+            background: rgba(214, 40, 40, 0.1);
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.4);
+        }
+
+        .content-body {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.4s ease;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .page-header h1 span {
+            color: var(--primary);
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            animation: slideUp 0.5s ease;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+            border: 1px solid rgba(82, 183, 136, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(27, 67, 50, 0.15);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            line-height: 1;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            color: var(--text-muted);
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            animation: slideUp 0.6s ease;
+        }
+
+        .action-card {
+            background: white;
+            border: 2px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-card:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.05), rgba(82, 183, 136, 0.02));
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(82, 183, 136, 0.2);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .action-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .action-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        .features-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            animation: slideUp 0.7s ease;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+            border: 1px solid rgba(82, 183, 136, 0.1);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            color: var(--text-main);
+        }
+
+        .info-box i {
+            color: var(--primary);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .info-box a {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .info-box a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* ===== AI CHATBOX ===== */
+        .chatbox-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            z-index: 999;
+        }
+
+        .chatbox-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .chatbox-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(82, 183, 136, 0.5);
+        }
+
+        .chatbox-toggle.active {
+            display: none;
+        }
+
+        .chatbox {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 550px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(27, 67, 50, 0.2);
+            display: none;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+            border: 1px solid rgba(82, 183, 136, 0.1);
+        }
+
+        .chatbox.active {
+            display: flex;
+        }
+
+        .chatbox-header {
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbox-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .chatbox-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .chatbox-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chatbox-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f9fdfb;
+        }
+
+        .message {
+            display: flex;
+            gap: 8px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: var(--text-main);
+            border: 1px solid rgba(82, 183, 136, 0.15);
+        }
+
+        .chatbox-input {
+            padding: 1rem;
+            border-top: 1px solid rgba(82, 183, 136, 0.1);
+            display: flex;
+            gap: 8px;
+        }
+
+        .chatbox-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid rgba(82, 183, 136, 0.2);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .chatbox-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+        }
+
+        .chatbox-send {
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .chatbox-send:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+        }
+
+        .chatbox-send:active {
+            transform: scale(0.95);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 14px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .features-section { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); position: fixed; z-index: 1000; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .content-body { padding: 1.5rem; }
+            .page-header h1 { font-size: 1.5rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-leaf"></i> AI-TestLab
+        </div>
+        <nav class="sidebar-menu">
+            <a href="#" class="menu-item active">
+                <i class="fas fa-home"></i> Tổng quan
+            </a>
+            <a href="javascript:goTo('test-creation.html')" class="menu-item">
+                <i class="fas fa-pen"></i> Tạo Test Case
+            </a>
+            <a href="javascript:goTo('website-analysis.html')" class="menu-item">
+                <i class="fas fa-search"></i> Phân tích Website
+            </a>
+            <a href="javascript:goTo('learning.html')" class="menu-item">
+                <i class="fas fa-book"></i> Khóa học
+            </a>
+            <a href="javascript:goTo('test-results.html')" class="menu-item">
+                <i class="fas fa-chart-bar"></i> Báo cáo
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn-logout" style="width: 100%; justify-content: center;">
+                <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <nav class="top-nav">
+            <div class="user-info">
+                <span id="userName"></span>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+
+            <!-- User Profile Menu -->
+            <div class="user-profile-menu" id="userProfileMenu">
+                <div class="profile-header">
+                    <div class="profile-avatar-large">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3 id="profileUsername">Username</h3>
+                    <p id="profileEmail">email@example.com</p>
+                </div>
+
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <div class="profile-info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span id="profileEmailInfo">email@example.com</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <i class="fas fa-calendar"></i>
+                            <span id="profileJoinDate">Tham gia từ tháng 1, 2026</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <i class="fas fa-flag"></i>
+                            <span>Thành viên Thường xuyên</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <button class="profile-action-btn">
+                            <i class="fas fa-user-edit"></i> Chỉnh sửa hồ sơ
+                        </button>
+                        <button class="profile-action-btn">
+                            <i class="fas fa-cog"></i> Cài đặt
+                        </button>
+                        <button class="profile-action-btn">
+                            <i class="fas fa-lock"></i> Đổi mật khẩu
+                        </button>
+                        <button class="profile-action-btn logout" id="logoutBtnProfile">
+                            <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content-body">
+            <header class="page-header">
+                <h1>Chào mừng quay trở lại, <span id="userEmail"></span></h1>
+                <p>Hệ thống kiểm thử AI của bạn đã sẵn sàng</p>
+            </header>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-vial"></i></div>
+                    <div class="stat-label">Tổng Test Cases</div>
+                    <div class="stat-value" id="totalTests">0</div>
+                    <div class="stat-change">↑ 12% so với tuần trước</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-label">Tests Passed</div>
+                    <div class="stat-value" id="passedTests" style="color: var(--success);">0</div>
+                    <div class="stat-change">✓ Tỷ lệ thành công cao</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+                    <div class="stat-label">Tests Failed</div>
+                    <div class="stat-value" id="failedTests" style="color: var(--danger);">0</div>
+                    <div class="stat-change">↓ Giảm 5% tuần này</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
+                    <div class="stat-label">Điểm tích lũy</div>
+                    <div class="stat-value" id="totalPoints">0</div>
+                    <div class="stat-change">🏆 Top 10% người dùng</div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <h2 style="color: var(--primary-dark); margin: 2rem 0 1.5rem; font-size: 1.2rem; font-weight: 700;">Thao tác nhanh</h2>
+            <section class="quick-actions">
+                <div class="action-card" onclick="goTo('test-creation.html')">
+                    <div class="action-icon"><i class="fas fa-plus-circle"></i></div>
+                    <h3>Tạo Test</h3>
+                    <p>Viết manual test</p>
+                </div>
+                <div class="action-card" onclick="goTo('website-analysis.html')">
+                    <div class="action-icon"><i class="fas fa-robot"></i></div>
+                    <h3>AI Scan</h3>
+                    <p>Phân tích tự động</p>
+                </div>
+                <div class="action-card" onclick="goTo('learning.html')">
+                    <div class="action-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>Học tập</h3>
+                    <p>Khóa học QA</p>
+                </div>
+                <div class="action-card" onclick="goTo('test-results.html')">
+                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Báo cáo</h3>
+                    <p>Xem kết quả</p>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="features-section">
+                <div class="card">
+                    <h3><i class="fas fa-lightbulb" style="color: var(--primary); margin-right: 10px;"></i>Mẹo & Tài liệu</h3>
+                    <div class="info-box">
+                        <i class="fas fa-video"></i>
+                        Hãy xem video hướng dẫn mới nhất về viết test case hiệu quả
+                        <a href="#">Xem video →</a>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem;">
+                        <i class="fas fa-book-open"></i>
+                        Tài liệu Cypress mới nhất đã được cập nhật
+                        <a href="#">Đọc tài liệu →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-fire" style="color: var(--primary); margin-right: 10px;"></i>Lộ trình học</h3>
+                    <div class="info-box">
+                        <i class="fas fa-spinner fa-spin" style="color: var(--primary);"></i>
+                        Đang học: Cypress Advanced
+                        <a href="#">Tiếp tục →</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- AI Chatbox -->
+    <div class="chatbox-container">
+        <button class="chatbox-toggle" id="chatboxToggle">
+            <i class="fas fa-message"></i>
+        </button>
+        
+        <div class="chatbox" id="chatbox">
+            <div class="chatbox-header">
+                <h3><i class="fas fa-robot"></i> AI Assistant</h3>
+                <button class="chatbox-close" id="chatboxClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="chatbox-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-content">
+                        👋 Xin chào! Tôi là AI Assistant của AI-TestLab. Hôm nay tôi có thể giúp bạn gì?
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chatbox-input">
+                <input type="text" id="chatInput" placeholder="Gõ câu hỏi của bạn..." />
+                <button class="chatbox-send" id="chatSend">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CHATBOX FUNCTIONALITY =====
+        const chatbox = document.getElementById('chatbox');
+        const chatboxToggle = document.getElementById('chatboxToggle');
+        const chatboxClose = document.getElementById('chatboxClose');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSend = document.getElementById('chatSend');
+
+        // AI Responses Database
+        const aiResponses = {
+            'hello': 'Xin chào! Tôi sẵn sàng giúp bạn. Bạn có thể hỏi tôi về testing, Cypress, hoặc bất kỳ tính năng nào của AI-TestLab!',
+            'test': 'Tôi có thể giúp bạn viết test cases. Hãy nói cho tôi biết website hoặc tính năng nào bạn muốn kiểm thử.',
+            'cypress': 'Cypress là một công cụ testing tuyệt vời! Nó cho phép bạn viết E2E tests một cách dễ dàng. Bạn cần giúp gì về Cypress?',
+            'help': 'Tôi có thể giúp bạn với:\n• Viết test cases\n• Tìm hiểu về Cypress\n• Phân tích website\n• Giải đáp các câu hỏi về QA testing',
+            'tutorial': 'Bạn có thể xem các video hướng dẫn trong phần "Mẹo & Tài liệu" hoặc vào "Khóa học" để tìm hiểu thêm!',
+            'ai': 'AI Assistant của chúng tôi có thể giúp bạn phân tích website và tự động tạo test cases. Hãy thử tính năng "AI Scan" trong "Thao tác nhanh"!',
+            'default': 'Tôi hiểu bạn muốn nói điều đó. Bạn có thể hỏi tôi về:\n• Testing & QA\n• Cypress framework\n• Cách sử dụng AI-TestLab\n• Test case best practices'
+        };
+
+        function toggleChatbox() {
+            chatbox.classList.toggle('active');
+            chatboxToggle.classList.toggle('active');
+        }
+
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = text;
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getAIResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Check for keywords
+            for (let key in aiResponses) {
+                if (lowerMessage.includes(key)) {
+                    return aiResponses[key];
+                }
+            }
+            
+            return aiResponses['default'];
+        }
+
+        function showTypingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            messageDiv.id = 'typingIndicator';
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'typing-dot';
+                typingDiv.appendChild(dot);
+            }
+            
+            messageDiv.appendChild(typingDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate AI response delay
+            setTimeout(() => {
+                removeTypingIndicator();
+                const response = getAIResponse(message);
+                addMessage(response, false);
+            }, 1000 + Math.random() * 500);
+        }
+
+        // Event Listeners
+        chatboxToggle.addEventListener('click', toggleChatbox);
+        chatboxClose.addEventListener('click', toggleChatbox);
+        chatSend.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // ===== DASHBOARD FUNCTIONALITY =====
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            if (!token || !user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('userName').textContent = userData.username;
+            document.getElementById('userEmail').textContent = userData.email;
+
+            // Update profile menu
+            document.getElementById('profileUsername').textContent = userData.username;
+            document.getElementById('profileEmail').textContent = userData.email;
+            document.getElementById('profileEmailInfo').textContent = userData.email;
+        }
+
+        // User Avatar / Profile Menu
+        const userAvatar = document.getElementById('userAvatar');
+        const userProfileMenu = document.getElementById('userProfileMenu');
+
+        userAvatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userProfileMenu.classList.toggle('active');
+        });
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', () => {
+            if (userProfileMenu.classList.contains('active')) {
+                userProfileMenu.classList.remove('active');
+            }
+        });
+
+        userProfileMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        document.getElementById('logoutBtnProfile').addEventListener('click', logout);
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'auth.html';
+        }
+
+        function goTo(page) {
+            window.location.href = page;
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>
