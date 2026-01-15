@@ -349,4 +349,96 @@ router.get('/validate-syntax', (req, res) => {
   }
 });
 
+/**
+ * Chat with AI about code review results
+ * POST /api/review-code-chat
+ */
+router.post('/review-code-chat', async (req, res) => {
+  try {
+    const { message, reviewData, chatHistory } = req.body;
+
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Câu hỏi không được để trống'
+      });
+    }
+
+    if (!genAI) {
+      return res.json({
+        success: false,
+        error: 'AI chưa được cấu hình'
+      });
+    }
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+    // Build context from review data
+    const context = reviewData ? `
+Kết quả review code trước đó:
+- Chất lượng: ${reviewData.metrics?.quality || 'Unknown'}
+- Điểm số: ${reviewData.metrics?.score || 'N/A'}/10
+- Độ phức tạp: ${reviewData.metrics?.complexity || 'Unknown'}
+- Tóm tắt: ${reviewData.summary || 'N/A'}
+- Vấn đề: ${reviewData.issues?.map(i => i.title).join(', ') || 'Không có'}
+- Gợi ý: ${reviewData.recommendations?.slice(0, 3).join(', ') || 'Không có'}
+    ` : 'Chưa có review code nào';
+
+    // Build conversation history
+    let conversationHistory = [];
+    if (chatHistory && Array.isArray(chatHistory)) {
+      chatHistory.forEach(chat => {
+        if (chat.user) {
+          conversationHistory.push({
+            role: 'user',
+            parts: [{ text: chat.user }]
+          });
+        }
+        if (chat.assistant) {
+          conversationHistory.push({
+            role: 'model',
+            parts: [{ text: chat.assistant }]
+          });
+        }
+      });
+    }
+
+    const chatPrompt = `Bạn là một chuyên gia Cypress testing. Người dùng đã nhận được kết quả review code này:
+
+${context}
+
+Bây giờ họ hỏi: "${message}"
+
+Trả lời bằng tiếng Việt, ngắn gọn (2-3 câu), và cụ thể giúp họ cải thiện code test.
+Nếu câu hỏi liên quan tới review code, sử dụng thông tin từ kết quả review để trả lời.
+Nếu là câu hỏi chung chung về Cypress, hãy cung cấp ví dụ code nếu cần thiết.`;
+
+    conversationHistory.push({
+      role: 'user',
+      parts: [{ text: chatPrompt }]
+    });
+
+    console.log(`🤖 Chat request: "${message.substring(0, 50)}..."`);
+
+    const result = await model.generateContent({
+      contents: conversationHistory
+    });
+
+    const response = result.response.text();
+    console.log('✅ Chat response received');
+
+    res.json({
+      success: true,
+      response: response
+    });
+
+  } catch (error) {
+    console.error('❌ Chat Error:', error.message);
+    res.json({
+      success: false,
+      error: error.message || 'Lỗi khi xử lý chat'
+    });
+  }
+});
+
 module.exports = router;

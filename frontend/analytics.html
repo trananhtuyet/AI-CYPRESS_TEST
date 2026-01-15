@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Reports - Test Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'Fira Code', monospace; }
+        .gradient-text { background: linear-gradient(135deg, #52b788, #2d6a4f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-[#52b788] to-[#40916c] text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-chart-bar text-2xl"></i>
+                <h1 class="text-2xl font-bold">Analytics & Reports</h1>
+            </div>
+            <a href="dashboard.html" class="flex items-center gap-2 hover:bg-white/20 px-4 py-2 rounded transition">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Loading State -->
+        <div id="loadingState" class="flex items-center justify-center py-12">
+            <div class="text-center">
+                <div class="animate-spin text-4xl text-[#52b788] mb-4">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                <p class="text-gray-600">Đang tải dữ liệu phân tích...</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="analyticsContent" class="hidden">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-gray-600 text-sm font-semibold mb-2">
+                        <i class="fas fa-flask text-blue-500 mr-2"></i>Tổng Test Cases
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900" id="totalTests">0</div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-gray-600 text-sm font-semibold mb-2">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>Passed
+                    </div>
+                    <div class="text-3xl font-bold text-green-600" id="passedSteps">0</div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-gray-600 text-sm font-semibold mb-2">
+                        <i class="fas fa-times-circle text-red-500 mr-2"></i>Failed
+                    </div>
+                    <div class="text-3xl font-bold text-red-600" id="failedSteps">0</div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-gray-600 text-sm font-semibold mb-2">
+                        <i class="fas fa-circle-notch text-yellow-500 mr-2"></i>Pending
+                    </div>
+                    <div class="text-3xl font-bold text-yellow-600" id="pendingSteps">0</div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-gray-600 text-sm font-semibold mb-2">
+                        <i class="fas fa-percentage text-purple-500 mr-2"></i>Pass Rate
+                    </div>
+                    <div class="text-3xl font-bold text-purple-600" id="passRate">0%</div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Pass/Fail Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-chart-pie text-[#52b788] mr-2"></i>Test Results Distribution
+                    </h3>
+                    <canvas id="passFailChart" height="100"></canvas>
+                </div>
+
+                <!-- By Priority -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-bars text-[#52b788] mr-2"></i>Test Cases by Priority
+                    </h3>
+                    <canvas id="priorityChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- By Module -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-cubes text-[#52b788] mr-2"></i>Test Cases by Module
+                    </h3>
+                    <canvas id="moduleChart" height="100"></canvas>
+                </div>
+
+                <!-- By Type -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-project-diagram text-[#52b788] mr-2"></i>Test Cases by Type
+                    </h3>
+                    <canvas id="typeChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Tables -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Module Details -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-list text-[#52b788] mr-2"></i>Chi tiết theo Module
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="border-b border-gray-200">
+                                <tr>
+                                    <th class="text-left py-2 font-semibold text-gray-700">Module</th>
+                                    <th class="text-right py-2 font-semibold text-gray-700">Tests</th>
+                                </tr>
+                            </thead>
+                            <tbody id="moduleTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Priority Details -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-list text-[#52b788] mr-2"></i>Chi tiết theo Priority
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="border-b border-gray-200">
+                                <tr>
+                                    <th class="text-left py-2 font-semibold text-gray-700">Priority</th>
+                                    <th class="text-right py-2 font-semibold text-gray-700">Tests</th>
+                                </tr>
+                            </thead>
+                            <tbody id="priorityTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-download text-[#52b788] mr-2"></i>Export Report
+                </h3>
+                <div class="flex gap-3 flex-wrap">
+                    <button onclick="exportAsCSV()" class="px-4 py-2 bg-[#52b788] text-white rounded-lg hover:bg-[#40916c] transition flex items-center gap-2">
+                        <i class="fas fa-file-csv"></i> Export as CSV
+                    </button>
+                    <button onclick="exportAsJSON()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                        <i class="fas fa-file-code"></i> Export as JSON
+                    </button>
+                    <button onclick="printReport()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center gap-2">
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let analyticsData = null;
+        let charts = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadAnalytics();
+        });
+
+        async function loadAnalytics() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:3000/api/analytics/summary', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch analytics');
+
+                analyticsData = await response.json();
+                displayAnalytics();
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
+                        <p class="text-red-600">Lỗi tải dữ liệu: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayAnalytics() {
+            const { summary, byPriority, byModule, byType } = analyticsData;
+
+            // Update summary cards
+            document.getElementById('totalTests').textContent = summary.totalTests;
+            document.getElementById('passedSteps').textContent = summary.passedSteps;
+            document.getElementById('failedSteps').textContent = summary.failedSteps;
+            document.getElementById('pendingSteps').textContent = summary.pendingSteps;
+            document.getElementById('passRate').textContent = summary.passRate + '%';
+
+            // Create charts
+            createPassFailChart(summary);
+            createPriorityChart(byPriority);
+            createModuleChart(byModule);
+            createTypeChart(byType);
+
+            // Populate tables
+            populateModuleTable(byModule);
+            populatePriorityTable(byPriority);
+
+            // Show content
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('analyticsContent').classList.remove('hidden');
+        }
+
+        function createPassFailChart(summary) {
+            const ctx = document.getElementById('passFailChart').getContext('2d');
+            const colors = ['#10b981', '#ef4444', '#eab308'];
+            
+            charts.passFailChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Passed', 'Failed', 'Pending'],
+                    datasets: [{
+                        data: [summary.passedSteps, summary.failedSteps, summary.pendingSteps],
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function createPriorityChart(byPriority) {
+            const ctx = document.getElementById('priorityChart').getContext('2d');
+            const priorities = Object.keys(byPriority);
+            const counts = Object.values(byPriority);
+            const colors = {
+                'Critical': '#dc2626',
+                'High': '#ea580c',
+                'Medium': '#eab308',
+                'Low': '#3b82f6'
+            };
+
+            charts.priorityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: priorities,
+                    datasets: [{
+                        label: 'Test Cases',
+                        data: counts,
+                        backgroundColor: priorities.map(p => colors[p] || '#9ca3af')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function createModuleChart(byModule) {
+            const ctx = document.getElementById('moduleChart').getContext('2d');
+            const modules = Object.keys(byModule);
+            const counts = Object.values(byModule);
+
+            charts.moduleChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: modules,
+                    datasets: [{
+                        label: 'Test Cases',
+                        data: counts,
+                        backgroundColor: '#52b788'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function createTypeChart(byType) {
+            const ctx = document.getElementById('typeChart').getContext('2d');
+            const types = Object.keys(byType);
+            const counts = Object.values(byType);
+            const colors = ['#8b5cf6', '#3b82f6'];
+
+            charts.typeChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: types,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function populateModuleTable(byModule) {
+            const tbody = document.getElementById('moduleTable');
+            tbody.innerHTML = Object.entries(byModule)
+                .sort((a, b) => b[1] - a[1])
+                .map(([module, count]) => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2 text-gray-700">${module || 'Uncategorized'}</td>
+                        <td class="text-right py-2 font-semibold text-[#52b788]">${count}</td>
+                    </tr>
+                `).join('');
+        }
+
+        function populatePriorityTable(byPriority) {
+            const tbody = document.getElementById('priorityTable');
+            const priorityOrder = ['Critical', 'High', 'Medium', 'Low'];
+            const colors = {
+                'Critical': 'text-red-600',
+                'High': 'text-orange-600',
+                'Medium': 'text-yellow-600',
+                'Low': 'text-blue-600'
+            };
+
+            tbody.innerHTML = priorityOrder
+                .filter(p => byPriority[p])
+                .map(p => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2"><span class="font-semibold ${colors[p] || ''}">${p}</span></td>
+                        <td class="text-right py-2 font-semibold">${byPriority[p]}</td>
+                    </tr>
+                `).join('');
+        }
+
+        function exportAsCSV() {
+            if (!analyticsData) return;
+            
+            const { summary, byModule, byPriority } = analyticsData;
+            let csv = 'Analytics Report\n';
+            csv += `Generated: ${new Date().toLocaleString('vi-VN')}\n\n`;
+            csv += 'Summary\n';
+            csv += `Total Tests,${summary.totalTests}\n`;
+            csv += `Passed Steps,${summary.passedSteps}\n`;
+            csv += `Failed Steps,${summary.failedSteps}\n`;
+            csv += `Pending Steps,${summary.pendingSteps}\n`;
+            csv += `Pass Rate,${summary.passRate}%\n\n`;
+            csv += 'By Module\n';
+            Object.entries(byModule).forEach(([module, count]) => {
+                csv += `${module},${count}\n`;
+            });
+            csv += '\nBy Priority\n';
+            Object.entries(byPriority).forEach(([priority, count]) => {
+                csv += `${priority},${count}\n`;
+            });
+
+            downloadFile(csv, 'analytics-report.csv', 'text/csv');
+        }
+
+        function exportAsJSON() {
+            if (!analyticsData) return;
+            const json = JSON.stringify({
+                ...analyticsData,
+                generatedAt: new Date().toISOString()
+            }, null, 2);
+            downloadFile(json, 'analytics-report.json', 'application/json');
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        function printReport() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
