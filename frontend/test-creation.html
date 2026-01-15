@@ -11,7 +11,12 @@
         body { font-family: 'Inter', sans-serif; }
         .code-editor { font-family: 'Fira Code', monospace; }
         .active-tab { border-bottom: 3px solid #52b788; color: #52b788; background: #f0fdf4; }
+        .step-row { transition: all 0.3s ease; }
         .step-row:hover .step-actions { opacity: 1; }
+        table { width: 100%; border-collapse: collapse; }
+        table td { padding: 1rem 1rem; }
+        table th { padding: 1rem 1rem; }
+        tr { transition: background-color 0.3s ease, opacity 0.3s ease; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .spinner { animation: spin 1s linear infinite; }
@@ -127,53 +132,48 @@
                 </button>
             </div>
 
-            <div id="panel-manual" class="flex-grow overflow-y-auto p-6">
-                <table class="w-full">
+            <div id="panel-manual" class="flex-grow overflow-y-auto p-6 min-h-0 block">
+                <table class="w-full border-collapse" style="table-layout: fixed;">
                     <thead>
                         <tr class="text-left text-xs text-gray-400 uppercase tracking-widest border-b border-gray-100">
                             <th class="pb-4 font-medium w-12 text-center">#</th>
                             <th class="pb-4 font-medium px-4">Thao tác thực hiện</th>
                             <th class="pb-4 font-medium px-4">Kết quả mong đợi</th>
-                            <th class="pb-4 font-medium w-32 text-center">Kết quả</th>
+                            <th class="pb-4 font-medium" style="width: 150px; text-align: center;">Kết quả</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <tr class="step-row group">
-                            <td class="py-4 text-center font-bold text-gray-300">01</td>
-                            <td class="py-4 px-4">
+                            <td class="text-center font-bold text-gray-300">01</td>
+                            <td class="px-4">
                                 <div class="font-medium text-sm mb-1">Truy cập URL ứng dụng</div>
                                 <div class="text-xs text-gray-400">Env: https://staging.app.com</div>
                             </td>
-                            <td class="py-4 px-4 text-sm text-gray-600 italic leading-relaxed">Màn hình login hiển thị với logo và 2 trường input Email, Password.</td>
-                            <td class="py-4 px-4">
-                                <div class="flex gap-1 justify-center step-status" data-status="pending">
-                                    <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition"><i class="fas fa-check"></i></button>
-                                    <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button>
+                            <td class="px-4 text-sm text-gray-600 italic leading-relaxed">Màn hình login hiển thị với logo và 2 trường input Email, Password.</td>
+                            <td class="text-center">
+                                <div class="flex gap-2 justify-center step-status" data-status="pending">
+                                    <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition flex items-center justify-center"><i class="fas fa-check"></i></button>
+                                    <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition flex items-center justify-center"><i class="fas fa-times"></i></button>
+                                    <button onclick="deleteStep(this)" class="w-8 h-8 rounded border border-gray-200 hover:bg-red-100 hover:text-red-500 transition flex items-center justify-center" title="Delete"><i class="fas fa-trash text-xs"></i></button>
                                 </div>
-                                <button onclick="deleteStep(this)" class="mt-2 w-full text-red-500 hover:bg-red-50 p-1 rounded text-xs font-bold transition">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
                             </td>
                         </tr>
                         <tr class="step-row group bg-red-50/30">
-                            <td class="py-4 text-center font-bold text-gray-300">02</td>
-                            <td class="py-4 px-4">
+                            <td class="text-center font-bold text-gray-300">02</td>
+                            <td class="px-4">
                                 <div class="font-medium text-sm mb-1 text-red-700">Nhập email hợp lệ và để trống password</div>
                                 <div class="text-xs text-gray-400 underline cursor-pointer">Data: invalid_login_set.csv</div>
                             </td>
-                            <td class="py-4 px-4 text-sm text-gray-600 italic leading-relaxed text-red-700/70">Hệ thống báo lỗi "Password cannot be blank" màu đỏ.</td>
-                            <td class="py-4 px-4">
-                                <div class="flex gap-1 justify-center step-status" data-status="failed">
-                                    <button class="bg-red-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter">
+                            <td class="px-4 text-sm text-gray-600 italic leading-relaxed text-red-700/70">Hệ thống báo lỗi "Password cannot be blank" màu đỏ.</td>
+                            <td class="text-center">
+                                <div class="flex gap-2 justify-center step-status" data-status="failed">
+                                    <button class="bg-red-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter flex items-center gap-1">
                                         <i class="fas fa-times-circle"></i> FAILED
                                     </button>
                                     <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
-                                <button onclick="deleteStep(this)" class="mt-2 w-full text-red-500 hover:bg-red-50 p-1 rounded text-xs font-bold transition">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -534,22 +534,20 @@
             const newRow = document.createElement('tr');
             newRow.className = 'step-row group hover:bg-gray-50';
             newRow.innerHTML = `
-                <td class="py-4 text-center font-bold text-gray-300">${stepNum}</td>
-                <td class="py-4 px-4">
-                    <input type="text" placeholder="Nhập thao tác..." class="w-full border border-gray-300 p-2 rounded text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/20 font-medium mb-1" />
+                <td class="text-center font-bold text-gray-300">${stepNum}</td>
+                <td class="px-4">
+                    <input type="text" placeholder="Nhập thao tác..." class="w-full border border-gray-300 p-2 rounded text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/20 font-medium" style="margin-bottom: 6px;" />
                     <input type="text" placeholder="Ghi chú (tuỳ chọn)..." class="w-full border border-gray-300 p-2 rounded text-xs text-gray-500 focus:outline-none focus:border-[#52b788]/50" />
                 </td>
-                <td class="py-4 px-4">
-                    <textarea placeholder="Mô tả kết quả mong đợi..." class="w-full border border-gray-300 p-2 rounded text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/20 resize-none" rows="2"></textarea>
+                <td class="px-4">
+                    <textarea placeholder="Mô tả kết quả mong đợi..." class="w-full border border-gray-300 p-2 rounded text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/20 resize-none" rows="2" style="overflow: hidden;"></textarea>
                 </td>
-                <td class="py-4 px-4">
-                    <div class="flex gap-1 justify-center step-status" data-status="pending">
-                        <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition" title="Pass"><i class="fas fa-check"></i></button>
-                        <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition" title="Fail"><i class="fas fa-times"></i></button>
+                <td class="text-center">
+                    <div class="flex gap-2 justify-center step-status" data-status="pending">
+                        <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition flex items-center justify-center" title="Pass"><i class="fas fa-check"></i></button>
+                        <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition flex items-center justify-center" title="Fail"><i class="fas fa-times"></i></button>
+                        <button onclick="deleteStep(this)" class="w-8 h-8 rounded border border-gray-200 hover:bg-red-100 hover:text-red-500 transition flex items-center justify-center" title="Delete"><i class="fas fa-trash text-xs"></i></button>
                     </div>
-                    <button onclick="deleteStep(this)" class="mt-2 w-full text-red-500 hover:bg-red-50 p-1 rounded text-xs font-bold transition">
-                        <i class="fas fa-trash"></i> Xóa
-                    </button>
                 </td>
             `;
 
@@ -562,20 +560,20 @@
             const statusDiv = event.target.closest('.step-status');
             const row = event.target.closest('tr');
             
-            // Remove previous states
+            // Remove previous states with smooth transition
+            row.style.transition = 'background-color 0.3s ease';
             row.classList.remove('bg-red-50/30');
             row.classList.add('bg-green-50/30');
             
             statusDiv.setAttribute('data-status', 'passed');
+            statusDiv.style.transition = 'all 0.3s ease';
             statusDiv.innerHTML = `
-                <div class="flex gap-1 justify-center w-full">
-                    <button class="bg-green-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter">
-                        <i class="fas fa-check-circle"></i> PASSED
-                    </button>
-                    <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+                <button class="bg-green-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter flex items-center gap-1">
+                    <i class="fas fa-check-circle"></i> PASSED
+                </button>
+                <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
+                    <i class="fas fa-times"></i>
+                </button>
             `;
         }
 
@@ -584,20 +582,20 @@
             const statusDiv = event.target.closest('.step-status');
             const row = event.target.closest('tr');
             
-            // Remove previous states
+            // Remove previous states with smooth transition
+            row.style.transition = 'background-color 0.3s ease';
             row.classList.remove('bg-green-50/30');
             row.classList.add('bg-red-50/30');
             
             statusDiv.setAttribute('data-status', 'failed');
+            statusDiv.style.transition = 'all 0.3s ease';
             statusDiv.innerHTML = `
-                <div class="flex gap-1 justify-center w-full">
-                    <button class="bg-red-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter">
-                        <i class="fas fa-times-circle"></i> FAILED
-                    </button>
-                    <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+                <button class="bg-red-600 text-white text-[10px] px-3 py-1 rounded font-bold uppercase tracking-tighter flex items-center gap-1">
+                    <i class="fas fa-times-circle"></i> FAILED
+                </button>
+                <button onclick="clearStatus(event)" class="text-gray-500 hover:text-gray-700 p-1 text-xs">
+                    <i class="fas fa-times"></i>
+                </button>
             `;
         }
 
@@ -606,24 +604,35 @@
             const statusDiv = event.target.closest('.step-status');
             const row = event.target.closest('tr');
             
-            // Remove all background colors
+            // Remove all background colors with smooth transition
+            row.style.transition = 'background-color 0.3s ease';
             row.classList.remove('bg-red-50/30', 'bg-green-50/30');
             
             statusDiv.setAttribute('data-status', 'pending');
+            statusDiv.style.transition = 'all 0.3s ease';
             statusDiv.innerHTML = `
-                <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition" title="Pass"><i class="fas fa-check"></i></button>
-                <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition" title="Fail"><i class="fas fa-times"></i></button>
+                <button onclick="markPass(event)" class="pass-btn w-8 h-8 rounded border border-gray-200 hover:bg-[#52b788] hover:text-white transition flex items-center justify-center" title="Pass"><i class="fas fa-check"></i></button>
+                <button onclick="markFail(event)" class="fail-btn w-8 h-8 rounded border border-gray-200 hover:bg-red-500 hover:text-white transition flex items-center justify-center" title="Fail"><i class="fas fa-times"></i></button>
+                <button onclick="deleteStep(this)" class="w-8 h-8 rounded border border-gray-200 hover:bg-red-100 hover:text-red-500 transition flex items-center justify-center" title="Delete"><i class="fas fa-trash text-xs"></i></button>
             `;
         }
 
         function deleteStep(btn) {
             const row = btn.closest('tr');
-            row.style.opacity = '0.5';
+            row.style.transition = 'all 0.3s ease-out';
+            row.style.opacity = '0';
+            row.style.maxHeight = '0px';
+            row.style.overflow = 'hidden';
+            row.style.paddingTop = '0px';
+            row.style.paddingBottom = '0px';
+            row.style.marginBottom = '0px';
+            row.style.borderTopWidth = '0px';
+            row.style.borderBottomWidth = '0px';
             setTimeout(() => {
                 row.remove();
                 reindexSteps();
                 console.log('✅ Xóa step thành công!');
-            }, 200);
+            }, 300);
         }
 
         function reindexSteps() {
@@ -1710,7 +1719,7 @@
                 btnManual.classList.add('active-tab');
                 btnManual.classList.remove('text-gray-400');
                 panelManual.classList.remove('hidden');
-                panelManual.style.display = 'flex';
+                panelManual.style.display = 'block';
                 if (selectedTestCaseId) editSaveBtn.style.display = 'flex';
             } else if (mode === 'auto') {
                 btnAuto.classList.add('active-tab');
