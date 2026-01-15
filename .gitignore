@@ -1,1 +1,14 @@
 node_modules
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/data/*.db
+backend/temp/
+cypress-runner/cypress/videos/
+cypress-runner/cypress/screenshots/
+.DS_Store
+.vscode/
+backend/node_modules/
+frontend/node_modules/
+cypress-runner/node_modules/

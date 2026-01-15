@@ -141,6 +141,8 @@ router.post('/review-test-script', async (req, res) => {
     // Check if using mock mode
     const useMock = process.env.USE_MOCK === 'true';
     console.log('🎭 USE_MOCK mode:', useMock);
+    console.log('🔍 Current env.USE_MOCK value:', process.env.USE_MOCK);
+    console.log('✅ genAI initialized:', !!genAI);
 
     if (useMock) {
       console.log('✨ Using mock analysis instead of AI');
@@ -169,42 +171,65 @@ router.post('/review-test-script', async (req, res) => {
       try {
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-        const reviewPrompt = `You are an expert Cypress test automation engineer and code reviewer. Analyze this Cypress test script and provide detailed feedback.
+        const reviewPrompt = `You are a world-class Cypress test automation engineer and code quality expert. 
+Your goal is to provide HIGHLY VALUABLE, ACTIONABLE feedback that directly improves test reliability and maintainability.
 
-TEST SCRIPT:
+TEST SCRIPT TO ANALYZE:
 \`\`\`javascript
 ${code}
 \`\`\`
 
-PROVIDE ANALYSIS IN THIS EXACT JSON FORMAT ONLY:
+EVALUATION CRITERIA:
+1. RELIABILITY: Does it avoid flaky tests? Uses explicit waits, proper selectors, handles async correctly?
+2. MAINTAINABILITY: Is code DRY? Uses Page Object Model? Has clear variable names? Easy to debug?
+3. COVERAGE: Tests positive + negative + edge cases? Validates expected vs actual results properly?
+4. SECURITY: No hardcoded credentials, API keys, or sensitive data exposed?
+5. PERFORMANCE: Efficient selectors? Avoids unnecessary waits? Good use of cy.intercept()?
+6. CYPRESS BEST PRACTICES: Proper use of before/beforeEach? Custom commands? Good error handling?
+7. ASSERTIONS: All test paths have meaningful assertions that prove desired behavior?
+8. SCALABILITY: Can be easily extended? Reusable selectors? Good data management?
+
+PROVIDE DETAILED ANALYSIS IN THIS EXACT JSON FORMAT ONLY (no markdown, no backticks):
 {
-  "summary": "1-2 sentence overview of the script quality",
+  "summary": "Professional assessment (2-3 sentences) of overall quality and main strengths/weaknesses",
   "metrics": {
-    "quality": "GOOD/FAIR/POOR",
+    "quality": "EXCELLENT|GOOD|FAIR|POOR",
     "score": 8.5,
-    "complexity": "LOW/MEDIUM/HIGH"
+    "complexity": "LOW|MEDIUM|HIGH"
   },
   "issues": [
     {
-      "type": "ERROR|WARNING|INFO",
-      "title": "Short issue title",
-      "description": "Detailed description",
-      "suggestion": "How to fix it"
+      "type": "CRITICAL|ERROR|WARNING|INFO",
+      "title": "Specific issue title",
+      "description": "Why this is a problem and its impact on test reliability",
+      "suggestion": "Exact code example or clear step-by-step fix",
+      "severity": "High|Medium|Low"
     }
   ],
   "recommendations": [
-    "Improvement 1",
-    "Improvement 2"
+    "Specific, actionable improvement with business value",
+    "Pattern or technique to implement with expected benefit",
+    "Best practice to adopt and why it matters"
   ],
   "details": {
-    "Cấu trúc": "Assessment",
-    "Lỗi": "Issues found",
-    "Hiệu năng": "Performance",
-    "Bảo mật": "Security",
-    "Best Practices": "Practices"
+    "Cấu trúc": "Assessment of organization, readability, and structure quality",
+    "Lỗi": "Summary of all issues by category and severity",
+    "Hiệu năng": "Performance analysis and optimization opportunities",
+    "Bảo mật": "Security vulnerabilities and protective measures needed",
+    "Best Practices": "Cypress patterns used/missing and specific techniques to apply"
   },
-  "improvedCode": "Improved version of the script"
-}`;
+  "improvedCode": "Complete improved version of the script with all suggestions applied",
+  "estimatedBenefit": "Expected improvement in test reliability, maintenance time saved, or bugs prevented"
+}
+
+QUALITY REQUIREMENTS FOR YOUR RESPONSE:
+- Issues must be SPECIFIC with line numbers or code references
+- Suggestions must be COPY-PASTE READY (exact code, not pseudo-code)
+- Recommendations must have BUSINESS VALUE (explain why it matters)
+- Improved code must be PRODUCTION-READY and TESTED
+- Only include issues that are REAL PROBLEMS, not nitpicks
+- Prioritize issues by IMPACT on test reliability and maintainability
+- Be PROFESSIONAL but helpful in tone`;
 
         console.log(`🤖 Attempt ${retryCount + 1}/${maxRetries}: Calling Gemini AI...`);
         
@@ -233,12 +258,22 @@ PROVIDE ANALYSIS IN THIS EXACT JSON FORMAT ONLY:
             score: reviewData.metrics?.score || 5,
             complexity: reviewData.metrics?.complexity || 'MEDIUM'
           },
-          issues: Array.isArray(reviewData.issues) ? reviewData.issues : [],
-          recommendations: Array.isArray(reviewData.recommendations) ? reviewData.recommendations : [],
+          issues: Array.isArray(reviewData.issues) ? reviewData.issues.filter(issue => {
+            // Filter for quality: must have meaningful description and suggestion
+            return issue.title && issue.description && issue.description.length > 10 && 
+                   issue.suggestion && issue.suggestion.length > 10;
+          }) : [],
+          recommendations: Array.isArray(reviewData.recommendations) ? reviewData.recommendations.filter(rec => {
+            // Filter for quality: must be specific and actionable
+            return rec && rec.length > 20 && !rec.includes('e.g.') && !rec.includes('for example');
+          }) : [],
           details: reviewData.details || {},
-          improvedCode: reviewData.improvedCode || null
+          improvedCode: reviewData.improvedCode || null,
+          estimatedBenefit: reviewData.estimatedBenefit || 'Implementation of suggestions will improve test reliability and maintainability'
         };
 
+        console.log(`✅ Quality validated: ${review.issues.length} issues, ${review.recommendations.length} recommendations`);
+        
         return res.json({
           status: 'success',
           ...review

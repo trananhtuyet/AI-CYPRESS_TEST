@@ -2225,19 +2225,90 @@
             console.log('📝 Stored tests:', testCases.length);
             
             const testsList = document.getElementById('autoTestCases');
-            testsList.innerHTML = testCases.map((test, idx) => `
-                <div class="p-3 bg-white border-l-4 border-green-500 rounded cursor-pointer hover:bg-green-50" data-test-id="${idx}" onclick="toggleTestSteps(${idx})">
-                    <p class="font-bold text-[#1b4332]">${idx + 1}. ${test.name}</p>
-                    <p class="text-xs text-gray-500 mt-1">${test.priority || 'Medium'} Priority • ${test.steps?.length || 0} steps</p>
-                    <p class="text-xs text-gray-400 mt-1">${test.type || 'Functional'}</p>
-                    <div id="steps-${idx}" class="hidden mt-2 text-xs text-gray-700 space-y-1">
-                        ${(test.steps || []).map((step, stepIdx) => `
-                            <div class="pl-3 border-l border-gray-300">• ${step}</div>
-                        `).join('')}
-                        <div class="pl-3 border-l border-gray-300 text-blue-600 mt-2"><strong>Expected:</strong> ${test.expectedResult || 'Test passed'}</div>
+            testsList.innerHTML = testCases.map((test, idx) => {
+                const hasTestData = test.testData && Object.keys(test.testData).length > 0;
+                const hasNotes = test.notes && test.notes.length > 0;
+                const hasTags = test.tags && Array.isArray(test.tags) && test.tags.length > 0;
+                
+                return `
+                <div class="p-4 bg-white border-l-4 border-green-500 rounded-lg cursor-pointer hover:bg-green-50 transition-all" data-test-id="${idx}" onclick="toggleTestSteps(${idx})">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <p class="font-bold text-[#1b4332] text-base">${idx + 1}. ${test.name}</p>
+                            <p class="text-sm text-gray-600 mt-2">${test.description || 'No description'}</p>
+                        </div>
+                        <div class="text-right ml-4">
+                            <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full 
+                                ${test.priority === 'Critical' ? 'bg-red-100 text-red-700' : 
+                                  test.priority === 'High' ? 'bg-orange-100 text-orange-700' : 
+                                  test.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 
+                                  'bg-blue-100 text-blue-700'}">
+                                ${test.priority || 'Medium'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 mt-3 flex-wrap">
+                        <span class="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded">${test.type || 'Functional'}</span>
+                        <span class="text-xs text-gray-500">📋 ${test.steps?.length || 0} steps</span>
+                        ${hasTestData ? `<span class="text-xs text-gray-500">🔧 Test data included</span>` : ''}
+                    </div>
+                    
+                    ${hasTags ? `
+                    <div class="flex gap-2 flex-wrap mt-2">
+                        ${test.tags.map(tag => `<span class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">${tag}</span>`).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <div id="steps-${idx}" class="hidden mt-4 pt-4 border-t border-gray-200">
+                        <div class="space-y-3">
+                            <div>
+                                <h5 class="font-semibold text-gray-700 text-sm mb-2">📍 Test Steps:</h5>
+                                <ol class="space-y-2">
+                                    ${(test.steps || []).map((step, stepIdx) => `
+                                        <li class="text-xs text-gray-700 pl-4 relative">
+                                            <span class="absolute left-0 font-bold text-blue-600">${stepIdx + 1}.</span>
+                                            <code class="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">${step}</code>
+                                        </li>
+                                    `).join('')}
+                                </ol>
+                            </div>
+                            
+                            ${hasTestData ? `
+                            <div>
+                                <h5 class="font-semibold text-gray-700 text-sm mb-2">🧪 Test Data:</h5>
+                                <div class="bg-gray-50 p-3 rounded text-xs text-gray-700 space-y-1">
+                                    ${Object.entries(test.testData || {}).map(([key, value]) => `
+                                        <div><span class="font-mono font-bold text-blue-600">${key}:</span> <code class="text-gray-800">${value}</code></div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <div>
+                                <h5 class="font-semibold text-gray-700 text-sm mb-2">✅ Expected Result:</h5>
+                                <p class="text-xs text-gray-700 pl-3 border-l-2 border-green-400">${test.expectedResult || 'Test passed'}</p>
+                            </div>
+                            
+                            ${hasNotes ? `
+                            <div>
+                                <h5 class="font-semibold text-gray-700 text-sm mb-2">📝 Notes:</h5>
+                                <p class="text-xs text-gray-700 pl-3 border-l-2 border-yellow-400">${test.notes}</p>
+                            </div>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
+            
+            // Auto-expand first test
+            setTimeout(() => {
+                const firstTest = document.querySelector('[data-test-id="0"]');
+                if (firstTest) {
+                    firstTest.click();
+                }
+            }, 100);
         }
 
         function toggleTestSteps(idx) {

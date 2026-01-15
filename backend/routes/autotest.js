@@ -46,77 +46,154 @@ async function generateAITestCases(htmlContent, fileName, elements) {
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
+    // Advanced HTML parsing
     const dom = new JSDOM(htmlContent);
     const document = dom.window.document;
     
-    const pageTitle = document.title || 'Unknown';
+    const pageTitle = document.title || 'Unknown Page';
+    const pageHeading = document.querySelector('h1, h2')?.textContent || 'No heading';
+    
+    // Detailed element extraction
+    const buttons = Array.from(document.querySelectorAll('button'));
+    const inputs = Array.from(document.querySelectorAll('input'));
+    const forms = Array.from(document.querySelectorAll('form'));
+    
+    // Element details
+    const buttonDetails = buttons.map(b => ({
+      text: b.textContent?.trim() || 'unnamed',
+      type: b.getAttribute('type') || 'button',
+      id: b.id || '',
+      class: b.className || ''
+    }));
+    
+    const inputDetails = inputs.map(i => ({
+      type: i.getAttribute('type') || 'text',
+      name: i.name || i.id || 'unnamed',
+      required: i.hasAttribute('required'),
+      pattern: i.getAttribute('pattern') || '',
+      placeholder: i.placeholder || '',
+      minLength: i.getAttribute('minlength') || '',
+      maxLength: i.getAttribute('maxlength') || ''
+    }));
+    
+    // Feature detection
     const hasValidation = htmlContent.includes('required') || htmlContent.includes('pattern') || htmlContent.includes('minlength');
     const hasErrorHandling = htmlContent.includes('onerror') || htmlContent.includes('try') || htmlContent.includes('catch');
     const hasSecurity = htmlContent.includes('CSRF') || htmlContent.includes('csrf') || htmlContent.includes('secure');
+    const hasAsync = htmlContent.includes('async') || htmlContent.includes('await') || htmlContent.includes('fetch');
+    const isForm = forms.length > 0;
+    
+    // Form-specific analysis
+    let formAnalysis = '';
+    if (isForm) {
+      formAnalysis = `\n\n=== FORM ANALYSIS ===
+Number of forms: ${forms.length}
+Form method: ${forms[0]?.getAttribute('method')?.toUpperCase() || 'POST'}
+Form action: ${forms[0]?.getAttribute('action') || 'Not specified'}
+Required fields: ${inputDetails.filter(i => i.required).length}
+Input field types: ${[...new Set(inputDetails.map(i => i.type))].join(', ')}`;
+    }
 
-    const prompt = `You are an expert QA automation engineer. Analyze this HTML UI and generate INTELLIGENT, SPECIFIC test cases.
+    const prompt = `You are an expert QA automation engineer with 15+ years of Cypress testing experience.
+Your task: Generate PRODUCTION-GRADE, HIGHLY SPECIFIC, EXECUTABLE Cypress test cases.
 
-PAGE INFO:
-- Title: ${pageTitle}
-- File: ${fileName}
+=== PAGE CONTEXT ===
+Page Title: ${pageTitle}
+Main Heading: ${pageHeading}
+File Name: ${fileName}
+Form-Based UI: ${isForm ? 'YES' : 'NO'}
+Has Input Validation: ${hasValidation ? 'YES' : 'NO'}
+Has Async Operations: ${hasAsync ? 'YES' : 'NO'}
 
-HTML CONTENT (First 4000 chars):
+=== UI ELEMENTS SUMMARY ===
+Buttons: ${buttonDetails.length} - ${buttonDetails.map(b => `"${b.text}" (type: ${b.type})`).slice(0, 3).join(', ')}
+Input Fields: ${inputDetails.length} - ${[...new Set(inputDetails.map(i => i.type))].join(', ')} types
+Forms: ${forms.length}
+Page Features: ${[hasValidation && 'Validation', hasErrorHandling && 'Error handling', hasSecurity && 'Security', hasAsync && 'Async'].filter(Boolean).join(', ') || 'Basic structure'}
+${formAnalysis}
+
+=== HTML SOURCE (First 5000 chars) ===
 \`\`\`html
-${htmlContent.substring(0, 4000)}
+${htmlContent.substring(0, 5000)}
 \`\`\`
 
-DETECTED ELEMENTS:
-- Buttons: ${elements.buttons?.length || 0}
-- Text Inputs: ${elements.inputs?.length || 0}  
-- Forms: ${elements.forms?.length || 0}
-- Links: ${elements.links?.length || 0}
-- Selects/Dropdowns: ${elements.selects?.length || 0}
-- Textareas: ${elements.textareas?.length || 0}
-- Has validation: ${hasValidation}
-- Has error handling: ${hasErrorHandling}
-- Has security checks: ${hasSecurity}
+=== TEST GENERATION STRATEGY ===
 
-GENERATE SPECIFIC TEST CASES:
-Return ONLY valid JSON (no markdown, no backticks, no extra text):
+Generate test cases in these categories (total 12-15 tests):
+
+**CATEGORY 1: POSITIVE TESTS (40-50%)**
+- Test happy paths with valid data
+- Use EXACT field selectors from HTML (id, name, data attributes)
+- Include REALISTIC test data (email format, phone format, etc.)
+- Each step should reference specific CSS selectors
+
+**CATEGORY 2: NEGATIVE/VALIDATION TESTS (35-40%)**
+- Test each required field with empty value
+- Test invalid formats (invalid email, short password, etc.)
+- Test boundary conditions (min/max length)
+- Verify proper error messages appear
+
+**CATEGORY 3: EDGE CASES & SPECIAL (15-20%)**
+- SQL injection attempts on inputs
+- XSS payload attempts
+- Special characters, unicode, emojis
+- Rapid/concurrent submissions
+- Browser compatibility scenarios
+
+=== OUTPUT JSON STRUCTURE (CRITICAL - FOLLOW EXACTLY) ===
+
+Return ONLY this JSON (no markdown, no backticks, no explanations):
 
 {
   "testCases": [
     {
       "id": 1,
-      "name": "Descriptive test name",
-      "description": "What this test validates",
-      "steps": ["Step 1", "Step 2", "Step 3"],
-      "expectedResult": "Specific expected outcome",
-      "priority": "High/Medium/Low",
-      "type": "Functional/UI/Integration/Security/Performance"
+      "name": "SPECIFIC TEST NAME - exactly what it tests",
+      "description": "Business value and what behavior is validated",
+      "steps": [
+        "EXECUTABLE STEP with selector: cy.get('#fieldId').type('value')",
+        "ACTION STEP: cy.get('button[type=submit]').click()",
+        "ASSERT STEP: cy.contains('Success message').should('be.visible')"
+      ],
+      "testData": {
+        "email": "test@example.com",
+        "password": "ValidPassword123!",
+        "fieldName": "exact value for this field"
+      },
+      "expectedResult": "SPECIFIC outcome - text appears, redirect happens, error shows, etc.",
+      "priority": "Critical|High|Medium|Low",
+      "type": "Functional|Validation|Security|UI|Performance",
+      "tags": ["positive", "form-submission"],
+      "notes": "Additional context or assertions to watch for"
     }
   ]
 }
 
-REQUIREMENTS:
-1. Generate 8-12 highly specific test cases
-2. Include specific element IDs, classes, or text when referencing UI elements
-3. Cover: positive scenarios, negative scenarios, edge cases, validation, security
-4. Each test must be actionable and testable
-5. Include specific data inputs where relevant
-6. Return ONLY the JSON object, nothing else
+=== QUALITY CHECKLIST (MUST PASS) ===
+✓ Each step is a complete Cypress command (cy.get().type(), cy.should(), etc.)
+✓ Selectors reference actual elements from HTML (use id, name, class, data-testid)
+✓ Test data is specific and matches field requirements
+✓ Expected result is measurable and specific (not vague like "works correctly")
+✓ All required fields have validation tests (empty + invalid format)
+✓ Both positive and negative scenarios covered
+✓ No generic "Test X works" - must be SPECIFIC
+✓ Each test can be run independently
+✓ Tests focus on actual functionality, not UI appearance
 
-SPECIFIC TEST IDEAS:
-- Test each form with valid/invalid data
-- Test button clicks and form submissions  
-- Test input field validation (required, min/max length, patterns)
-- Test link navigation
-- Test dropdown selections
-- Test error messages
-- Test responsive behavior
-- Test accessibility
-- Test CSRF/security if applicable`;
+=== CRITICAL REQUIREMENTS ===
+- Generate MINIMUM 12 tests, MAXIMUM 15 tests
+- EVERY test must be EXECUTABLE as Cypress code
+- Steps should use cy.get() selectors referencing the actual HTML
+- Include testData with REALISTIC values
+- Test each input field with valid AND invalid data
+- If form exists, test both submission success AND validation errors
+- Return ONLY the JSON - no markdown, no code blocks, no extra text`;
 
-    console.log('🤖 Calling Gemini 2.0 Flash AI for intelligent test generation...');
+    console.log('🤖 Calling Gemini 2.0 Flash AI for intelligent HTML-based test generation...');
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
     
-    console.log('📊 AI Response received, parsing...');
+    console.log('📊 AI Response received, parsing JSON...');
     
     let testData;
     try {
@@ -139,14 +216,53 @@ SPECIFIC TEST IDEAS:
     const testCases = testData.testCases || [];
     console.log(`✅ AI Generated ${testCases.length} specific test cases`);
     
-    if (testCases.length > 0) {
-      console.log('📝 AI Test Cases:');
-      testCases.slice(0, 3).forEach(tc => {
-        console.log(`   - ${tc.name} (${tc.priority})`);
+    // Validate and filter test cases for quality
+    const validatedTestCases = testCases.filter(tc => {
+      // Must have all required fields
+      if (!tc.name || !tc.description || !Array.isArray(tc.steps) || !tc.expectedResult) {
+        console.warn(`⚠️ Skipping test "${tc.name}" - missing required fields`);
+        return false;
+      }
+      
+      // Steps must be specific and non-empty
+      if (tc.steps.length === 0 || tc.steps.some(step => !step || step.trim().length < 5)) {
+        console.warn(`⚠️ Skipping test "${tc.name}" - steps too vague or empty`);
+        return false;
+      }
+      
+      // Must have reasonable priority and type
+      const validPriorities = ['Critical', 'High', 'Medium', 'Low'];
+      const validTypes = ['Functional', 'Validation', 'Security', 'UI', 'Performance', 'Integration', 'Regression', 'Smoke'];
+      if (!validPriorities.includes(tc.priority) || !validTypes.includes(tc.type)) {
+        console.warn(`⚠️ Skipping test "${tc.name}" - invalid priority or type`);
+        return false;
+      }
+      
+      // expectedResult must be specific
+      if (tc.expectedResult.length < 10) {
+        console.warn(`⚠️ Skipping test "${tc.name}" - expected result too vague`);
+        return false;
+      }
+      
+      // Require reasonable test data
+      if (!tc.testData || Object.keys(tc.testData).length === 0) {
+        console.warn(`⚠️ Skipping test "${tc.name}" - missing test data`);
+        return false;
+      }
+      
+      return true;
+    });
+    
+    console.log(`✅ Quality Check: ${validatedTestCases.length}/${testCases.length} tests passed validation`);
+    
+    if (validatedTestCases.length > 0) {
+      console.log('📝 High-Quality Test Cases Generated:');
+      validatedTestCases.slice(0, 3).forEach(tc => {
+        console.log(`   ✓ ${tc.name} [${tc.priority}] - ${tc.type}`);
       });
     }
     
-    return testCases;
+    return validatedTestCases;
   } catch (err) {
     console.error('❌ Gemini AI Error:', err.message);
     if (err.response?.text) {
