@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Analyzer - AI Testing Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #52b788;
+            --primary-dark: #1b4332;
+            --primary-soft: #b7e4c7;
+            --bg-body: #f7fffb;
+            --text-main: #2d6a4f;
+            --text-muted: #6b9080;
+            --glass-white: rgba(255, 255, 255, 0.8);
+            --border-soft: rgba(82, 183, 136, 0.15);
+            --success: #40916c;
+            --danger: #d62828;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid var(--border-soft);
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .sidebar-brand i {
+            font-size: 1.6rem;
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 1.5rem 0.8rem;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card-glass {
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-glass:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.15);
+            border-color: rgba(82, 183, 136, 0.3);
+        }
+
+        /* ===== INPUT SECTION ===== */
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-label {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .input-url {
+            padding: 12px 16px;
+            border: 1.5px solid rgba(82, 183, 136, 0.2);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        .input-url:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 10px 16px;
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== LOADING STATE ===== */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(82, 183, 136, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-item {
+            background: white;
+            border: 1.5px solid rgba(82, 183, 136, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(82, 183, 136, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .feature-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ===== TEST CASES SECTION ===== */
+        .test-cases-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .test-case-item {
+            background: white;
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .test-case-item:hover {
+            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.1);
+        }
+
+        .test-case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .test-case-title {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .test-case-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(82, 183, 136, 0.1);
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .test-case-code {
+            background: #f5f9f7;
+            border: 1px solid rgba(82, 183, 136, 0.15);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #2d6a4f;
+        }
+
+        /* ===== CYPRESS HIGHLIGHT ===== */
+        .cypress-features {
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.05), rgba(82, 183, 136, 0.02));
+            border: 1.5px dashed var(--primary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .cypress-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cypress-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cypress-features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .cypress-feature-tag {
+            background: white;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* ===== CUSTOM TEST SECTION ===== */
+        .custom-test-form {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-textarea {
+            padding: 12px 16px;
+            border: 1.5px solid rgba(82, 183, 136, 0.2);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--text-main);
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 1.5rem;
+            }
+
+            .test-cases-container {
+                grid-template-columns: 1fr;
+            }
+
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-soft);
+                flex-direction: row;
+                align-items: center;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .sidebar-brand {
+                padding: 0;
+                border: none;
+                margin-bottom: 0;
+            }
+
+            .sidebar-menu {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .test-cases-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-globe"></i> Analyzer
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="analytics.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </a>
+            <a href="website-analyzer.html" class="menu-item active">
+                <i class="fas fa-globe"></i> Website Analyzer
+            </a>
+            <a href="script-review.html" class="menu-item">
+                <i class="fas fa-code-review"></i> Script Review
+            </a>
+            <a href="auth.html" class="menu-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Website Analyzer</h1>
+                <p class="page-subtitle">Phân tích website & sinh test case tự động với Cypress</p>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card-glass">
+            <div class="input-section">
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-link"></i> Nhập URL Website
+                    </label>
+                    <input type="url" id="websiteUrl" class="input-url" placeholder="https://example.com" />
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <button onclick="analyzeWebsite()" class="btn-primary">
+                        <i class="fas fa-search"></i> Phân tích
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="card-glass loading hidden">
+            <div>
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Đang phân tích website...</p>
+            </div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div id="analysisContent" class="hidden">
+            <!-- Cypress Highlight Section -->
+            <div class="cypress-features">
+                <div class="cypress-badge">
+                    <i class="fas fa-leaf"></i> Cypress Superpowers
+                </div>
+                <div class="cypress-title">
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                    Tại sao chọn Cypress?
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+                    Cypress cung cấp trải nghiệm testing hiện đại với Time Travel Debugger, Real-time reloads, và Cross-browser testing. 
+                    Viết test một lần, chạy khắp nơi! 🚀
+                </p>
+                <div class="cypress-features-list">
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-mouse"></i> Selectors
+                    </div>
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-keyboard"></i> Interactions
+                    </div>
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-check"></i> Assertions
+                    </div>
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-camera"></i> Screenshots
+                    </div>
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-video"></i> Video Recording
+                    </div>
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-clock"></i> Time Travel Debug
+                    </div>
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-arrows-alt"></i> Responsive Test
+                    </div>
+                    <div class="cypress-feature-tag">
+                        <i class="fas fa-network-wired"></i> API Testing
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detected Features -->
+            <div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
+                    <i class="fas fa-cube"></i> Các chức năng được phát hiện
+                </h2>
+                <div id="featuresContainer" class="features-grid"></div>
+            </div>
+
+            <!-- AI Generated Test Cases -->
+            <div style="margin-top: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
+                    <i class="fas fa-robot"></i> Test Cases được sinh bởi AI
+                </h2>
+                <div id="testCasesContainer" class="test-cases-container"></div>
+            </div>
+
+            <!-- Custom Test Case Section -->
+            <div class="card-glass">
+                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
+                    <i class="fas fa-plus-circle" style="color: var(--primary);"></i> Thêm Test Case Tùy chỉnh
+                </h2>
+                <form class="custom-test-form" onsubmit="addCustomTestCase(event)">
+                    <div class="form-group">
+                        <label class="form-label">Tên Test Case</label>
+                        <input type="text" id="testCaseName" class="form-input" placeholder="VD: Login với email hợp lệ" required />
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Loại Test</label>
+                            <select id="testCaseType" class="form-input" required>
+                                <option>Functional</option>
+                                <option>Security</option>
+                                <option>Performance</option>
+                                <option>UI/UX</option>
+                                <option>Accessibility</option>
+                                <option>Integration</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Mức độ ưu tiên</label>
+                            <select id="testCasePriority" class="form-input" required>
+                                <option>Critical</option>
+                                <option>High</option>
+                                <option>Medium</option>
+                                <option>Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mô tả các bước (Steps)</label>
+                        <textarea id="testCaseSteps" class="form-textarea" placeholder="1. Mở trang login&#10;2. Nhập email&#10;3. Nhập password&#10;4. Click nút Login&#10;5. Xác nhận điều hướng" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cypress Selectors & Code</label>
+                        <textarea id="testCaseCode" class="form-textarea" placeholder="cy.visit('/')&#10;cy.get('[data-testid=email]').type('test@example.com')&#10;cy.get('[data-testid=password]').type('password')&#10;cy.get('button:contains(Login)').click()&#10;cy.url().should('include', '/dashboard')" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Lưu Test Case
+                    </button>
+                </form>
+            </div>
+
+            <!-- Custom Test Cases List -->
+            <div style="margin-top: 2rem;">
+                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
+                    <i class="fas fa-list-check"></i> Test Cases Tùy chỉnh
+                </h2>
+                <div id="customTestCasesContainer" style="display: grid; gap: 1.5rem;"></div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="card-glass" style="margin-top: 2rem;">
+                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
+                    <i class="fas fa-download"></i> Xuất Test Cases
+                </h2>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button onclick="exportCypressTests()" class="btn-primary">
+                        <i class="fas fa-file-code"></i> Xuất Cypress Tests
+                    </button>
+                    <button onclick="exportAsJSON()" class="btn-primary">
+                        <i class="fas fa-file-code"></i> Xuất JSON
+                    </button>
+                    <button onclick="exportAsCSV()" class="btn-primary">
+                        <i class="fas fa-file-csv"></i> Xuất CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let analyzedData = null;
+        let customTestCases = [];
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'auth.html';
+        }
+
+        async function analyzeWebsite() {
+            const url = document.getElementById('websiteUrl').value.trim();
+            
+            if (!url) {
+                alert('Vui lòng nhập URL');
+                return;
+            }
+
+            // Validate URL
+            try {
+                new URL(url);
+            } catch {
+                alert('URL không hợp lệ');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:3000/api/website-analyzer', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                if (!response.ok) throw new Error('Phân tích thất bại');
+
+                const data = await response.json();
+                analyzedData = data;
+                displayAnalysis(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Lỗi khi phân tích: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loadingState');
+            const content = document.getElementById('analysisContent');
+            
+            if (show) {
+                loading.classList.remove('hidden');
+                content.classList.add('hidden');
+            } else {
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+            }
+        }
+
+        function displayAnalysis(data) {
+            // Display detected features
+            const featuresContainer = document.getElementById('featuresContainer');
+            featuresContainer.innerHTML = (data.features || []).map(feature => `
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas ${getFeatureIcon(feature.type)}"></i>
+                    </div>
+                    <div class="feature-title">${feature.name}</div>
+                    <div class="feature-desc">${feature.description}</div>
+                </div>
+            `).join('');
+
+            // Display test cases
+            const testCasesContainer = document.getElementById('testCasesContainer');
+            testCasesContainer.innerHTML = (data.testCases || []).map((testCase, idx) => `
+                <div class="test-case-item">
+                    <div class="test-case-header">
+                        <div class="test-case-title">${testCase.title}</div>
+                        <div class="test-case-type">${testCase.type}</div>
+                    </div>
+                    <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                        ${testCase.description}
+                    </div>
+                    <div class="test-case-code">${escapeHtml(testCase.code)}</div>
+                    <button onclick="copyToClipboard(${idx})" class="btn-secondary">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getFeatureIcon(type) {
+            const icons = {
+                'form': 'fa-clipboard-list',
+                'navigation': 'fa-directions',
+                'authentication': 'fa-lock',
+                'search': 'fa-search',
+                'modal': 'fa-window-maximize',
+                'table': 'fa-table',
+                'api': 'fa-network-wired',
+                'payment': 'fa-credit-card',
+                'social': 'fa-share-alt'
+            };
+            return icons[type] || 'fa-cube';
+        }
+
+        function addCustomTestCase(event) {
+            event.preventDefault();
+
+            const testCase = {
+                id: Date.now(),
+                name: document.getElementById('testCaseName').value,
+                type: document.getElementById('testCaseType').value,
+                priority: document.getElementById('testCasePriority').value,
+                steps: document.getElementById('testCaseSteps').value,
+                code: document.getElementById('testCaseCode').value
+            };
+
+            customTestCases.push(testCase);
+            event.target.reset();
+            displayCustomTestCases();
+
+            // Show success message
+            alert('✅ Test case đã được lưu thành công!');
+        }
+
+        function displayCustomTestCases() {
+            const container = document.getElementById('customTestCasesContainer');
+            
+            if (customTestCases.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Chưa có test case tùy chỉnh nào</p>';
+                return;
+            }
+
+            container.innerHTML = customTestCases.map(testCase => `
+                <div class="test-case-item" style="border-left-color: #eab308;">
+                    <div class="test-case-header">
+                        <div>
+                            <div class="test-case-title">${testCase.name}</div>
+                            <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
+                                <span class="test-case-type" style="background: rgba(234, 179, 8, 0.1); color: #ea580c;">${testCase.type}</span>
+                                <span class="test-case-type" style="background: rgba(234, 179, 8, 0.1); color: #ea580c;">${testCase.priority}</span>
+                            </div>
+                        </div>
+                        <button onclick="deleteCustomTestCase(${testCase.id})" class="btn-secondary" style="background: #fee; color: #d62828;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; white-space: pre-wrap;">${escapeHtml(testCase.steps)}</div>
+                    <div class="test-case-code">${escapeHtml(testCase.code)}</div>
+                </div>
+            `).join('');
+        }
+
+        function deleteCustomTestCase(id) {
+            customTestCases = customTestCases.filter(tc => tc.id !== id);
+            displayCustomTestCases();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyToClipboard(idx) {
+            const testCases = analyzedData.testCases || [];
+            const code = testCases[idx].code;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Code đã được copy!');
+            });
+        }
+
+        function exportCypressTests() {
+            const allTests = [
+                ...(analyzedData.testCases || []).map(tc => tc.code),
+                ...customTestCases.map(tc => tc.code)
+            ];
+
+            const content = allTests.join('\n\n// ===== NEXT TEST =====\n\n');
+            downloadFile(content, 'cypress-tests.js', 'text/javascript');
+        }
+
+        function exportAsJSON() {
+            const data = {
+                website: document.getElementById('websiteUrl').value,
+                generatedAt: new Date().toISOString(),
+                features: analyzedData.features || [],
+                aiGeneratedTests: analyzedData.testCases || [],
+                customTests: customTestCases
+            };
+
+            downloadFile(JSON.stringify(data, null, 2), 'website-analysis.json', 'application/json');
+        }
+
+        function exportAsCSV() {
+            let csv = 'Test Case Name,Type,Priority,Steps,Code\n';
+
+            // AI Generated Tests
+            (analyzedData.testCases || []).forEach(tc => {
+                csv += `"${tc.title}","${tc.type}","AI Generated","${tc.description}","${tc.code}"\n`;
+            });
+
+            // Custom Tests
+            customTestCases.forEach(tc => {
+                csv += `"${tc.name}","${tc.type}","${tc.priority}","${tc.steps}","${tc.code}"\n`;
+            });
+
+            downloadFile(csv, 'website-analysis.csv', 'text/csv');
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

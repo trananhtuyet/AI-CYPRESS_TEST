@@ -13,6 +13,7 @@ const testCasesV2Routes = require('./routes/testcases-v2');
 const autoTestRoutes = require('./routes/autotest');
 const scriptReviewRoutes = require('./routes/script-review');
 const analyticsRoutes = require('./routes/analytics');
+const websiteAnalyzerRoutes = require('./routes/website-analyzer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,9 +45,11 @@ app.use('/api/v2/testcases', testCasesV2Routes);
 app.use('/api/autotest', autoTestRoutes);
 app.use('/api', scriptReviewRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api', websiteAnalyzerRoutes);
 
 console.log('📍 Script Review Routes Registered: /api/review-test-script, /api/validate-syntax');
 console.log('📊 Analytics Routes Registered: /api/analytics/*');
+console.log('🌐 Website Analyzer Routes Registered: /api/website-analyzer, /api/cypress-cheatsheet');
 
 
 // Health check endpoint
