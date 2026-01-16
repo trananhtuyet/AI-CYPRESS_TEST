@@ -256,53 +256,21 @@
             </div>
 
             <!-- Improved Code Modal -->
-            <div id="improvedCodeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                <div class="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col my-10">
-                    <!-- Header -->
-                    <div class="bg-gradient-to-r from-[#52b788] to-[#40916c] px-6 py-4 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-code-branch text-white text-xl"></i>
-                            <h2 class="text-white text-lg font-bold">Code Cải Thiện</h2>
-                            <span class="text-white/80 text-sm">Phiên bản tối ưu từ Gemini AI</span>
-                        </div>
-                        <button onclick="toggleImprovedCodeView()" class="text-white hover:bg-white/20 p-2 rounded transition">
+            <div id="improvedCodeModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-lg max-w-4xl w-full max-h-96 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-lg font-bold">✅ Code sau khi cải thiện</h3>
+                        <button onclick="toggleImprovedCodeView()" class="text-white hover:bg-white/20 p-1 rounded transition">
                             <i class="fas fa-times text-xl"></i>
                         </button>
                     </div>
-                    
-                    <!-- Content -->
-                    <div class="overflow-y-auto flex-1 p-6">
-                        <div class="space-y-4">
-                            <!-- Info message -->
-                            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded text-sm">
-                                <p class="text-blue-800">
-                                    <i class="fas fa-lightbulb mr-2"></i>
-                                    Đây là phiên bản code đã được AI tối ưu hóa dựa trên các vấn đề được phát hiện. 
-                                    Sao chép và thay thế code cũ để cải thiện chất lượng test.
-                                </p>
-                            </div>
-                            
-                            <!-- Code display -->
-                            <div class="rounded-lg overflow-hidden border border-gray-300 bg-[#1e1e1e]">
-                                <pre id="improvedCodeDisplay" class="text-[#d4d4d4] p-4 font-mono text-sm overflow-x-auto leading-relaxed"></pre>
-                            </div>
-                        </div>
+                    <div class="flex-grow overflow-y-auto p-4">
+                        <pre id="improvedCodeDisplay" class="bg-[#1e1e1e] text-[#d4d4d4] p-4 rounded font-mono text-xs overflow-x-auto"></pre>
                     </div>
-                    
-                    <!-- Footer with actions -->
-                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between gap-3">
-                        <div class="text-sm text-gray-600">
-                            <i class="fas fa-info-circle mr-1"></i>
-                            Sao chép code và dán vào project của bạn
-                        </div>
-                        <div class="flex gap-3">
-                            <button onclick="copyImprovedCode()" class="flex items-center gap-2 px-4 py-2 bg-[#52b788] text-white rounded-lg hover:bg-[#40916c] transition font-semibold">
-                                <i class="fas fa-copy"></i>Sao chép Code
-                            </button>
-                            <button onclick="toggleImprovedCodeView()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold">
-                                Đóng
-                            </button>
-                        </div>
+                    <div class="border-t px-4 py-3 flex gap-2">
+                        <button onclick="copyImprovedCode()" class="flex-1 bg-[#52b788] text-white py-2 rounded font-bold hover:bg-[#40916c] transition">
+                            <i class="fas fa-copy mr-2"></i>Copy Code
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1852,72 +1820,6 @@
             document.getElementById('autoIssuesScore').textContent = (data.issues?.length || 0);
             document.getElementById('autoPointScore').textContent = (data.score || 0).toFixed(1) + '/10';
 
-            // Add enhanced score visualization section at the top
-            if (data.metrics || data.score) {
-                const scoreCard = document.createElement('div');
-                const score = data.metrics?.score || data.score || 0;
-                const quality = data.metrics?.quality || data.quality || 'FAIR';
-                const complexity = data.metrics?.complexity || 'MEDIUM';
-                
-                // Determine score color
-                let scoreColor = 'text-red-600';
-                let scoreBg = 'bg-red-50';
-                let scoreIcon = 'fa-frown';
-                if (score >= 7.5) {
-                    scoreColor = 'text-green-600';
-                    scoreBg = 'bg-green-50';
-                    scoreIcon = 'fa-smile';
-                } else if (score >= 6) {
-                    scoreColor = 'text-yellow-600';
-                    scoreBg = 'bg-yellow-50';
-                    scoreIcon = 'fa-meh';
-                }
-                
-                scoreCard.className = `${scoreBg} border-2 border-l-8 ${scoreColor.replace('text', 'border')} p-4 rounded-lg mb-4`;
-                scoreCard.innerHTML = `
-                    <div class="flex items-start justify-between gap-4">
-                        <div class="flex-1">
-                            <h3 class="font-bold ${scoreColor} text-lg mb-2">
-                                <i class="fas ${scoreIcon} mr-2"></i>Kết quả đánh giá
-                            </h3>
-                            <p class="text-gray-700 text-sm mb-3">${data.summary || 'Script analysis completed'}</p>
-                            <div class="flex gap-4 flex-wrap">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-semibold px-3 py-1 rounded-full ${
-                                        quality === 'GOOD' || quality === 'EXCELLENT' ? 'bg-green-200 text-green-900' :
-                                        quality === 'FAIR' ? 'bg-yellow-200 text-yellow-900' :
-                                        'bg-red-200 text-red-900'
-                                    }">Quality: ${quality}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-200 text-blue-900">Complexity: ${complexity}</span>
-                                </div>
-                                ${data.estimatedBenefit ? `
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-purple-200 text-purple-900">✨ ${data.estimatedBenefit}</span>
-                                </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <div class="relative w-24 h-24 flex items-center justify-center">
-                                <svg class="w-full h-full" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="4"/>
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="4" 
-                                        class="${scoreColor}" stroke-dasharray="${(score/10) * 282.7}" stroke-dashoffset="0"
-                                        style="transform: rotate(-90deg); transform-origin: 50% 50%; transition: all 0.3s ease;"/>
-                                </svg>
-                                <div class="absolute text-center">
-                                    <div class="text-2xl font-bold ${scoreColor}">${score.toFixed(1)}</div>
-                                    <div class="text-xs text-gray-600">/10</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(scoreCard);
-            }
-
             // Add status indicator if fallback or mock
             if (data.status === 'fallback' || data.status === 'mock') {
                 const statusDiv = document.createElement('div');
@@ -1938,7 +1840,7 @@
             }
 
             // Add general feedback
-            if (data.summary && (!data.metrics && !data.score)) {
+            if (data.summary) {
                 const summaryDiv = document.createElement('div');
                 summaryDiv.className = 'bg-blue-50 border-l-4 border-blue-500 p-3 rounded text-sm';
                 summaryDiv.innerHTML = `
@@ -1954,36 +1856,25 @@
                     const issueDiv = document.createElement('div');
                     let bgColor = 'bg-red-50 border-red-500';
                     let textColor = 'text-red-900';
-                    if (issue.type === 'warning' || issue.type === 'WARNING') {
+                    if (issue.type === 'warning') {
                         bgColor = 'bg-yellow-50 border-yellow-500';
                         textColor = 'text-yellow-900';
-                    } else if (issue.type === 'info' || issue.type === 'INFO') {
+                    } else if (issue.type === 'info') {
                         bgColor = 'bg-blue-50 border-blue-500';
                         textColor = 'text-blue-900';
-                    } else if (issue.type === 'error' || issue.type === 'ERROR') {
+                    } else if (issue.type === 'error') {
                         bgColor = 'bg-red-50 border-red-500';
                         textColor = 'text-red-900';
-                    } else if (issue.type === 'CRITICAL') {
-                        bgColor = 'bg-red-100 border-red-600';
-                        textColor = 'text-red-800';
                     }
                     
-                    issueDiv.className = `${bgColor} border-l-4 p-3 rounded text-sm mb-2`;
+                    issueDiv.className = `${bgColor} border-l-4 p-3 rounded text-sm`;
                     issueDiv.innerHTML = `
-                        <h4 class="font-bold ${textColor} mb-1 flex items-center gap-2">
-                            <i class="fas fa-${issue.type === 'error' || issue.type === 'ERROR' || issue.type === 'CRITICAL' ? 'times-circle' : issue.type === 'warning' || issue.type === 'WARNING' ? 'exclamation-triangle' : 'info-circle'} mr-0"></i>
+                        <h4 class="font-bold ${textColor} mb-1">
+                            <i class="fas fa-${issue.type === 'error' ? 'times-circle' : issue.type === 'warning' ? 'exclamation-triangle' : 'info-circle'} mr-2"></i>
                             ${issue.title || 'Issue'}
-                            ${issue.severity ? `<span class="text-xs font-semibold px-2 py-0.5 rounded ${
-                                issue.severity === 'High' ? 'bg-red-200 text-red-800' :
-                                issue.severity === 'Medium' ? 'bg-yellow-200 text-yellow-800' :
-                                'bg-blue-200 text-blue-800'
-                            }">${issue.severity}</span>` : ''}
                         </h4>
-                        <p class="${textColor} mb-2">${issue.description || ''}</p>
-                        ${issue.suggestion ? `<div class="bg-white/50 p-2 rounded border-l-2 border-green-500 mt-2">
-                            <p class="text-xs font-semibold text-green-700 mb-1">💡 Cách khắc phục:</p>
-                            <code class="text-xs text-gray-700 block overflow-x-auto">${issue.suggestion}</code>
-                        </div>` : ''}
+                        <p class="${textColor}">${issue.description || ''}</p>
+                        ${issue.suggestion ? `<p class="text-blue-600 font-semibold mt-1"><i class="fas fa-arrow-right mr-1"></i>${issue.suggestion}</p>` : ''}
                     `;
                     container.appendChild(issueDiv);
                 });
@@ -2034,36 +1925,12 @@
         function toggleImprovedCodeView() {
             const modal = document.getElementById('improvedCodeModal');
             modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                // Auto-focus on open
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
-            }
         }
 
         function copyImprovedCode() {
             const code = document.getElementById('improvedCodeDisplay').textContent;
-            if (!code || code.trim().length === 0) {
-                alert('❌ Không có code để copy');
-                return;
-            }
-            
             navigator.clipboard.writeText(code).then(() => {
-                // Show success feedback
-                const button = event.target.closest('button');
-                const originalHtml = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-check"></i>Đã sao chép!';
-                button.classList.add('bg-green-600', 'hover:bg-green-700');
-                button.classList.remove('bg-[#52b788]', 'hover:bg-[#40916c]');
-                
-                setTimeout(() => {
-                    button.innerHTML = originalHtml;
-                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
-                    button.classList.add('bg-[#52b788]', 'hover:bg-[#40916c]');
-                }, 2000);
-            }).catch(() => {
-                alert('❌ Lỗi khi copy code');
+                alert('✅ Đã copy code!');
             });
         }
 
@@ -2358,90 +2225,19 @@
             console.log('📝 Stored tests:', testCases.length);
             
             const testsList = document.getElementById('autoTestCases');
-            testsList.innerHTML = testCases.map((test, idx) => {
-                const hasTestData = test.testData && Object.keys(test.testData).length > 0;
-                const hasNotes = test.notes && test.notes.length > 0;
-                const hasTags = test.tags && Array.isArray(test.tags) && test.tags.length > 0;
-                
-                return `
-                <div class="p-4 bg-white border-l-4 border-green-500 rounded-lg cursor-pointer hover:bg-green-50 transition-all" data-test-id="${idx}" onclick="toggleTestSteps(${idx})">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <p class="font-bold text-[#1b4332] text-base">${idx + 1}. ${test.name}</p>
-                            <p class="text-sm text-gray-600 mt-2">${test.description || 'No description'}</p>
-                        </div>
-                        <div class="text-right ml-4">
-                            <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full 
-                                ${test.priority === 'Critical' ? 'bg-red-100 text-red-700' : 
-                                  test.priority === 'High' ? 'bg-orange-100 text-orange-700' : 
-                                  test.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 
-                                  'bg-blue-100 text-blue-700'}">
-                                ${test.priority || 'Medium'}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 mt-3 flex-wrap">
-                        <span class="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded">${test.type || 'Functional'}</span>
-                        <span class="text-xs text-gray-500">📋 ${test.steps?.length || 0} steps</span>
-                        ${hasTestData ? `<span class="text-xs text-gray-500">🔧 Test data included</span>` : ''}
-                    </div>
-                    
-                    ${hasTags ? `
-                    <div class="flex gap-2 flex-wrap mt-2">
-                        ${test.tags.map(tag => `<span class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">${tag}</span>`).join('')}
-                    </div>
-                    ` : ''}
-                    
-                    <div id="steps-${idx}" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <div class="space-y-3">
-                            <div>
-                                <h5 class="font-semibold text-gray-700 text-sm mb-2">📍 Test Steps:</h5>
-                                <ol class="space-y-2">
-                                    ${(test.steps || []).map((step, stepIdx) => `
-                                        <li class="text-xs text-gray-700 pl-4 relative">
-                                            <span class="absolute left-0 font-bold text-blue-600">${stepIdx + 1}.</span>
-                                            <code class="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">${step}</code>
-                                        </li>
-                                    `).join('')}
-                                </ol>
-                            </div>
-                            
-                            ${hasTestData ? `
-                            <div>
-                                <h5 class="font-semibold text-gray-700 text-sm mb-2">🧪 Test Data:</h5>
-                                <div class="bg-gray-50 p-3 rounded text-xs text-gray-700 space-y-1">
-                                    ${Object.entries(test.testData || {}).map(([key, value]) => `
-                                        <div><span class="font-mono font-bold text-blue-600">${key}:</span> <code class="text-gray-800">${value}</code></div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            ` : ''}
-                            
-                            <div>
-                                <h5 class="font-semibold text-gray-700 text-sm mb-2">✅ Expected Result:</h5>
-                                <p class="text-xs text-gray-700 pl-3 border-l-2 border-green-400">${test.expectedResult || 'Test passed'}</p>
-                            </div>
-                            
-                            ${hasNotes ? `
-                            <div>
-                                <h5 class="font-semibold text-gray-700 text-sm mb-2">📝 Notes:</h5>
-                                <p class="text-xs text-gray-700 pl-3 border-l-2 border-yellow-400">${test.notes}</p>
-                            </div>
-                            ` : ''}
-                        </div>
+            testsList.innerHTML = testCases.map((test, idx) => `
+                <div class="p-3 bg-white border-l-4 border-green-500 rounded cursor-pointer hover:bg-green-50" data-test-id="${idx}" onclick="toggleTestSteps(${idx})">
+                    <p class="font-bold text-[#1b4332]">${idx + 1}. ${test.name}</p>
+                    <p class="text-xs text-gray-500 mt-1">${test.priority || 'Medium'} Priority • ${test.steps?.length || 0} steps</p>
+                    <p class="text-xs text-gray-400 mt-1">${test.type || 'Functional'}</p>
+                    <div id="steps-${idx}" class="hidden mt-2 text-xs text-gray-700 space-y-1">
+                        ${(test.steps || []).map((step, stepIdx) => `
+                            <div class="pl-3 border-l border-gray-300">• ${step}</div>
+                        `).join('')}
+                        <div class="pl-3 border-l border-gray-300 text-blue-600 mt-2"><strong>Expected:</strong> ${test.expectedResult || 'Test passed'}</div>
                     </div>
                 </div>
-                `;
-            }).join('');
-            
-            // Auto-expand first test
-            setTimeout(() => {
-                const firstTest = document.querySelector('[data-test-id="0"]');
-                if (firstTest) {
-                    firstTest.click();
-                }
-            }, 100);
+            `).join('');
         }
 
         function toggleTestSteps(idx) {

@@ -3,178 +3,527 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics & Reports - Test Management System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Analytics & Reports - AI Testing Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
-        code, pre { font-family: 'Fira Code', monospace; }
-        .gradient-text { background: linear-gradient(135deg, #52b788, #2d6a4f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        :root {
+            --primary: #52b788;
+            --primary-dark: #1b4332;
+            --primary-soft: #b7e4c7;
+            --bg-body: #f7fffb;
+            --text-main: #2d6a4f;
+            --text-muted: #6b9080;
+            --glass-white: rgba(255, 255, 255, 0.8);
+            --border-soft: rgba(82, 183, 136, 0.15);
+            --success: #40916c;
+            --danger: #d62828;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: white;
+            border-right: 1px solid var(--border-soft);
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .sidebar-brand i {
+            font-size: 1.6rem;
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 1.5rem 0.8rem;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card-glass {
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-glass:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.15);
+            border-color: rgba(82, 183, 136, 0.3);
+        }
+
+        .stat-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 1.8rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: white;
+            border-color: rgba(82, 183, 136, 0.3);
+            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== CHARTS ===== */
+        .chart-container {
+            position: relative;
+            height: 280px;
+            margin-top: 1rem;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.3);
+        }
+
+        /* ===== TABLES ===== */
+        .table-row-hover:hover {
+            background: rgba(82, 183, 136, 0.1);
+            transform: translateX(4px);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-soft);
+                flex-direction: row;
+                align-items: center;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .sidebar-brand {
+                padding: 0;
+                border: none;
+                margin-bottom: 0;
+            }
+
+            .sidebar-menu {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-gradient-to-r from-[#52b788] to-[#40916c] text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-chart-bar text-2xl"></i>
-                <h1 class="text-2xl font-bold">Analytics & Reports</h1>
-            </div>
-            <a href="dashboard.html" class="flex items-center gap-2 hover:bg-white/20 px-4 py-2 rounded transition">
-                <i class="fas fa-arrow-left"></i> Quay lại
-            </a>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-chart-bar"></i> Analytics
         </div>
-    </nav>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="analytics.html" class="menu-item active">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </a>
+            <a href="script-review.html" class="menu-item">
+                <i class="fas fa-code-review"></i> Script Review
+            </a>
+            <a href="auth.html" class="menu-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </aside>
 
-    <div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Analytics & Reports</h1>
+                <p class="page-subtitle">Phân tích chi tiết hiệu suất test</p>
+            </div>
+        </div>
+
         <!-- Loading State -->
-        <div id="loadingState" class="flex items-center justify-center py-12">
+        <div id="loadingState" class="flex items-center justify-center py-20">
             <div class="text-center">
-                <div class="animate-spin text-4xl text-[#52b788] mb-4">
-                    <i class="fas fa-spinner"></i>
+                <div class="inline-block">
+                    <div class="w-20 h-20 rounded-full border-4 border-emerald-200 border-t-emerald-600 animate-spin"></div>
                 </div>
-                <p class="text-gray-600">Đang tải dữ liệu phân tích...</p>
+                <p class="text-gray-600 mt-6 text-lg">Đang tải dữ liệu phân tích...</p>
             </div>
         </div>
 
         <!-- Content -->
         <div id="analyticsContent" class="hidden">
             <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-gray-600 text-sm font-semibold mb-2">
-                        <i class="fas fa-flask text-blue-500 mr-2"></i>Tổng Test Cases
+            <div style="margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">Tóm tắt Hiệu suất</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="stat-card fade-in-up">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <span class="stat-label">Tổng Test Cases</span>
+                            <div style="width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-flask" style="color: #3b82f6; font-size: 1.2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="totalTests">0</div>
+                        <p class="stat-description">Số lượng test tổng cộng</p>
                     </div>
-                    <div class="text-3xl font-bold text-gray-900" id="totalTests">0</div>
-                </div>
 
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-gray-600 text-sm font-semibold mb-2">
-                        <i class="fas fa-check-circle text-green-500 mr-2"></i>Passed
+                    <div class="stat-card fade-in-up">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <span class="stat-label">Passed</span>
+                            <div style="width: 40px; height: 40px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-check-circle" style="color: #22c55e; font-size: 1.2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" style="color: #22c55e;" id="passedSteps">0</div>
+                        <p class="stat-description">Test thành công</p>
                     </div>
-                    <div class="text-3xl font-bold text-green-600" id="passedSteps">0</div>
-                </div>
 
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-gray-600 text-sm font-semibold mb-2">
-                        <i class="fas fa-times-circle text-red-500 mr-2"></i>Failed
+                    <div class="stat-card fade-in-up">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <span class="stat-label">Failed</span>
+                            <div style="width: 40px; height: 40px; background: rgba(239, 68, 68, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" style="color: #ef4444;" id="failedSteps">0</div>
+                        <p class="stat-description">Test thất bại</p>
                     </div>
-                    <div class="text-3xl font-bold text-red-600" id="failedSteps">0</div>
-                </div>
 
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-gray-600 text-sm font-semibold mb-2">
-                        <i class="fas fa-circle-notch text-yellow-500 mr-2"></i>Pending
+                    <div class="stat-card fade-in-up">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <span class="stat-label">Pending</span>
+                            <div style="width: 40px; height: 40px; background: rgba(234, 179, 8, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-circle-notch" style="color: #eab308; font-size: 1.2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" style="color: #eab308;" id="pendingSteps">0</div>
+                        <p class="stat-description">Đang chờ xử lý</p>
                     </div>
-                    <div class="text-3xl font-bold text-yellow-600" id="pendingSteps">0</div>
-                </div>
 
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-gray-600 text-sm font-semibold mb-2">
-                        <i class="fas fa-percentage text-purple-500 mr-2"></i>Pass Rate
+                    <div class="stat-card fade-in-up">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <span class="stat-label">Pass Rate</span>
+                            <div style="width: 40px; height: 40px; background: rgba(168, 85, 247, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-percentage" style="color: #a855f7; font-size: 1.2rem;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" style="color: #a855f7;" id="passRate">0%</div>
+                        <p class="stat-description">Tỷ lệ thành công</p>
                     </div>
-                    <div class="text-3xl font-bold text-purple-600" id="passRate">0%</div>
                 </div>
             </div>
 
             <!-- Charts Row 1 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                 <!-- Pass/Fail Chart -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-chart-pie text-[#52b788] mr-2"></i>Test Results Distribution
-                    </h3>
-                    <canvas id="passFailChart" height="100"></canvas>
+                <div class="card-glass">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--success)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-chart-pie" style="color: white; font-size: 1rem;"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Test Results Distribution</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Phân bổ kết quả test</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="passFailChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- By Priority -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-bars text-[#52b788] mr-2"></i>Test Cases by Priority
-                    </h3>
-                    <canvas id="priorityChart" height="100"></canvas>
+                <div class="card-glass">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-bars" style="color: white; font-size: 1rem;"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Test Cases by Priority</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Theo mức độ ưu tiên</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
                 </div>
             </div>
 
             <!-- Charts Row 2 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                 <!-- By Module -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-cubes text-[#52b788] mr-2"></i>Test Cases by Module
-                    </h3>
-                    <canvas id="moduleChart" height="100"></canvas>
+                <div class="card-glass">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--success)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cubes" style="color: white; font-size: 1rem;"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Test Cases by Module</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Phân bổ theo module</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="moduleChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- By Type -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-project-diagram text-[#52b788] mr-2"></i>Test Cases by Type
-                    </h3>
-                    <canvas id="typeChart" height="100"></canvas>
+                <div class="card-glass">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #818cf8, #6366f1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-project-diagram" style="color: white; font-size: 1rem;"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Test Cases by Type</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Theo loại test</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="typeChart"></canvas>
+                    </div>
                 </div>
             </div>
 
             <!-- Detailed Tables -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                 <!-- Module Details -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-list text-[#52b788] mr-2"></i>Chi tiết theo Module
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead class="border-b border-gray-200">
-                                <tr>
-                                    <th class="text-left py-2 font-semibold text-gray-700">Module</th>
-                                    <th class="text-right py-2 font-semibold text-gray-700">Tests</th>
+                <div class="card-glass">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <i class="fas fa-list" style="color: var(--primary); font-size: 1.2rem;"></i>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Chi tiết theo Module</h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; font-size: 0.9rem; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid rgba(82, 183, 136, 0.2);">
+                                    <th style="text-align: left; padding: 0.75rem 0; font-weight: 700; color: var(--primary-dark);">Module</th>
+                                    <th style="text-align: right; padding: 0.75rem 0; font-weight: 700; color: var(--primary-dark);">Tests</th>
                                 </tr>
                             </thead>
-                            <tbody id="moduleTable" class="divide-y divide-gray-200"></tbody>
+                            <tbody id="moduleTable" style="border-top: 1px solid rgba(82, 183, 136, 0.15);"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Priority Details -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
-                        <i class="fas fa-list text-[#52b788] mr-2"></i>Chi tiết theo Priority
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead class="border-b border-gray-200">
-                                <tr>
-                                    <th class="text-left py-2 font-semibold text-gray-700">Priority</th>
-                                    <th class="text-right py-2 font-semibold text-gray-700">Tests</th>
+                <div class="card-glass">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <i class="fas fa-list" style="color: var(--primary); font-size: 1.2rem;"></i>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Chi tiết theo Priority</h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; font-size: 0.9rem; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid rgba(82, 183, 136, 0.2);">
+                                    <th style="text-align: left; padding: 0.75rem 0; font-weight: 700; color: var(--primary-dark);">Priority</th>
+                                    <th style="text-align: right; padding: 0.75rem 0; font-weight: 700; color: var(--primary-dark);">Tests</th>
                                 </tr>
                             </thead>
-                            <tbody id="priorityTable" class="divide-y divide-gray-200"></tbody>
+                            <tbody id="priorityTable" style="border-top: 1px solid rgba(82, 183, 136, 0.15);"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
             <!-- Export Section -->
-            <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">
-                    <i class="fas fa-download text-[#52b788] mr-2"></i>Export Report
-                </h3>
-                <div class="flex gap-3 flex-wrap">
-                    <button onclick="exportAsCSV()" class="px-4 py-2 bg-[#52b788] text-white rounded-lg hover:bg-[#40916c] transition flex items-center gap-2">
+            <div class="card-glass">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ec4899, #db2777); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-download" style="color: white; font-size: 1rem;"></i>
+                    </div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Export Report</h3>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button onclick="exportAsCSV()" class="btn-primary">
                         <i class="fas fa-file-csv"></i> Export as CSV
                     </button>
-                    <button onclick="exportAsJSON()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <button onclick="exportAsJSON()" class="btn-primary">
                         <i class="fas fa-file-code"></i> Export as JSON
                     </button>
-                    <button onclick="printReport()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center gap-2">
+                    <button onclick="printReport()" class="btn-primary" style="background: linear-gradient(135deg, #6b7280, #4b5563);">
                         <i class="fas fa-print"></i> Print Report
                     </button>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         let analyticsData = null;
@@ -189,24 +538,32 @@
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
+                    console.warn('No token found, redirecting to auth');
                     window.location.href = 'auth.html';
                     return;
                 }
+
+                console.log('🔐 Loading analytics with token:', token.substring(0, 20) + '...');
 
                 const response = await fetch('http://localhost:3000/api/analytics/summary', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (!response.ok) throw new Error('Failed to fetch analytics');
+                console.log('📊 Analytics response status:', response.status);
+                const data = await response.json();
+                console.log('📊 Analytics response data:', JSON.stringify(data, null, 2));
 
-                analyticsData = await response.json();
+                if (!response.ok) throw new Error(`Failed to fetch analytics: ${data.error || response.statusText}`);
+
+                analyticsData = data;
                 displayAnalytics();
             } catch (error) {
-                console.error('Error loading analytics:', error);
+                console.error('❌ Error loading analytics:', error);
                 document.getElementById('loadingState').innerHTML = `
                     <div class="text-center">
                         <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
-                        <p class="text-red-600">Lỗi tải dữ liệu: ${error.message}</p>
+                        <p class="text-red-600 text-lg font-medium">Lỗi tải dữ liệu: ${error.message}</p>
+                        <p class="text-sm text-gray-600 mt-2">Kiểm tra console (F12) để xem chi tiết</p>
                     </div>
                 `;
             }
@@ -237,6 +594,12 @@
             document.getElementById('analyticsContent').classList.remove('hidden');
         }
 
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'auth.html';
+        }
+
         function createPassFailChart(summary) {
             const ctx = document.getElementById('passFailChart').getContext('2d');
             const colors = ['#10b981', '#ef4444', '#eab308'];
@@ -249,14 +612,22 @@
                         data: [summary.passedSteps, summary.failedSteps, summary.pendingSteps],
                         backgroundColor: colors,
                         borderColor: '#ffffff',
-                        borderWidth: 2
+                        borderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom' }
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: { size: 13, weight: '600' },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
                     }
                 }
             });
@@ -280,15 +651,24 @@
                     datasets: [{
                         label: 'Test Cases',
                         data: counts,
-                        backgroundColor: priorities.map(p => colors[p] || '#9ca3af')
+                        backgroundColor: priorities.map(p => colors[p] || '#9ca3af'),
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     indexAxis: 'y',
-                    plugins: { legend: { display: false } },
-                    scales: { x: { beginAtZero: true } }
+                    plugins: { 
+                        legend: { display: false }
+                    },
+                    scales: { 
+                        x: { 
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
                 }
             });
         }
@@ -305,14 +685,21 @@
                     datasets: [{
                         label: 'Test Cases',
                         data: counts,
-                        backgroundColor: '#52b788'
+                        backgroundColor: 'rgba(96, 165, 250, 0.8)',
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
                 }
             });
         }
@@ -331,13 +718,23 @@
                         data: counts,
                         backgroundColor: colors,
                         borderColor: '#ffffff',
-                        borderWidth: 2
+                        borderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'bottom' } }
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: { size: 13, weight: '600' },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -347,9 +744,9 @@
             tbody.innerHTML = Object.entries(byModule)
                 .sort((a, b) => b[1] - a[1])
                 .map(([module, count]) => `
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-2 text-gray-700">${module || 'Uncategorized'}</td>
-                        <td class="text-right py-2 font-semibold text-[#52b788]">${count}</td>
+                    <tr class="table-row-hover transition-all" style="border-bottom: 1px solid rgba(82, 183, 136, 0.1); padding: 0.75rem 0;">
+                        <td style="padding: 0.75rem 0; color: var(--text-main); font-weight: 500;">${module || 'Uncategorized'}</td>
+                        <td style="text-align: right; padding: 0.75rem 0; font-weight: 700; color: var(--primary);">${count}</td>
                     </tr>
                 `).join('');
         }
@@ -358,18 +755,18 @@
             const tbody = document.getElementById('priorityTable');
             const priorityOrder = ['Critical', 'High', 'Medium', 'Low'];
             const colors = {
-                'Critical': 'text-red-600',
-                'High': 'text-orange-600',
-                'Medium': 'text-yellow-600',
-                'Low': 'text-blue-600'
+                'Critical': '#dc2626',
+                'High': '#ea580c',
+                'Medium': '#eab308',
+                'Low': '#3b82f6'
             };
 
             tbody.innerHTML = priorityOrder
                 .filter(p => byPriority[p])
                 .map(p => `
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-2"><span class="font-semibold ${colors[p] || ''}">${p}</span></td>
-                        <td class="text-right py-2 font-semibold">${byPriority[p]}</td>
+                    <tr class="table-row-hover transition-all" style="border-bottom: 1px solid rgba(82, 183, 136, 0.1); padding: 0.75rem 0;">
+                        <td style="padding: 0.75rem 0;"><span style="font-weight: 700; color: ${colors[p]};">${p}</span></td>
+                        <td style="text-align: right; padding: 0.75rem 0; font-weight: 700;">${byPriority[p]}</td>
                     </tr>
                 `).join('');
         }

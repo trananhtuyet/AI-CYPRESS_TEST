@@ -135,9 +135,10 @@ router.post('/login', async (req, res) => {
 // Get current user profile
 router.get('/profile', authMiddleware, async (req, res) => {
   try {
+    console.log('🔐 Profile request - User ID from token:', req.user?.id);
     const user = await getQuery(
       'SELECT id, username, email, full_name, avatar_url, created_at FROM users WHERE id = ?',
-      [req.userId]
+      [req.user?.id]
     );
 
     if (!user) {
