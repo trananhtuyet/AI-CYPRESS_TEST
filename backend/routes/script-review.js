@@ -240,14 +240,24 @@ QUALITY REQUIREMENTS FOR YOUR RESPONSE:
 
         let reviewData;
         try {
-          reviewData = JSON.parse(responseText);
-        } catch (e) {
-          const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            reviewData = JSON.parse(jsonMatch[0]);
-          } else {
-            throw new Error('No JSON found in response');
+          try {
+            reviewData = JSON.parse(responseText);
+          } catch (e) {
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              try {
+                reviewData = JSON.parse(jsonMatch[0]);
+              } catch (parseErr) {
+                console.error('❌ JSON parse error:', parseErr.message);
+                throw new Error('Failed to parse JSON: ' + parseErr.message);
+              }
+            } else {
+              throw new Error('No JSON found in response');
+            }
           }
+        } catch (jsonError) {
+          console.error('❌ JSON parsing failed:', jsonError.message);
+          throw jsonError;
         }
 
         // Ensure all required fields exist
@@ -437,6 +447,119 @@ Nếu là câu hỏi chung chung về Cypress, hãy cung cấp ví dụ code n�
     res.json({
       success: false,
       error: error.message || 'Lỗi khi xử lý chat'
+    });
+  }
+});
+
+/**
+ * Ask follow-up questions about a review
+ * POST /api/ask-about-review
+ */
+router.post('/ask-about-review', async (req, res) => {
+  console.log('📌 [ROUTE] /ask-about-review called');
+  try {
+    const { question, previousReview, code } = req.body;
+    
+    if (!question || typeof question !== 'string' || question.trim().length === 0) {
+      console.log('❌ Question validation failed');
+      return res.status(400).json({
+        error: 'Câu hỏi không được để trống'
+      });
+    }
+
+    if (!previousReview) {
+      console.log('❌ Previous review data missing');
+      return res.status(400).json({
+        error: 'Vui lòng review code trước'
+      });
+    }
+
+    console.log('❓ Question:', question.substring(0, 100));
+
+    // Check if using mock mode
+    const useMock = process.env.USE_MOCK === 'true';
+    
+    if (useMock || !genAI) {
+      console.log('⚠️ Using mock response for follow-up question');
+      const mockAnswers = {
+        'timeout': 'Timeout 5000 được sử dụng để chờ element tải xong. Nó giúp tránh flaky tests khi element chưa render. Bạn có thể điều chỉnh giá trị này tùy theo tốc độ ứng dụng.',
+        'wait': 'Trong Cypress, nên dùng .should() assertions thay vì cy.wait() với ID. Điều này giúp test chặn đúng thời điểm cần thiết mà không hardcode thời gian.',
+        'selector': 'Selector [name="email"] rất tốt vì nó cụ thể và ít thay đổi. Tránh dùng .class hoặc vị trí trong DOM vì dễ bị ảnh hưởng bởi thay đổi styling.',
+        'assertion': 'Assertion .should("include", "/dashboard") kiểm tra URL sau login thành công. Đây là cách tốt để xác nhận navigation đúng.',
+        'default': 'Dựa trên review code trước đó, điều quan trọng là sử dụng explicit waits thay vì implicit waits, tránh hardcode data, và luôn có assertions ý nghĩa.'
+      };
+
+      let answer = mockAnswers.default;
+      for (const [key, value] of Object.entries(mockAnswers)) {
+        if (question.toLowerCase().includes(key)) {
+          answer = value;
+          break;
+        }
+      }
+
+      return res.json({
+        success: true,
+        answer: answer,
+        source: 'mock'
+      });
+    }
+
+    // Build context from previous review
+    const reviewContext = `
+KẾT QUẢ REVIEW CODE TRƯỚC:
+- Chất lượng: ${previousReview.metrics?.quality || 'N/A'}
+- Điểm số: ${previousReview.metrics?.score || 'N/A'}/10
+- Độ phức tạp: ${previousReview.metrics?.complexity || 'N/A'}
+- Số lỗi tìm thấy: ${previousReview.issues?.length || 0}
+
+CÁC VẤN ĐỀ TÌM THẤY:
+${(previousReview.issues || []).map(i => `- [${i.type.toUpperCase()}] ${i.title}: ${i.description}`).join('\n')}
+
+GỢI Ý CẢI THIỆN:
+${(previousReview.recommendations || []).map(r => `- ${r}`).join('\n')}
+
+CODE GỐC:
+\`\`\`javascript
+${code}
+\`\`\`
+`;
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+    const followUpPrompt = `Bạn là một chuyên gia Cypress testing có kinh nghiệm hơn 10 năm. 
+Người dùng đã nhận được kết quả review code của mình:
+
+${reviewContext}
+
+Bây giờ họ có câu hỏi follow-up: "${question}"
+
+YÊUVỀ ĐÁP TIẾP:
+1. Trả lời bằng Tiếng Việt, rõ ràng và chuyên nghiệp
+2. Giải thích kỹ LỚN (không quá dài, 3-5 câu)
+3. Nếu câu hỏi liên quan tới code, cung cấp ví dụ code cụ thể
+4. Giải thích TẠI SAO điều đó lại quan trọng
+5. Nếu có cách tốt hơn, hãy đề xuất
+
+Trả lời trực tiếp mà không dùng markdown hoặc định dạng đặc biệt.`;
+
+    console.log('🤖 Calling Gemini AI for follow-up...');
+    
+    const result = await model.generateContent(followUpPrompt);
+    const answer = result.response.text();
+
+    console.log('✅ Follow-up answer received');
+
+    res.json({
+      success: true,
+      answer: answer,
+      source: 'ai'
+    });
+
+  } catch (error) {
+    console.error('❌ Follow-up Question Error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Lỗi khi xử lý câu hỏi'
     });
   }
 });

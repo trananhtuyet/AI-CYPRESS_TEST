@@ -102,6 +102,38 @@
             box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
         }
 
+        .sidebar-footer {
+            padding: 1rem 0.8rem;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            border: none;
+            color: white;
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.3);
+        }
+
+        .btn-logout i {
+            font-size: 1.1rem;
+        }
+
         /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
@@ -294,18 +326,27 @@
         </div>
         <nav class="sidebar-menu">
             <a href="dashboard.html" class="menu-item">
-                <i class="fas fa-home"></i> Dashboard
+                <i class="fas fa-home"></i> Tổng quan
+            </a>
+            <a href="test-creation.html" class="menu-item">
+                <i class="fas fa-pen"></i> Tạo Test Case
             </a>
             <a href="analytics.html" class="menu-item active">
-                <i class="fas fa-chart-bar"></i> Analytics
+                <i class="fas fa-chart-line"></i> Analytics
+            </a>
+            <a href="website-analyzer.html" class="menu-item">
+                <i class="fas fa-globe"></i> Website Analyzer
             </a>
             <a href="script-review.html" class="menu-item">
-                <i class="fas fa-code-review"></i> Script Review
-            </a>
-            <a href="auth.html" class="menu-item" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
+                <i class="fas fa-code"></i> Script Review
             </a>
         </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
     </aside>
 
     <!-- Main Content -->

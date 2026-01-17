@@ -14,6 +14,7 @@ const autoTestRoutes = require('./routes/autotest');
 const scriptReviewRoutes = require('./routes/script-review');
 const analyticsRoutes = require('./routes/analytics');
 const websiteAnalyzerRoutes = require('./routes/website-analyzer');
+const cypressRunnerRoutes = require('./routes/cypress-runner');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,10 +47,17 @@ app.use('/api/autotest', autoTestRoutes);
 app.use('/api', scriptReviewRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api', websiteAnalyzerRoutes);
+app.use('/api', cypressRunnerRoutes);
+
+// Pass genAI to website analyzer routes
+if (websiteAnalyzerRoutes.setGenAI) {
+  websiteAnalyzerRoutes.setGenAI(genAI);
+}
 
 console.log('📍 Script Review Routes Registered: /api/review-test-script, /api/validate-syntax');
 console.log('📊 Analytics Routes Registered: /api/analytics/*');
-console.log('🌐 Website Analyzer Routes Registered: /api/website-analyzer, /api/cypress-cheatsheet');
+console.log('🌐 Website Analyzer Routes Registered: /api/website-analyzer, /api/cypress-cheatsheet, /api/analyze-website-features, /api/generate-tests-for-feature');
+console.log('🧪 Cypress Runner Routes Registered: /api/run-cypress-tests, /api/test-history');
 
 
 // Health check endpoint
@@ -149,9 +157,21 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
+    console.log('💬 Chat request received:', message.substring(0, 50));
+    
+    if (!genAI) {
+      return res.status(500).json({ 
+        status: 'error',
+        error: 'AI not configured'
+      });
+    }
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const result = await model.generateContent(message);
     const response = await result.response;
     const text = response.text();
+
+    console.log('✅ Chat response generated successfully');
 
     res.json({ 
       status: 'success',
@@ -159,6 +179,7 @@ app.post('/api/chat', async (req, res) => {
       response: text
     });
   } catch (error) {
+    console.error('❌ Chat error:', error.message);
     res.status(500).json({ 
       status: 'error',
       error: error.message 

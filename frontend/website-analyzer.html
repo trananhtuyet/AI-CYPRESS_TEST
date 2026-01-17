@@ -10,14 +10,18 @@
         :root {
             --primary: #52b788;
             --primary-dark: #1b4332;
-            --primary-soft: #b7e4c7;
-            --bg-body: #f7fffb;
-            --text-main: #2d6a4f;
-            --text-muted: #6b9080;
-            --glass-white: rgba(255, 255, 255, 0.8);
-            --border-soft: rgba(82, 183, 136, 0.15);
-            --success: #40916c;
-            --danger: #d62828;
+            --primary-light: #74c69d;
+            --secondary: #40916c;
+            --accent: #2d6a4f;
+            --card-bg: #f8fafc;
+            --card-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --ai-gradient: linear-gradient(135deg, #52b788 0%, #40916c 100%);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --sidebar-width: 280px;
         }
 
@@ -28,11 +32,16 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
         body {
-            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             color: var(--text-main);
-            min-height: 100vh;
             display: flex;
+            min-height: 100vh;
         }
 
         /* ===== SIDEBAR ===== */
@@ -40,11 +49,12 @@
             width: var(--sidebar-width);
             height: 100vh;
             background: white;
-            border-right: 1px solid var(--border-soft);
+            border-right: 1px solid rgba(82, 183, 136, 0.15);
             position: fixed;
             display: flex;
             flex-direction: column;
             box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+            z-index: 100;
         }
 
         .sidebar-brand {
@@ -55,7 +65,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            border-bottom: 1px solid var(--border-soft);
+            border-bottom: 1px solid rgba(82, 183, 136, 0.15);
         }
 
         .sidebar-brand i {
@@ -96,608 +106,919 @@
         }
 
         .menu-item.active {
-            background: linear-gradient(135deg, var(--primary), var(--success));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+        }
+
+        .sidebar-footer {
+            padding: 1rem 0.8rem;
+            border-top: 1px solid rgba(82, 183, 136, 0.15);
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.4);
+        }
+
+        .btn-logout i {
+            font-size: 1.1rem;
         }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
-            flex: 1;
             margin-left: var(--sidebar-width);
-            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 2.5rem;
+            overflow-y: auto;
         }
 
+        /* ===== PAGE HEADER ===== */
         .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .page-title {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: var(--primary-dark);
+            background: var(--ai-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
         }
 
         .page-subtitle {
             color: var(--text-muted);
             font-size: 0.95rem;
-            margin-top: 0.25rem;
+            margin: 0;
         }
 
-        /* ===== CARDS ===== */
-        .card-glass {
-            background: var(--glass-white);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card-glass:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.15);
-            border-color: rgba(82, 183, 136, 0.3);
-        }
-
-        /* ===== INPUT SECTION ===== */
-        .input-section {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .input-label {
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 0.9rem;
-        }
-
-        .input-url {
-            padding: 12px 16px;
-            border: 1.5px solid rgba(82, 183, 136, 0.2);
-            border-radius: 12px;
-            font-size: 0.95rem;
+        /* ===== SEARCH SECTION ===== */
+        .search-wrapper {
             background: white;
-            color: var(--text-main);
-            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 18px;
+            display: flex;
+            gap: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--card-border);
+            margin-bottom: 2.5rem;
         }
 
-        .input-url:focus {
+        .search-wrapper input {
+            flex: 1;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+            background: transparent;
+            color: var(--text-main);
         }
 
-        /* ===== BUTTONS ===== */
-        .btn-primary {
-            display: inline-flex;
+        .search-wrapper input::placeholder {
+            color: var(--text-light);
+        }
+
+        .btn-analyze {
+            background: var(--ai-gradient);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--primary), var(--success));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+            white-space: nowrap;
         }
 
-        .btn-primary:hover {
+        .btn-analyze:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.3);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.4);
         }
 
-        .btn-secondary {
-            padding: 10px 16px;
-            background: var(--primary-soft);
-            color: var(--primary-dark);
-            border: none;
-            border-radius: 10px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
+        .btn-analyze:active {
+            transform: translateY(0);
         }
 
-        .btn-secondary:hover {
-            background: var(--primary);
-            color: white;
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
-        /* ===== LOADING STATE ===== */
-        .loading {
+        .stat-card {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 3rem;
+            gap: 20px;
+            transition: all 0.3s;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(82, 183, 136, 0.2);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ===== FEATURES SECTION ===== */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .feature-item {
-            background: white;
-            border: 1.5px solid rgba(82, 183, 136, 0.2);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .feature-item:hover {
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
             border-color: var(--primary);
-            box-shadow: 0 8px 24px rgba(82, 183, 136, 0.1);
-            transform: translateY(-4px);
         }
 
-        .feature-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
-            border-radius: 12px;
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-            color: var(--primary);
+            font-size: 1.6rem;
+            flex-shrink: 0;
         }
 
-        .feature-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 0.5rem;
+        .icon-blue {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #1b4332;
         }
 
-        .feature-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* ===== TEST CASES SECTION ===== */
-        .test-cases-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .test-case-item {
-            background: white;
-            border-left: 4px solid var(--primary);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .test-case-item:hover {
-            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.1);
-        }
-
-        .test-case-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .test-case-title {
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .test-case-type {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(82, 183, 136, 0.1);
-            color: var(--primary);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .test-case-code {
-            background: #f5f9f7;
-            border: 1px solid rgba(82, 183, 136, 0.15);
-            border-radius: 8px;
-            padding: 1rem;
-            overflow-x: auto;
-            margin-bottom: 1rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
+        .icon-purple {
+            background: linear-gradient(135deg, #b7e4c7 0%, #95d5b2 100%);
             color: #2d6a4f;
         }
 
-        /* ===== CYPRESS HIGHLIGHT ===== */
-        .cypress-features {
-            background: linear-gradient(135deg, rgba(82, 183, 136, 0.05), rgba(82, 183, 136, 0.02));
-            border: 1.5px dashed var(--primary);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+        .icon-green {
+            background: linear-gradient(135deg, #52b788 0%, #40916c 100%);
+            color: #ffffff;
         }
 
-        .cypress-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            background: linear-gradient(135deg, var(--primary), var(--success));
-            color: white;
-            border-radius: 20px;
-            font-size: 0.75rem;
+        .stat-info h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--ai-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-info p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ===== DASHBOARD GRID ===== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 1.8rem;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.15rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+        }
+
+        .card-header i {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        /* ===== FEATURE TAGS ===== */
+        .feature-tag {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem;
+            background: linear-gradient(135deg, #d1fae5 0%, #b7e4c7 100%);
+            border: 1px solid rgba(82, 183, 136, 0.2);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: all 0.3s;
+        }
+
+        .feature-tag:hover {
+            background: linear-gradient(135deg, #b7e4c7 0%, #95d5b2 100%);
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .feature-tag i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* ===== AI TEST ITEM ===== */
+        .ai-test-item {
+            border: 1.5px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .ai-test-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .ai-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--ai-gradient);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .cypress-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .ai-test-item h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            padding-right: 100px;
         }
 
-        .cypress-features-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        .ai-test-item p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .ai-test-items {
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
         }
 
-        .cypress-feature-tag {
-            background: white;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-align: center;
+        .ai-test-items .card-header {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .ai-test-items .card-header h2 {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 0.8rem;
+            color: var(--primary-dark);
+            font-size: 1.3rem;
         }
 
-        /* ===== CUSTOM TEST SECTION ===== */
-        .custom-test-form {
-            display: grid;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+        .ai-test-items .ai-test-item {
+            padding: 1.2rem;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            background: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        .ai-test-items .ai-test-item:hover {
+            box-shadow: 0 8px 24px rgba(82, 183, 136, 0.12);
+            border-color: var(--primary);
+            transform: translateY(-2px);
         }
 
-        .form-label {
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 0.9rem;
-        }
-
-        .form-input,
-        .form-textarea {
-            padding: 12px 16px;
-            border: 1.5px solid rgba(82, 183, 136, 0.2);
+        /* ===== CODE BLOCK ===== */
+        .code-block {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            padding: 1.25rem;
             border-radius: 12px;
-            font-size: 0.95rem;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            position: relative;
+            overflow-x: auto;
+            border: 1px solid rgba(226, 232, 240, 0.1);
+            line-height: 1.6;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: inherit;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-run {
             background: white;
             color: var(--text-main);
-            font-family: inherit;
-            transition: all 0.3s ease;
+            border: 1.5px solid var(--card-border);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-input:focus,
-        .form-textarea:focus {
-            outline: none;
+        .btn-run:hover {
+            background: var(--ai-gradient);
+            color: white;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.25);
+        }
+
+        .btn-run:active {
+            transform: translateY(0);
+        }
+
+        /* ===== SPECIAL CARD ===== */
+        .special-card {
+            background: var(--ai-gradient);
+            color: white;
+            border: none;
+        }
+
+        .special-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        .special-card p {
+            font-size: 0.9rem;
+            margin: 12px 0 20px;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .special-card .btn-run {
+            width: 100%;
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 14px;
+            font-weight: 700;
+            justify-content: center;
+        }
+
+        .special-card .btn-run:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 200px;
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
             }
 
             .main-content {
-                margin-left: 200px;
                 padding: 1.5rem;
-            }
-
-            .test-cases-container {
-                grid-template-columns: 1fr;
-            }
-
-            .input-section {
-                grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 768px) {
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-right: none;
-                border-bottom: 1px solid var(--border-soft);
-                flex-direction: row;
-                align-items: center;
-                padding: 1rem;
-                margin-bottom: 1rem;
+                position: fixed;
+                left: -280px;
+                transition: left 0.3s;
+                z-index: 1000;
             }
 
-            .sidebar-brand {
-                padding: 0;
-                border: none;
-                margin-bottom: 0;
-            }
-
-            .sidebar-menu {
-                display: none;
+            .sidebar.active {
+                left: 0;
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 1rem;
+                padding: 1.5rem;
             }
 
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
+            .page-title {
+                font-size: 1.6rem;
             }
 
-            .test-cases-container {
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
+
+            .search-wrapper {
+                flex-direction: column;
+            }
+
+            .btn-analyze {
+                justify-content: center;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .card-header h2 {
+                width: 100%;
+            }
+
+            .ai-badge {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .ai-test-item h3 {
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .card {
+                padding: 1.2rem;
+                border-radius: 14px;
+            }
+
+            .code-block {
+                font-size: 0.75rem;
+                padding: 1rem;
+            }
+        }
+
+        /* Scrollbar styling */
+        .sidebar-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(82, 183, 136, 0.2);
+            border-radius: 3px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: rgba(82, 183, 136, 0.4);
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: rgba(82, 183, 136, 0.2);
+            border-radius: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(82, 183, 136, 0.4);
+        }
+
+        /* ===== TABS STYLES ===== */
+        .tabs-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--card-border);
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .tab-button:hover {
+            color: var(--primary);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== MODAL STYLES ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(27, 67, 50, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--card-border);
+        }
+
+        .modal-header h2 {
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1.5px solid var(--card-border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--card-border);
+        }
+
+        .btn-cancel {
+            background: white;
+            color: var(--text-main);
+            border: 1.5px solid var(--card-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: var(--card-bg);
+            border-color: var(--primary);
+        }
+
+        .btn-submit {
+            background: var(--ai-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-globe"></i> Analyzer
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span>AI-TestLab</span>
         </div>
         <nav class="sidebar-menu">
             <a href="dashboard.html" class="menu-item">
-                <i class="fas fa-home"></i> Dashboard
+                <i class="fas fa-home"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="test-creation.html" class="menu-item">
+                <i class="fas fa-pencil"></i>
+                <span>Tạo Test Case</span>
             </a>
             <a href="analytics.html" class="menu-item">
-                <i class="fas fa-chart-bar"></i> Analytics
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
             </a>
             <a href="website-analyzer.html" class="menu-item active">
-                <i class="fas fa-globe"></i> Website Analyzer
+                <i class="fas fa-globe"></i>
+                <span>Website Analyzer</span>
             </a>
             <a href="script-review.html" class="menu-item">
-                <i class="fas fa-code-review"></i> Script Review
-            </a>
-            <a href="auth.html" class="menu-item" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
+                <i class="fas fa-code"></i>
+                <span>Script Review</span>
             </a>
         </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Đăng Xuất</span>
+            </button>
+        </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">Website Analyzer</h1>
-                <p class="page-subtitle">Phân tích website & sinh test case tự động với Cypress</p>
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- PAGE HEADER -->
+        <header class="page-header">
+            <h1 class="page-title">Website Analyzer</h1>
+            <p class="page-subtitle">Sử dụng AI để bóc tách cấu trúc và tạo kịch bản kiểm thử tự động trong giây lát.</p>
+        </header>
+
+        <!-- SEARCH SECTION -->
+        <div class="search-wrapper">
+            <input type="url" placeholder="Dán link website bạn muốn phân tích tại đây..." id="urlInput">
+            <button class="btn-analyze" onclick="analyzeSite()">
+                <i class="fas fa-magnifying-glass"></i> Phân tích ngay
+            </button>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">
+                    <i class="fas fa-puzzle-piece"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="featuresCount">0</h3>
+                    <p>Chức năng tìm thấy</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="testCasesCount">0</h3>
+                    <p>AI Test Cases</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="customTestCount">0</h3>
+                    <p>Test tùy chỉnh</p>
+                </div>
             </div>
         </div>
 
-        <!-- Input Section -->
-        <div class="card-glass">
-            <div class="input-section">
-                <div class="input-group">
-                    <label class="input-label">
-                        <i class="fas fa-link"></i> Nhập URL Website
-                    </label>
-                    <input type="url" id="websiteUrl" class="input-url" placeholder="https://example.com" />
+        <!-- MAIN GRID -->
+        <div class="dashboard-grid">
+            <!-- LEFT COLUMN -->
+            <div class="left-col">
+                <!-- FEATURES CARD -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-list-check"></i>
+                            Chức năng phát hiện
+                        </h2>
+                        <span style="font-size: 0.8rem; color: var(--text-light);">Auto-detected</span>
+                    </div>
+                    <p style="text-align: center; color: #999; padding: 2rem 0;">Phân tích website để xem các chức năng được phát hiện</p>
                 </div>
-                <div style="display: flex; align-items: flex-end;">
-                    <button onclick="analyzeWebsite()" class="btn-primary">
-                        <i class="fas fa-search"></i> Phân tích
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="right-col">
+                <!-- ADD TEST CARD -->
+                <div class="card special-card">
+                    <h3>
+                        <i class="fas fa-sparkles"></i>
+                        Tạo Test Case mới?
+                    </h3>
+                    <p>Tự viết kịch bản của riêng bạn để AI tối ưu hóa code và hiệu suất.</p>
+                    <button class="btn-run" onclick="openCreateTestCaseModal()">
+                        <i class="fas fa-plus"></i> Tạo kịch bản mới
                     </button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Loading State -->
-        <div id="loadingState" class="card-glass loading hidden">
-            <div>
-                <div class="spinner"></div>
-                <p style="margin-top: 1rem; color: var(--text-muted);">Đang phân tích website...</p>
-            </div>
-        </div>
+                <!-- TABS -->
+                <div class="tabs-container" id="testTabsContainer" style="display: none;">
+                    <button class="tab-button active" onclick="switchTab('custom-tests')">
+                        <i class="fas fa-pen"></i> Test Tùy Chỉnh
+                    </button>
+                    <button class="tab-button" onclick="switchTab('ai-tests')">
+                        <i class="fas fa-magic"></i> AI Test Cases
+                    </button>
+                </div>
 
-        <!-- Analysis Results -->
-        <div id="analysisContent" class="hidden">
-            <!-- Cypress Highlight Section -->
-            <div class="cypress-features">
-                <div class="cypress-badge">
-                    <i class="fas fa-leaf"></i> Cypress Superpowers
-                </div>
-                <div class="cypress-title">
-                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                    Tại sao chọn Cypress?
-                </div>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-                    Cypress cung cấp trải nghiệm testing hiện đại với Time Travel Debugger, Real-time reloads, và Cross-browser testing. 
-                    Viết test một lần, chạy khắp nơi! 🚀
-                </p>
-                <div class="cypress-features-list">
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-mouse"></i> Selectors
+                <!-- CUSTOM TESTS TAB (Show first) -->
+                <div class="card tab-content active" id="customTestsTab">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="margin: 0;">
+                            <i class="fas fa-pen"></i>
+                            Test Tùy Chỉnh
+                        </h2>
+                        <button class="btn-run" onclick="optimizeCustomTests()" style="background: #40916c; color: white;">
+                            <i class="fas fa-wand-magic-sparkles"></i> AI Tối Ưu
+                        </button>
                     </div>
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-keyboard"></i> Interactions
-                    </div>
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-check"></i> Assertions
-                    </div>
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-camera"></i> Screenshots
-                    </div>
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-video"></i> Video Recording
-                    </div>
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-clock"></i> Time Travel Debug
-                    </div>
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-arrows-alt"></i> Responsive Test
-                    </div>
-                    <div class="cypress-feature-tag">
-                        <i class="fas fa-network-wired"></i> API Testing
+                    <div id="customTestsContainer" style="padding: 1rem 0;">
+                        <p style="text-align: center; color: #999; padding: 2rem 0;">Tạo test case mới để bắt đầu</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Detected Features -->
-            <div>
-                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
-                    <i class="fas fa-cube"></i> Các chức năng được phát hiện
-                </h2>
-                <div id="featuresContainer" class="features-grid"></div>
-            </div>
-
-            <!-- AI Generated Test Cases -->
-            <div style="margin-top: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
-                    <i class="fas fa-robot"></i> Test Cases được sinh bởi AI
-                </h2>
-                <div id="testCasesContainer" class="test-cases-container"></div>
-            </div>
-
-            <!-- Custom Test Case Section -->
-            <div class="card-glass">
-                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
-                    <i class="fas fa-plus-circle" style="color: var(--primary);"></i> Thêm Test Case Tùy chỉnh
-                </h2>
-                <form class="custom-test-form" onsubmit="addCustomTestCase(event)">
-                    <div class="form-group">
-                        <label class="form-label">Tên Test Case</label>
-                        <input type="text" id="testCaseName" class="form-input" placeholder="VD: Login với email hợp lệ" required />
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                        <div class="form-group">
-                            <label class="form-label">Loại Test</label>
-                            <select id="testCaseType" class="form-input" required>
-                                <option>Functional</option>
-                                <option>Security</option>
-                                <option>Performance</option>
-                                <option>UI/UX</option>
-                                <option>Accessibility</option>
-                                <option>Integration</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Mức độ ưu tiên</label>
-                            <select id="testCasePriority" class="form-input" required>
-                                <option>Critical</option>
-                                <option>High</option>
-                                <option>Medium</option>
-                                <option>Low</option>
-                            </select>
+                <!-- AI TESTS TAB -->
+                <div class="card tab-content" id="aiTestsTab">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-code-branch"></i>
+                            Kịch bản AI đề xuất
+                        </h2>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-run" onclick="runAllTests()">
+                                <i class="fas fa-play"></i> Run All
+                            </button>
+                            <button class="btn-run" onclick="exportTests()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Mô tả các bước (Steps)</label>
-                        <textarea id="testCaseSteps" class="form-textarea" placeholder="1. Mở trang login&#10;2. Nhập email&#10;3. Nhập password&#10;4. Click nút Login&#10;5. Xác nhận điều hướng" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Cypress Selectors & Code</label>
-                        <textarea id="testCaseCode" class="form-textarea" placeholder="cy.visit('/')&#10;cy.get('[data-testid=email]').type('test@example.com')&#10;cy.get('[data-testid=password]').type('password')&#10;cy.get('button:contains(Login)').click()&#10;cy.url().should('include', '/dashboard')" required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> Lưu Test Case
-                    </button>
-                </form>
-            </div>
-
-            <!-- Custom Test Cases List -->
-            <div style="margin-top: 2rem;">
-                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
-                    <i class="fas fa-list-check"></i> Test Cases Tùy chỉnh
-                </h2>
-                <div id="customTestCasesContainer" style="display: grid; gap: 1.5rem;"></div>
-            </div>
-
-            <!-- Export Section -->
-            <div class="card-glass" style="margin-top: 2rem;">
-                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
-                    <i class="fas fa-download"></i> Xuất Test Cases
-                </h2>
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button onclick="exportCypressTests()" class="btn-primary">
-                        <i class="fas fa-file-code"></i> Xuất Cypress Tests
-                    </button>
-                    <button onclick="exportAsJSON()" class="btn-primary">
-                        <i class="fas fa-file-code"></i> Xuất JSON
-                    </button>
-                    <button onclick="exportAsCSV()" class="btn-primary">
-                        <i class="fas fa-file-csv"></i> Xuất CSV
-                    </button>
+                    <p style="text-align: center; color: #999; padding: 2rem 0;">Click vào chức năng bên trái để xem test cases</p>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        let analyzedData = null;
-        let customTestCases = [];
+        const API_URL = 'http://localhost:3000';
 
         function logout() {
             localStorage.removeItem('token');
@@ -705,229 +1026,671 @@
             window.location.href = 'auth.html';
         }
 
-        async function analyzeWebsite() {
-            const url = document.getElementById('websiteUrl').value.trim();
-            
+        async function analyzeSite() {
+            const url = document.getElementById('urlInput').value;
             if (!url) {
                 alert('Vui lòng nhập URL');
                 return;
             }
 
-            // Validate URL
-            try {
-                new URL(url);
-            } catch {
-                alert('URL không hợp lệ');
-                return;
-            }
-
-            showLoading(true);
+            console.log('Analyzing:', url);
+            
+            const analyzeBtn = event.target;
+            const originalHTML = analyzeBtn.innerHTML;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang phân tích...';
+            analyzeBtn.disabled = true;
 
             try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    window.location.href = 'auth.html';
-                    return;
-                }
-
-                const response = await fetch('http://localhost:3000/api/website-analyzer', {
+                // Call backend to analyze website features
+                console.log('📤 Calling API:', `${API_URL}/api/analyze-website-features`);
+                console.log('📤 POST data:', { url });
+                
+                const response = await fetch(`${API_URL}/api/analyze-website-features`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ url })
                 });
 
-                if (!response.ok) throw new Error('Phân tích thất bại');
+                console.log('📥 Response status:', response.status);
+                console.log('📥 Response ok:', response.ok);
+                
+                // Check status first
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
+                }
 
-                const data = await response.json();
-                analyzedData = data;
-                displayAnalysis(data);
+                // Parse JSON
+                let data;
+                try {
+                    data = await response.json();
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    throw new Error('Invalid JSON response from server');
+                }
+
+                console.log('📥 Response data:', data);
+
+                // Display features
+                displayFeatures(data.features, url);
+                alert('✅ Phân tích thành công! Tìm thấy ' + data.features.length + ' chức năng');
+                
             } catch (error) {
-                console.error('Error:', error);
-                alert('Lỗi khi phân tích: ' + error.message);
+                console.error('❌ Error:', error);
+                alert('❌ Lỗi phân tích: ' + error.message);
             } finally {
-                showLoading(false);
+                analyzeBtn.innerHTML = originalHTML;
+                analyzeBtn.disabled = false;
             }
         }
 
-        function showLoading(show) {
-            const loading = document.getElementById('loadingState');
-            const content = document.getElementById('analysisContent');
+        function displayFeatures(features, url) {
+            // Update stats
+            document.getElementById('featuresCount').textContent = features.length;
+            document.getElementById('testCasesCount').textContent = (features.length * 3);
             
-            if (show) {
-                loading.classList.remove('hidden');
-                content.classList.add('hidden');
-            } else {
-                loading.classList.add('hidden');
-                content.classList.remove('hidden');
+            // Show tabs container
+            document.getElementById('testTabsContainer').style.display = 'flex';
+            
+            // Hide initial AI card
+            const initialCard = document.getElementById('initialAICard');
+            if (initialCard) {
+                initialCard.style.display = 'none';
             }
-        }
-
-        function displayAnalysis(data) {
-            // Display detected features
-            const featuresContainer = document.getElementById('featuresContainer');
-            featuresContainer.innerHTML = (data.features || []).map(feature => `
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas ${getFeatureIcon(feature.type)}"></i>
-                    </div>
-                    <div class="feature-title">${feature.name}</div>
-                    <div class="feature-desc">${feature.description}</div>
-                </div>
-            `).join('');
-
-            // Display test cases
-            const testCasesContainer = document.getElementById('testCasesContainer');
-            testCasesContainer.innerHTML = (data.testCases || []).map((testCase, idx) => `
-                <div class="test-case-item">
-                    <div class="test-case-header">
-                        <div class="test-case-title">${testCase.title}</div>
-                        <div class="test-case-type">${testCase.type}</div>
-                    </div>
-                    <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">
-                        ${testCase.description}
-                    </div>
-                    <div class="test-case-code">${escapeHtml(testCase.code)}</div>
-                    <button onclick="copyToClipboard(${idx})" class="btn-secondary">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function getFeatureIcon(type) {
-            const icons = {
-                'form': 'fa-clipboard-list',
-                'navigation': 'fa-directions',
-                'authentication': 'fa-lock',
-                'search': 'fa-search',
-                'modal': 'fa-window-maximize',
-                'table': 'fa-table',
-                'api': 'fa-network-wired',
-                'payment': 'fa-credit-card',
-                'social': 'fa-share-alt'
-            };
-            return icons[type] || 'fa-cube';
-        }
-
-        function addCustomTestCase(event) {
-            event.preventDefault();
-
-            const testCase = {
-                id: Date.now(),
-                name: document.getElementById('testCaseName').value,
-                type: document.getElementById('testCaseType').value,
-                priority: document.getElementById('testCasePriority').value,
-                steps: document.getElementById('testCaseSteps').value,
-                code: document.getElementById('testCaseCode').value
-            };
-
-            customTestCases.push(testCase);
-            event.target.reset();
-            displayCustomTestCases();
-
-            // Show success message
-            alert('✅ Test case đã được lưu thành công!');
-        }
-
-        function displayCustomTestCases() {
-            const container = document.getElementById('customTestCasesContainer');
             
-            if (customTestCases.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted);">Chưa có test case tùy chỉnh nào</p>';
+            // Find or create container for left-col features
+            let leftContainer = document.querySelector('.left-col .card:first-child');
+            if (!leftContainer) {
+                console.error('Left column not found');
                 return;
             }
 
-            container.innerHTML = customTestCases.map(testCase => `
-                <div class="test-case-item" style="border-left-color: #eab308;">
-                    <div class="test-case-header">
-                        <div>
-                            <div class="test-case-title">${testCase.name}</div>
-                            <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem;">
-                                <span class="test-case-type" style="background: rgba(234, 179, 8, 0.1); color: #ea580c;">${testCase.type}</span>
-                                <span class="test-case-type" style="background: rgba(234, 179, 8, 0.1); color: #ea580c;">${testCase.priority}</span>
-                            </div>
+            // Clear existing feature tags (keep header)
+            const existingTags = leftContainer.querySelectorAll('.feature-tag');
+            existingTags.forEach(tag => tag.remove());
+            
+            // Add feature tags to left column
+            if (features && features.length > 0) {
+                features.forEach((feature, index) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'feature-tag';
+                    tag.style.cursor = 'pointer';
+                    
+                    const icons = ['fas fa-user-lock', 'fas fa-cart-shopping', 'fas fa-magnifying-glass', 
+                                   'fas fa-envelope', 'fas fa-cogs', 'fas fa-chart-line', 'fas fa-bell', 'fas fa-gear'];
+                    const icon = icons[index % icons.length];
+                    
+                    tag.innerHTML = `
+                        <i class="fas ${icon}"></i>
+                        <span>${feature.name}</span>
+                    `;
+                    tag.onclick = (e) => {
+                        // Try to load from localStorage first
+                        const cached = loadTestCasesFromCache(feature.name);
+                        if (cached) {
+                            displayTestCases(cached, feature.name);
+                        } else {
+                            generateTestCases(feature.name, feature.description, url, e.target);
+                        }
+                    };
+                    leftContainer.appendChild(tag);
+                });
+            }
+
+            // Find or create container for test items in right column
+            let container = document.querySelector('.ai-test-items');
+            
+            if (!container) {
+                // Create new container in the right-col
+                const rightCol = document.querySelector('.right-col');
+                if (!rightCol) {
+                    console.error('Right column not found');
+                    alert('❌ Không tìm thấy container phù hợp');
+                    return;
+                }
+
+                // Create a new card for features
+                container = document.createElement('div');
+                container.className = 'card ai-test-items';
+                container.style.marginTop = '2rem';
+                
+                const header = document.createElement('div');
+                header.className = 'card-header';
+                header.innerHTML = `
+                    <h2>
+                        <i class="fas fa-magic"></i>
+                        Các chức năng phát hiện được
+                    </h2>
+                `;
+                container.appendChild(header);
+                rightCol.appendChild(container);
+            }
+
+            // Clear existing feature items (but keep header)
+            const items = container.querySelectorAll('.ai-test-item');
+            items.forEach(item => item.remove());
+
+            if (!features || features.length === 0) {
+                const msg = document.createElement('p');
+                msg.style.cssText = 'text-align: center; color: #999;';
+                msg.textContent = 'Không tìm thấy chức năng';
+                container.appendChild(msg);
+                return;
+            }
+
+            // Add feature cards
+            features.forEach((feature, index) => {
+                const featureCard = document.createElement('div');
+                featureCard.className = 'ai-test-item';
+                featureCard.style.cursor = 'pointer';
+                featureCard.innerHTML = `
+                    <span class="ai-badge">Feature ${index + 1}</span>
+                    <h3>${feature.name}</h3>
+                    <p>${feature.description}</p>
+                    <p style="font-size: 0.9rem; color: #888; margin-top: 0.5rem;">
+                        <strong>Priority:</strong> ${feature.priority}
+                    </p>
+                    <button class="btn-run" onclick="generateTestCases('${feature.name.replace(/'/g, "\\'")}', '${feature.description.replace(/'/g, "\\'")}', '${url}', this)">
+                        <i class="fas fa-magic"></i> Tạo Test Cases
+                    </button>
+                `;
+                container.appendChild(featureCard);
+            });
+        }
+
+        async function generateTestCases(featureName, featureDescription, url, targetElement) {
+            console.log(`Generating test cases for: ${featureName}`);
+
+            // Find the button if targetElement is provided
+            let btn = null;
+            if (targetElement) {
+                btn = targetElement.closest('button') || (targetElement.tagName === 'BUTTON' ? targetElement : null);
+            }
+            
+            const originalHTML = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
+                btn.disabled = true;
+            }
+
+            try {
+                console.log(`Fetching from: ${API_URL}/api/generate-tests-for-feature`);
+                const response = await fetch(`${API_URL}/api/generate-tests-for-feature`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url,
+                        feature: featureName,
+                        featureDescription
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
+                // Check if response is OK first
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response text:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
+                }
+
+                // Now parse JSON safely
+                let data;
+                try {
+                    data = await response.json();
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    const responseText = await response.text();
+                    console.error('Response text:', responseText);
+                    throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+                }
+
+                console.log('Generated test cases:', data);
+
+                if (!data.testCases) {
+                    throw new Error('No testCases in response');
+                }
+
+                // Save to localStorage
+                saveTestCasesToCache(featureName, data.testCases);
+                
+                // Display test cases in right column
+                displayTestCases(data.testCases, featureName);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Lỗi tạo test cases: ' + error.message);
+            } finally {
+                if (btn) {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        function saveTestCasesToCache(featureName, testCases) {
+            try {
+                const cacheKey = `testcases_${featureName.replace(/\s+/g, '_')}`;
+                localStorage.setItem(cacheKey, JSON.stringify(testCases));
+                console.log(`✅ Test cases saved to cache: ${cacheKey}`);
+            } catch (error) {
+                console.warn('Failed to save to localStorage:', error);
+            }
+        }
+
+        function loadTestCasesFromCache(featureName) {
+            try {
+                const cacheKey = `testcases_${featureName.replace(/\s+/g, '_')}`;
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    console.log(`✅ Test cases loaded from cache: ${cacheKey}`);
+                    return JSON.parse(cached);
+                }
+            } catch (error) {
+                console.warn('Failed to load from localStorage:', error);
+            }
+            return null;
+        }
+
+        function displayTestCases(testCases, featureName) {
+            // Store current feature name for creating new test cases
+            localStorage.setItem('currentSelectedFeature', featureName);
+
+            // Get AI tests tab container
+            let container = document.getElementById('aiTestsTab');
+            if (!container) return;
+
+            // Clear previous content
+            container.innerHTML = '';
+
+            // Create test cases container
+            const wrapper = document.createElement('div');
+            wrapper.className = 'card';
+            wrapper.style.marginTop = '0';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            header.innerHTML = `
+                <h2>
+                    <i class="fas fa-vial"></i>
+                    Test Cases cho "${featureName}"
+                </h2>
+                <button class="btn-run" onclick="runAllTestCases(this)" style="background: #52b788;">
+                    <i class="fas fa-play"></i> Chạy tất cả
+                </button>
+            `;
+            wrapper.appendChild(header);
+
+            if (!testCases || testCases.length === 0) {
+                const msg = document.createElement('p');
+                msg.style.cssText = 'text-align: center; color: #999; padding: 2rem;';
+                msg.textContent = 'Không có test cases';
+                wrapper.appendChild(msg);
+                container.appendChild(wrapper);
+                return;
+            }
+
+            // Add test case items
+            testCases.forEach((testCase, index) => {
+                const testItem = document.createElement('div');
+                testItem.className = 'ai-test-item';
+                testItem.style.marginBottom = '1rem';
+                testItem.style.borderLeft = '4px solid #52b788';
+                testItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <span class="ai-badge" style="background: #52b788;">Test ${index + 1}</span>
+                            <h4 style="margin: 0.5rem 0; color: #1b4332;">${testCase.name}</h4>
+                            <p style="margin: 0.3rem 0; font-size: 0.9rem;">${testCase.description}</p>
+                            <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #666;">
+                                <strong>Priority:</strong> ${testCase.priority}
+                            </p>
+                            <details style="margin-top: 0.5rem; cursor: pointer;">
+                                <summary style="color: #52b788; font-weight: 500;">📋 Steps (${testCase.steps ? testCase.steps.length : 0})</summary>
+                                <div style="background: #f0f9ff; padding: 0.5rem; margin-top: 0.5rem; border-radius: 4px; font-size: 0.85rem;">
+                                    ${testCase.steps ? testCase.steps.map((step, i) => `<div style="margin: 0.3rem 0;">✓ ${step}</div>`).join('') : 'N/A'}
+                                </div>
+                            </details>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #333;">
+                                <strong>Expected:</strong> ${testCase.expectedResult}
+                            </p>
                         </div>
-                        <button onclick="deleteCustomTestCase(${testCase.id})" class="btn-secondary" style="background: #fee; color: #d62828;">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn-run" onclick="runSingleTest(this, '${testCase.name}')" style="white-space: nowrap; margin-left: 1rem; background: #40916c;">
+                            <i class="fas fa-play"></i> Run
                         </button>
                     </div>
-                    <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; white-space: pre-wrap;">${escapeHtml(testCase.steps)}</div>
-                    <div class="test-case-code">${escapeHtml(testCase.code)}</div>
-                </div>
-            `).join('');
+                    <div class="test-result" style="display: none; margin-top: 0.5rem; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem;"></div>
+                `;
+                wrapper.appendChild(testItem);
+            });
+
+            container.appendChild(wrapper);
+            switchTab('ai-tests');
         }
 
-        function deleteCustomTestCase(id) {
-            customTestCases = customTestCases.filter(tc => tc.id !== id);
-            displayCustomTestCases();
+        function runSingleTest(btn, testName) {
+            const resultDiv = btn.closest('.ai-test-item').querySelector('.test-result');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chạy...';
+            btn.disabled = true;
+
+            // Simulate test execution (1-2 second delay)
+            setTimeout(() => {
+                const passed = Math.random() > 0.3; // 70% pass rate for demo
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = passed ? '#d4edda' : '#f8d7da';
+                resultDiv.style.color = passed ? '#155724' : '#721c24';
+                resultDiv.style.border = `1px solid ${passed ? '#c3e6cb' : '#f5c6cb'}`;
+                resultDiv.innerHTML = `
+                    <strong>${passed ? '✅ PASS' : '❌ FAIL'}</strong> - ${testName}
+                    ${!passed ? '<br>Error: Element not found or assertion failed' : ''}
+                `;
+                btn.innerHTML = '<i class="fas fa-play"></i> Run';
+                btn.disabled = false;
+            }, 1500);
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        function runAllTestCases(btn) {
+            const testItems = btn.closest('.card').querySelectorAll('.ai-test-item');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chạy tất cả...';
+            btn.disabled = true;
 
-        function copyToClipboard(idx) {
-            const testCases = analyzedData.testCases || [];
-            const code = testCases[idx].code;
-            navigator.clipboard.writeText(code).then(() => {
-                alert('✅ Code đã được copy!');
+            let completed = 0;
+            testItems.forEach(item => {
+                const runBtn = item.querySelector('.btn-run');
+                runBtn.click();
+                setTimeout(() => {
+                    completed++;
+                    if (completed === testItems.length) {
+                        btn.innerHTML = '<i class="fas fa-play"></i> Chạy tất cả';
+                        btn.disabled = false;
+                    }
+                }, 1500 * (completed + 1));
             });
         }
 
-        function exportCypressTests() {
-            const allTests = [
-                ...(analyzedData.testCases || []).map(tc => tc.code),
-                ...customTestCases.map(tc => tc.code)
-            ];
-
-            const content = allTests.join('\n\n// ===== NEXT TEST =====\n\n');
-            downloadFile(content, 'cypress-tests.js', 'text/javascript');
+        function runAllTests() {
+            console.log('Running all tests');
+            alert('Chức năng này sẽ chạy toàn bộ test cases');
         }
 
-        function exportAsJSON() {
-            const data = {
-                website: document.getElementById('websiteUrl').value,
-                generatedAt: new Date().toISOString(),
-                features: analyzedData.features || [],
-                aiGeneratedTests: analyzedData.testCases || [],
-                customTests: customTestCases
+        function exportTests() {
+            console.log('Exporting tests');
+            alert('Chức năng này sẽ export toàn bộ test cases');
+        }
+    </script>
+
+    <!-- CREATE TEST CASE MODAL -->
+    <div id="createTestCaseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <i class="fas fa-plus-circle"></i>
+                    Tạo Test Case Mới
+                </h2>
+                <button class="modal-close" onclick="closeCreateTestCaseModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="createTestCaseForm" onsubmit="submitCreateTestCase(event)">
+                <div class="form-group">
+                    <label for="testCaseName">Tên Test Case <span style="color: red;">*</span></label>
+                    <input type="text" id="testCaseName" name="testCaseName" placeholder="Ví dụ: Test đăng nhập thành công" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="testCaseDescription">Mô tả <span style="color: red;">*</span></label>
+                    <textarea id="testCaseDescription" name="testCaseDescription" placeholder="Mô tả chi tiết về test case này" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="testCasePriority">Mức độ ưu tiên</label>
+                    <select id="testCasePriority" name="testCasePriority">
+                        <option value="Low">Thấp (Low)</option>
+                        <option value="Medium" selected>Trung bình (Medium)</option>
+                        <option value="High">Cao (High)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="testCaseSteps">Các bước thực hiện (mỗi dòng một bước)</label>
+                    <textarea id="testCaseSteps" name="testCaseSteps" placeholder="Bước 1&#10;Bước 2&#10;Bước 3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="testCaseExpected">Kết quả mong đợi <span style="color: red;">*</span></label>
+                    <textarea id="testCaseExpected" name="testCaseExpected" placeholder="Mô tả kết quả dự kiến sau khi test" required></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeCreateTestCaseModal()">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-check"></i> Tạo Test Case
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openCreateTestCaseModal() {
+            document.getElementById('createTestCaseModal').classList.add('active');
+            document.getElementById('createTestCaseForm').reset();
+        }
+
+        function closeCreateTestCaseModal() {
+            document.getElementById('createTestCaseModal').classList.remove('active');
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            if (tabName === 'ai-tests') {
+                document.getElementById('aiTestsTab').classList.add('active');
+                document.querySelector('.tab-button:nth-child(1)').classList.add('active');
+            } else if (tabName === 'custom-tests') {
+                document.getElementById('customTestsTab').classList.add('active');
+                document.querySelector('.tab-button:nth-child(2)').classList.add('active');
+                // Refresh custom tests display
+                displayCustomTests();
+            }
+        }
+
+        function displayCustomTests() {
+            const customTestsContainer = document.getElementById('customTestsContainer');
+            const customTests = localStorage.getItem('customTestCases');
+            
+            if (!customTests) {
+                customTestsContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem 0;">Tạo test case mới để bắt đầu</p>';
+                return;
+            }
+
+            const tests = JSON.parse(customTests);
+            if (tests.length === 0) {
+                customTestsContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem 0;">Tạo test case mới để bắt đầu</p>';
+                return;
+            }
+
+            customTestsContainer.innerHTML = '';
+            tests.forEach((testCase, index) => {
+                const testItem = document.createElement('div');
+                testItem.className = 'ai-test-item';
+                testItem.style.marginBottom = '1rem';
+                testItem.style.borderLeft = '4px solid #40916c';
+                testItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <span class="ai-badge" style="background: #40916c;">Custom ${index + 1}</span>
+                            <h4 style="margin: 0.5rem 0; color: #1b4332;">${testCase.name}</h4>
+                            <p style="margin: 0.3rem 0; font-size: 0.9rem;">${testCase.description}</p>
+                            <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #666;">
+                                <strong>Priority:</strong> ${testCase.priority}
+                            </p>
+                            <details style="margin-top: 0.5rem; cursor: pointer;">
+                                <summary style="color: #40916c; font-weight: 500;">📋 Steps (${testCase.steps ? testCase.steps.length : 0})</summary>
+                                <div style="background: #f0f9ff; padding: 0.5rem; margin-top: 0.5rem; border-radius: 4px; font-size: 0.85rem;">
+                                    ${testCase.steps ? testCase.steps.map((step, i) => `<div style="margin: 0.3rem 0;">✓ ${step}</div>`).join('') : 'N/A'}
+                                </div>
+                            </details>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #333;">
+                                <strong>Expected:</strong> ${testCase.expectedResult}
+                            </p>
+                        </div>
+                        <button class="btn-run" onclick="deleteCustomTest(${testCase.id})" style="white-space: nowrap; margin-left: 1rem; background: #ef4444; color: white;">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </div>
+                `;
+                customTestsContainer.appendChild(testItem);
+            });
+        }
+
+        function deleteCustomTest(testId) {
+            if (confirm('Bạn có chắc muốn xóa test case này?')) {
+                const customTests = localStorage.getItem('customTestCases');
+                if (customTests) {
+                    let tests = JSON.parse(customTests);
+                    tests = tests.filter(t => t.id !== testId);
+                    if (tests.length > 0) {
+                        localStorage.setItem('customTestCases', JSON.stringify(tests));
+                    } else {
+                        localStorage.removeItem('customTestCases');
+                    }
+                    displayCustomTests();
+                    updateCustomTestCount();
+                }
+            }
+        }
+
+        function updateCustomTestCount() {
+            const customTests = localStorage.getItem('customTestCases');
+            const count = customTests ? JSON.parse(customTests).length : 0;
+            document.getElementById('customTestCount').textContent = count;
+        }
+
+        async function optimizeCustomTests() {
+            const customTests = localStorage.getItem('customTestCases');
+            if (!customTests) {
+                alert('❌ Không có test case nào để tối ưu');
+                return;
+            }
+
+            const tests = JSON.parse(customTests);
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tối ưu...';
+            btn.disabled = true;
+
+            try {
+                // Format test cases for AI
+                const testSummary = tests.map(t => `- ${t.name}: ${t.description}`).join('\n');
+                
+                const response = await fetch(`${API_URL}/api/review-test-script`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: testSummary,
+                        language: 'test-description'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to optimize tests');
+                }
+
+                const data = await response.json();
+                alert('✅ AI đã tối ưu! Kiểm tra console để xem gợi ý');
+                console.log('🤖 AI Optimization Suggestions:', data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Lỗi: ' + error.message);
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        function submitCreateTestCase(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('testCaseName').value.trim();
+            const description = document.getElementById('testCaseDescription').value.trim();
+            const priority = document.getElementById('testCasePriority').value;
+            const stepsText = document.getElementById('testCaseSteps').value.trim();
+            const expectedResult = document.getElementById('testCaseExpected').value.trim();
+
+            if (!name || !description || !expectedResult) {
+                alert('❌ Vui lòng điền các trường bắt buộc');
+                return;
+            }
+
+            // Parse steps from text
+            const steps = stepsText
+                ? stepsText.split('\n').map(s => s.trim()).filter(s => s.length > 0)
+                : [];
+
+            // Create test case object
+            const testCase = {
+                id: Date.now(),
+                name: name,
+                description: description,
+                priority: priority,
+                steps: steps,
+                expectedResult: expectedResult
             };
 
-            downloadFile(JSON.stringify(data, null, 2), 'website-analysis.json', 'application/json');
+            console.log('Created test case:', testCase);
+
+            // Get existing custom test cases
+            let customTestCases = localStorage.getItem('customTestCases');
+            let allCustomTests = customTestCases ? JSON.parse(customTestCases) : [];
+            
+            // Add new test case
+            allCustomTests.push(testCase);
+
+            // Save back to localStorage
+            localStorage.setItem('customTestCases', JSON.stringify(allCustomTests));
+
+            // Close modal
+            closeCreateTestCaseModal();
+
+            // Show success message
+            alert('✅ Test Case được tạo thành công!');
+
+            // Refresh displays
+            updateCustomTestCount();
+            displayCustomTests();
+            
+            // Show custom tests tab
+            document.getElementById('testTabsContainer').style.display = 'flex';
+            switchTab('custom-tests');
         }
 
-        function exportAsCSV() {
-            let csv = 'Test Case Name,Type,Priority,Steps,Code\n';
+        // Close modal when clicking outside
+        document.getElementById('createTestCaseModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCreateTestCaseModal();
+            }
+        });
 
-            // AI Generated Tests
-            (analyzedData.testCases || []).forEach(tc => {
-                csv += `"${tc.title}","${tc.type}","AI Generated","${tc.description}","${tc.code}"\n`;
-            });
-
-            // Custom Tests
-            customTestCases.forEach(tc => {
-                csv += `"${tc.name}","${tc.type}","${tc.priority}","${tc.steps}","${tc.code}"\n`;
-            });
-
-            downloadFile(csv, 'website-analysis.csv', 'text/csv');
-        }
-
-        function downloadFile(content, filename, type) {
-            const blob = new Blob([content], { type });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        }
+        // Initialize custom test count on page load
+        window.addEventListener('load', () => {
+            updateCustomTestCount();
+        });
     </script>
 </body>
 </html>
