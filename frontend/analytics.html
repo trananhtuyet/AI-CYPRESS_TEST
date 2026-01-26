@@ -36,31 +36,70 @@
             display: flex;
         }
 
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #0f172a 0%, #1b4332 50%, #2d6a4f 100%);
+            border-bottom: 2px solid rgba(82, 183, 136, 0.3);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            gap: 2rem;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.15);
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .navbar-title {
+            color: white;
+            font-weight: 700;
+            flex: 1;
+        }
+
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
-            background: white;
-            border-right: 1px solid var(--border-soft);
+            background: linear-gradient(180deg, #f8fafb 0%, #f0fdf4 100%);
+            border-right: 2px solid rgba(82, 183, 136, 0.2);
             position: fixed;
             display: flex;
             flex-direction: column;
             box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+            top: 70px;
+            margin-top: 0;
         }
 
         .sidebar-brand {
             padding: 2rem 1.5rem;
-            font-size: 1.4rem;
-            font-weight: 800;
+            font-size: 1.2rem;
+            font-weight: 900;
             color: var(--primary-dark);
             display: flex;
             align-items: center;
             gap: 10px;
-            border-bottom: 1px solid var(--border-soft);
+            border-bottom: 2px solid rgba(82, 183, 136, 0.2);
         }
 
         .sidebar-brand i {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: var(--primary);
         }
 
@@ -79,7 +118,7 @@
             border-radius: 12px;
             margin-bottom: 0.5rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
+            font-weight: 700;
             font-size: 0.95rem;
         }
 
@@ -91,15 +130,17 @@
         }
 
         .menu-item:hover {
-            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
+            background: linear-gradient(135deg, rgba(82, 183, 136, 0.15), rgba(82, 183, 136, 0.08));
             color: var(--primary);
-            transform: translateX(5px);
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(82, 183, 136, 0.1);
         }
 
         .menu-item.active {
             background: linear-gradient(135deg, var(--primary), var(--success));
             color: white;
             box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+            font-weight: 800;
         }
 
         .sidebar-footer {
@@ -138,6 +179,7 @@
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
+            margin-top: 70px;
             padding: 2rem;
         }
 
@@ -150,70 +192,110 @@
         }
 
         .page-title {
-            font-size: 2rem;
-            font-weight: 800;
+            font-size: 2.2rem;
+            font-weight: 900;
             color: var(--primary-dark);
         }
 
         .page-subtitle {
             color: var(--text-muted);
             font-size: 0.95rem;
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
+            font-weight: 600;
         }
 
         /* ===== CARDS ===== */
         .card-glass {
-            background: var(--glass-white);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.9) 100%);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
+            border: 2px solid rgba(82, 183, 136, 0.25);
+            border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .card-glass::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(82, 183, 136, 0.05) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         .card-glass:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.15);
-            border-color: rgba(82, 183, 136, 0.3);
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border-color: rgba(82, 183, 136, 0.4);
+            background: linear-gradient(135deg, white 0%, rgba(240, 253, 244, 0.95) 100%);
         }
 
         .stat-card {
-            background: var(--glass-white);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.9) 100%);
             backdrop-filter: blur(10px);
-            border: 1.5px solid rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            padding: 1.8rem;
+            border: 2px solid rgba(82, 183, 136, 0.25);
+            border-radius: 16px;
+            padding: 1.5rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--success), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-6px) scale(1.02);
             background: white;
-            border-color: rgba(82, 183, 136, 0.3);
-            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.15);
+            border-color: rgba(82, 183, 136, 0.5);
+            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
         }
 
         .stat-value {
-            font-size: 2.5rem;
-            font-weight: 800;
+            font-size: 2.2rem;
+            font-weight: 900;
             color: var(--primary);
             margin-top: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .stat-label {
             color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .stat-description {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-top: 0.5rem;
+            font-weight: 500;
         }
 
         /* ===== CHARTS ===== */
@@ -228,20 +310,25 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 24px;
+            padding: 13px 26px;
             background: linear-gradient(135deg, var(--primary), var(--success));
             color: white;
             border: none;
             border-radius: 12px;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.25);
+            font-size: 0.95rem;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
         }
 
         /* ===== TABLES ===== */
@@ -265,6 +352,27 @@
         .fade-in-up {
             animation: fadeInUp 0.6s ease-out forwards;
         }
+
+        /* ===== ADDITIONAL ANIMATIONS ===== */
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .animate-slideIn { animation: slideInLeft 0.5s ease-out; }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(82, 183, 136, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(82, 183, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(82, 183, 136, 0); }
+        }
+
+        .pulse-ring { animation: pulse-ring 2s infinite; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
@@ -319,6 +427,18 @@
     </style>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-chart-line"></i>
+            <span>AI-TestLab</span>
+        </div>
+        <div class="navbar-title">📊 Analytics & Reports</div>
+        <div style="color: white; font-weight: 700; font-size: 0.9rem;">
+            <i class="far fa-user-circle" style="font-size: 1.5rem; margin-right: 10px;"></i>
+        </div>
+    </nav>
+
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-brand">
@@ -372,62 +492,58 @@
         <!-- Content -->
         <div id="analyticsContent" class="hidden">
             <!-- Summary Cards -->
-            <div style="margin-bottom: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">Tóm tắt Hiệu suất</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="margin-bottom: 2.5rem;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;">
+                    <div style="width: 4px; height: 28px; background: linear-gradient(180deg, var(--primary), var(--success)); border-radius: 2px;"></div>
+                    <h2 style="font-size: 1.6rem; font-weight: 900; color: var(--primary-dark);">Tóm tắt Hiệu suất</h2>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
                     <div class="stat-card fade-in-up">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                            <span class="stat-label">Tổng Test Cases</span>
-                            <div style="width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-flask" style="color: #3b82f6; font-size: 1.2rem;"></i>
-                            </div>
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span class="stat-label"><i class="fas fa-flask" style="color: #3b82f6;"></i> TỔNG TEST</span>
+                            <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1)); border: 1px solid rgba(59, 130, 246, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: #3b82f6; text-transform: uppercase;">All Cases</div>
                         </div>
                         <div class="stat-value" id="totalTests">0</div>
-                        <p class="stat-description">Số lượng test tổng cộng</p>
+                        <p class="stat-description">Tổng số test case được tạo</p>
                     </div>
 
                     <div class="stat-card fade-in-up">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                            <span class="stat-label">Passed</span>
-                            <div style="width: 40px; height: 40px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-check-circle" style="color: #22c55e; font-size: 1.2rem;"></i>
-                            </div>
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span class="stat-label"><i class="fas fa-check-circle" style="color: #22c55e;"></i> PASSED</span>
+                            <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1)); border: 1px solid rgba(34, 197, 94, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: #22c55e; text-transform: uppercase;">Success</div>
                         </div>
-                        <div class="stat-value" style="color: #22c55e;" id="passedSteps">0</div>
-                        <p class="stat-description">Test thành công</p>
+                        <div class="stat-value" style="background: linear-gradient(135deg, #22c55e, #16a34a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="passedSteps">0</div>
+                        <p class="stat-description">Test thành công ✓</p>
                     </div>
 
                     <div class="stat-card fade-in-up">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                            <span class="stat-label">Failed</span>
-                            <div style="width: 40px; height: 40px; background: rgba(239, 68, 68, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-times-circle" style="color: #ef4444; font-size: 1.2rem;"></i>
-                            </div>
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span class="stat-label"><i class="fas fa-times-circle" style="color: #ef4444;"></i> FAILED</span>
+                            <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1)); border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: #ef4444; text-transform: uppercase;">Alert</div>
                         </div>
-                        <div class="stat-value" style="color: #ef4444;" id="failedSteps">0</div>
-                        <p class="stat-description">Test thất bại</p>
+                        <div class="stat-value" style="background: linear-gradient(135deg, #ef4444, #dc2626); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="failedSteps">0</div>
+                        <p class="stat-description">Test thất bại ✕</p>
                     </div>
 
                     <div class="stat-card fade-in-up">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                            <span class="stat-label">Pending</span>
-                            <div style="width: 40px; height: 40px; background: rgba(234, 179, 8, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-circle-notch" style="color: #eab308; font-size: 1.2rem;"></i>
-                            </div>
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span class="stat-label"><i class="fas fa-circle-notch" style="color: #eab308;"></i> PENDING</span>
+                            <div style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(234, 179, 8, 0.1)); border: 1px solid rgba(234, 179, 8, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: #eab308; text-transform: uppercase;">Waiting</div>
                         </div>
-                        <div class="stat-value" style="color: #eab308;" id="pendingSteps">0</div>
-                        <p class="stat-description">Đang chờ xử lý</p>
+                        <div class="stat-value" style="background: linear-gradient(135deg, #eab308, #ca8a04); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="pendingSteps">0</div>
+                        <p class="stat-description">Đang chờ xử lý ⏳</p>
                     </div>
 
                     <div class="stat-card fade-in-up">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                            <span class="stat-label">Pass Rate</span>
-                            <div style="width: 40px; height: 40px; background: rgba(168, 85, 247, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-percentage" style="color: #a855f7; font-size: 1.2rem;"></i>
-                            </div>
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span class="stat-label"><i class="fas fa-chart-pie" style="color: #a855f7;"></i> PASS RATE</span>
+                            <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(168, 85, 247, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: #a855f7; text-transform: uppercase;">KPI</div>
                         </div>
-                        <div class="stat-value" style="color: #a855f7;" id="passRate">0%</div>
-                        <p class="stat-description">Tỷ lệ thành công</p>
+                        <div class="stat-value" style="background: linear-gradient(135deg, #a855f7, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="passRate">0%</div>
+                        <p class="stat-description">Tỷ lệ test thành công</p>
+                        <div style="margin-top: 0.75rem; background: rgba(168, 85, 247, 0.1); height: 4px; border-radius: 2px; overflow: hidden;">
+                            <div id="passRateBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #a855f7, #9333ea); transition: width 0.6s ease; border-radius: 2px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -619,6 +735,10 @@
             document.getElementById('failedSteps').textContent = summary.failedSteps;
             document.getElementById('pendingSteps').textContent = summary.pendingSteps;
             document.getElementById('passRate').textContent = summary.passRate + '%';
+            
+            // Update pass rate progress bar
+            const passRateValue = parseInt(summary.passRate) || 0;
+            document.getElementById('passRateBar').style.width = passRateValue + '%';
 
             // Create charts
             createPassFailChart(summary);

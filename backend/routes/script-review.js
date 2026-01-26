@@ -467,14 +467,9 @@ router.post('/ask-about-review', async (req, res) => {
       });
     }
 
-    if (!previousReview) {
-      console.log('❌ Previous review data missing');
-      return res.status(400).json({
-        error: 'Vui lòng review code trước'
-      });
-    }
-
     console.log('❓ Question:', question.substring(0, 100));
+    console.log('📝 Has code:', !!code);
+    console.log('📊 Has previous review:', !!previousReview);
 
     // Check if using mock mode
     const useMock = process.env.USE_MOCK === 'true';
@@ -486,7 +481,7 @@ router.post('/ask-about-review', async (req, res) => {
         'wait': 'Trong Cypress, nên dùng .should() assertions thay vì cy.wait() với ID. Điều này giúp test chặn đúng thời điểm cần thiết mà không hardcode thời gian.',
         'selector': 'Selector [name="email"] rất tốt vì nó cụ thể và ít thay đổi. Tránh dùng .class hoặc vị trí trong DOM vì dễ bị ảnh hưởng bởi thay đổi styling.',
         'assertion': 'Assertion .should("include", "/dashboard") kiểm tra URL sau login thành công. Đây là cách tốt để xác nhận navigation đúng.',
-        'default': 'Dựa trên review code trước đó, điều quan trọng là sử dụng explicit waits thay vì implicit waits, tránh hardcode data, và luôn có assertions ý nghĩa.'
+        'default': 'Dựa trên code của bạn, điều quan trọng là sử dụng explicit waits thay vì implicit waits, tránh hardcode data, và luôn có assertions ý nghĩa.'
       };
 
       let answer = mockAnswers.default;
@@ -505,7 +500,7 @@ router.post('/ask-about-review', async (req, res) => {
     }
 
     // Build context from previous review
-    const reviewContext = `
+    const reviewContext = previousReview ? `
 KẾT QUẢ REVIEW CODE TRƯỚC:
 - Chất lượng: ${previousReview.metrics?.quality || 'N/A'}
 - Điểm số: ${previousReview.metrics?.score || 'N/A'}/10
@@ -517,32 +512,69 @@ ${(previousReview.issues || []).map(i => `- [${i.type.toUpperCase()}] ${i.title}
 
 GỢI Ý CẢI THIỆN:
 ${(previousReview.recommendations || []).map(r => `- ${r}`).join('\n')}
+` : 'Chưa có review code trước.';
 
-CODE GỐC:
+    // Build code context
+    const codeContext = code ? `
+CODE CỦA NGƯỜI DÙNG:
 \`\`\`javascript
-${code}
-\`\`\`
-`;
+${code.substring(0, 1000)}${code.length > 1000 ? '... (còn ' + (code.length - 1000) + ' ký tự)' : ''}
+\`\`\`` : 'Chưa có code.';
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const followUpPrompt = `Bạn là một chuyên gia Cypress testing có kinh nghiệm hơn 10 năm. 
-Người dùng đã nhận được kết quả review code của mình:
+    // Detect if user is asking for code
+    const isAskingForCode = /code|viết|example|sample|implement|cách|how to|làm sao|template|script/.test(question.toLowerCase());
 
-${reviewContext}
+    const followUpPrompt = isAskingForCode ? 
+`ROLE: Bạn là một chuyên gia Cypress testing có kinh nghiệm 10+ năm.
 
-Bây giờ họ có câu hỏi follow-up: "${question}"
+CÂUHỎI: "${question}"
 
-YÊUVỀ ĐÁP TIẾP:
-1. Trả lời bằng Tiếng Việt, rõ ràng và chuyên nghiệp
-2. Giải thích kỹ LỚN (không quá dài, 3-5 câu)
-3. Nếu câu hỏi liên quan tới code, cung cấp ví dụ code cụ thể
-4. Giải thích TẠI SAO điều đó lại quan trọng
-5. Nếu có cách tốt hơn, hãy đề xuất
+CONTEXT:
+${code ? `Code hiện tại:\n${code.substring(0, 1500)}${code.length > 1500 ? '\n...' : ''}` : ''}
 
-Trả lời trực tiếp mà không dùng markdown hoặc định dạng đặc biệt.`;
+OUTPUT FORMAT (QUAN TRỌNG):
+Phải trả lời theo cấu trúc ĐÚNG NHƯ SAU:
+
+=== CODE ===
+[Viết code Cypress test ở đây - phải chạy được]
+[Không comment dài, chỉ comment ngắn gọn]
+[Dễ copy-paste]
+
+=== GIẢI THÍCH ===
+[Giải thích từng bước code làm gì]
+[Tại sao phải làm vậy]
+[Các assertion check cái gì]
+[Lưu ý gì khi chạy]
+
+YÊU CẦU:
+• Phân tách rõ ràng code vs giải thích
+• Code phải chạy được ngay (có import, describe, it)
+• Giải thích bằng Tiếng Việt, ngắn gọn
+• Không comment dài dòng trong code
+• Selector phải cụ thể và realistic`
+:
+`ROLE: Bạn là một chuyên gia Cypress testing có kinh nghiệm 10+ năm.
+
+CÂUHỎI: "${question}"
+
+CONTEXT:
+${code ? `Code của người dùng:\n${code.substring(0, 2000)}${code.length > 2000 ? '\n...' : ''}` : ''}
+
+${previousReview ? `Review trước: Điểm ${previousReview.metrics?.score}/10 - ${(previousReview.issues || []).map(i => i.title).join(', ')}` : ''}
+
+YÊU CẦU:
+• Trả lời TRỰC TIẾP vào câu hỏi
+• Phân tích CODE CỤ THỂ nếu liên quan
+• Giải thích NGUYÊN NHÂN tại sao
+• Tối đa 4-5 câu, súc tích
+• Dùng Tiếng Việt
+• KHÔNG markdown`;
 
     console.log('🤖 Calling Gemini AI for follow-up...');
+    console.log('❓ Question:', question.substring(0, 80));
+    console.log('🔍 Detecting code request:', isAskingForCode);
     
     const result = await model.generateContent(followUpPrompt);
     const answer = result.response.text();

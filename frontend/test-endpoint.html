@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Endpoint</title>
+</head>
+<body>
+    <h1>Test Endpoint</h1>
+    <button onclick="testEndpoint()">Test Analyze Website</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testEndpoint() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>🔄 Testing...</p>';
+            
+            try {
+                const url = 'https://www.google.com';
+                console.log('📤 Sending request to /api/analyze-website-features');
+                console.log('📤 URL:', url);
+                
+                const response = await fetch('http://localhost:3001/api/analyze-website-features', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                console.log('📥 Response status:', response.status);
+                console.log('📥 Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('📥 Response data:', data);
+                
+                resultDiv.innerHTML = `
+                    <h2>✅ Success!</h2>
+                    <p>Status: ${response.status}</p>
+                    <p>Features Found: ${data.features ? data.features.length : 0}</p>
+                    <pre>${JSON.stringify(data.features, null, 2).substring(0, 500)}</pre>
+                `;
+            } catch (error) {
+                console.error('❌ Error:', error);
+                resultDiv.innerHTML = `
+                    <h2>❌ Error</h2>
+                    <p>${error.message}</p>
+                    <p>Check the browser console for more details</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 // API Configuration
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://localhost:3001';
 
 // Utility Functions
 function showStatus(elementId, message, type) {

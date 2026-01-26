@@ -4,800 +4,340 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Script Review - AI Testing Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #52b788;
-            --primary-dark: #1b4332;
-            --primary-soft: #b7e4c7;
-            --bg-body: #f7fffb;
-            --text-main: #2d6a4f;
-            --text-muted: #6b9080;
-            --glass-white: rgba(255, 255, 255, 0.8);
-            --border-soft: rgba(82, 183, 136, 0.15);
-            --success: #40916c;
-            --danger: #d62828;
-            --sidebar-width: 280px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: white;
-            border-right: 1px solid var(--border-soft);
-            position: fixed;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
-        }
-
-        .sidebar-brand {
-            padding: 2rem 1.5rem;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid var(--border-soft);
-        }
-
-        .sidebar-brand i {
-            font-size: 1.6rem;
-            color: var(--primary);
-        }
-
-        .sidebar-menu {
-            flex: 1;
-            padding: 1.5rem 0.8rem;
-            overflow-y: auto;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.2rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: 12px;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .menu-item i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        .menu-item:hover {
-            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
-            color: var(--primary);
-            transform: translateX(5px);
-        }
-
-        .menu-item.active {
-            background: linear-gradient(135deg, var(--primary), var(--success));
-            color: white;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
-        }
-
-        .sidebar-footer {
-            padding: 1rem 0.8rem;
-            border-top: 1px solid var(--border-soft);
-        }
-
-        .btn-logout {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--success));
-            border: none;
-            color: white;
-            padding: 1rem 1.2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
-        }
-
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.3);
-        }
-
-        .btn-logout i {
-            font-size: 1.1rem;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        /* ===== PAGE HEADER ===== */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .page-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-        }
-
-        .page-subtitle {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-top: 0.25rem;
-        }
-
-        /* ===== CARDS ===== */
-        .card-glass {
-            background: var(--glass-white);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card-glass:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.15);
-            border-color: rgba(82, 183, 136, 0.3);
-        }
-
-        /* ===== CODE EDITOR ===== */
-        .code-editor {
-            font-family: 'Fira Code', monospace;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border-radius: 12px;
-            padding: 1rem;
-            border: 1px solid rgba(82, 183, 136, 0.1);
-        }
-
-        /* ===== FEEDBACK BOX ===== */
-        .feedback-box {
-            border-left: 4px solid var(--primary);
-            background: var(--glass-white);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s;
-        }
-
-        .error-feedback {
-            border-left-color: #dc2626;
-            background: rgba(254, 242, 242, 0.8);
-        }
-
-        .warning-feedback {
-            border-left-color: #f59e0b;
-            background: rgba(255, 251, 235, 0.8);
-        }
-
-        .success-feedback {
-            border-left-color: var(--primary);
-            background: rgba(240, 253, 244, 0.8);
-        }
-
-        .info-feedback {
-            border-left-color: #3b82f6;
-            background: rgba(239, 246, 255, 0.8);
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--primary), var(--success));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.2);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.3);
-        }
-
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: white;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
-            transform: translateY(-2px);
-        }
-
-        /* ===== SPINNER ===== */
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 200px;
-            }
-
-            .main-content {
-                margin-left: 200px;
-                padding: 1.5rem;
-            }
-
-            .page-title {
-                font-size: 1.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-right: none;
-                border-bottom: 1px solid var(--border-soft);
-                flex-direction: row;
-                align-items: center;
-                padding: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
+        body { font-family: 'Inter', sans-serif; }
+        .code-editor { font-family: 'Fira Code', monospace; }
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-in { animation: slideInUp 0.6s ease-out forwards; }
+        
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { 
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(82, 183, 136, 0.2);
         }
     </style>
 </head>
-<body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <i class="fas fa-code"></i> Script Review
-        </div>
-        <nav class="sidebar-menu">
-            <a href="dashboard.html" class="menu-item">
-                <i class="fas fa-home"></i> Tổng quan
-            </a>
-            <a href="test-creation.html" class="menu-item">
-                <i class="fas fa-pen"></i> Tạo Test Case
-            </a>
-            <a href="analytics.html" class="menu-item">
-                <i class="fas fa-chart-line"></i> Analytics
-            </a>
-            <a href="website-analyzer.html" class="menu-item">
-                <i class="fas fa-globe"></i> Website Analyzer
-            </a>
-            <a href="script-review.html" class="menu-item active">
-                <i class="fas fa-code"></i> Script Review
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <button class="btn-logout" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
+<body class="bg-gradient-to-br from-[#f0fdf4] via-[#f5f5f5] to-[#f0fdf4] min-h-screen">
 
-    <!-- Main Content -->
-    <main class="main-content">
-
-        <!-- Page Header -->
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">Script Review</h1>
-                <p class="page-subtitle">Kiểm tra và cải thiện test script với AI</p>
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-[#1b4332] via-[#2d6a4f] to-[#1b4332] text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-xl">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2">
+                <div class="bg-[#52b788] p-1.5 rounded-lg shadow-lg"><i class="fas fa-leaf text-white"></i></div>
+                <span class="text-lg font-bold tracking-tight">AI<span class="text-[#52b788]">-TestLab</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-gray-300">
+                <a href="dashboard.html" class="hover:text-white transition">Tổng quan</a>
+                <a href="test-creation.html" class="hover:text-white transition">Test Cases</a>
+                <a href="analytics.html" class="hover:text-white transition">Phân tích</a>
+                <a href="#" class="text-white border-b-2 border-[#52b788] pb-1 font-semibold">Script Review</a>
             </div>
         </div>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-gray-300"><i class="far fa-clock mr-1"></i> Tự động lưu</span>
+            <div class="h-8 w-8 bg-gradient-to-tr from-[#52b788] to-[#40916c] rounded-full flex items-center justify-center font-bold text-xs shadow-lg">SR</div>
+        </div>
+    </nav>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-            <!-- Left Panel: Code Input -->
-            <div class="card-glass" style="display: flex; flex-direction: column;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(82, 183, 136, 0.2);">
-                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--success)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-pen" style="color: white; font-size: 1rem;"></i>
-                    </div>
-                    <div>
-                        <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Viết Test Script</h2>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Dán code Cypress của bạn</p>
-                    </div>
-                </div>
-                
-                <textarea id="codeInput" class="code-editor" style="flex: 1; min-height: 350px; resize: vertical;" placeholder="Dán Cypress test script của bạn tại đây...
-
-Ví dụ:
-describe('Login Test', () => {
-  it('should login with valid credentials', () => {
-    cy.visit('http://localhost:8080/login.html')
-    cy.get('input[name=email]').type('user@example.com')
-    cy.get('input[name=password]').type('password123')
-    cy.get('button[type=submit]').click()
-    cy.url().should('include', '/dashboard')
-  })
-})"></textarea>
-                    
-                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-                    <button onclick="reviewScript()" class="btn-primary" style="flex: 1;">
-                        <i class="fas fa-magic" id="reviewBtn"></i>
-                        <span>Gửi cho AI Review</span>
-                    </button>
-                    <button onclick="loadExample()" class="btn-secondary">
-                        <i class="fas fa-download"></i>
-                        <span>Ví dụ</span>
-                    </button>
-                    <button onclick="clearCode()" class="btn-secondary">
-                        <i class="fas fa-trash"></i>
-                        <span>Xóa</span>
-                    </button>
-                </div>
+    <!-- Main Layout -->
+    <div class="max-w-full mx-auto grid grid-cols-12 gap-0 h-[calc(100vh-70px)] overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="col-span-3 md:col-span-2 border-r border-gray-200 bg-gradient-to-b from-[#f8fafb] to-white p-5 overflow-y-auto shadow-sm">
+            <div class="mb-6">
+                <h2 class="text-xs font-bold text-[#52b788] uppercase tracking-widest mb-1">📝 Input</h2>
+                <p class="text-xs text-gray-500">Dán code của bạn</p>
             </div>
 
-            <!-- Right Panel: AI Feedback -->
-            <div class="card-glass" style="display: flex; flex-direction: column;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(82, 183, 136, 0.2);">
-                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #a855f7, #9333ea); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-sparkles" style="color: white; font-size: 1rem;"></i>
-                    </div>
-                    <div>
-                        <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Nhận xét AI</h2>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Phân tích và gợi ý cải thiện</p>
-                    </div>
-                </div>
-                
-                <div id="feedbackContainer" style="flex: 1; overflow-y: auto;">
-                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
-                        <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                        <p>Viết test script và nhấn "Gửi cho AI Review" để nhận nhận xét</p>
-                    </div>
-                </div>
-
-                <div id="scoreboard" style="display: none; border-top: 1px solid rgba(82, 183, 136, 0.2); padding: 1rem; margin-top: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
-                    <div>
-                        <div id="scoreQuality" style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">--</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Chất lượng</div>
-                    </div>
-                    <div>
-                        <div id="scoreIssues" style="font-size: 1.5rem; font-weight: 700; color: #dc2626; margin-bottom: 0.5rem;">--</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Vấn đề</div>
-                    </div>
-                    <div>
-                        <div id="scoreScore" style="font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin-bottom: 0.5rem;">--</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Điểm số</div>
-                    </div>
-                </div>
+            <!-- Code Input -->
+            <div class="mb-5 p-4 bg-gradient-to-br from-blue-50 to-blue-50 rounded-xl border border-blue-200">
+                <label class="block text-xs font-bold text-[#1b4332] mb-2"><i class="fas fa-code mr-1.5 text-blue-600"></i>Test Script</label>
+                <textarea id="codeInput" class="w-full border border-blue-300 rounded-lg p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white resize-none shadow-sm" placeholder="Paste Cypress test script here..." style="height: 280px; font-family: 'Fira Code', monospace;"></textarea>
+                <button onclick="analyzeCode()" class="w-full mt-3 bg-gradient-to-r from-[#52b788] to-[#40916c] text-white font-bold py-2.5 px-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition text-sm">
+                    <i class="fas fa-magic mr-1.5"></i> Phân tích ngay
+                </button>
             </div>
-        </div>
 
-        <!-- Detailed Analysis Section -->
-        <div id="analysisSection" style="display: none; margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
-                <i class="fas fa-chart-bar" style="margin-right: 0.75rem;"></i>Phân tích chi tiết
-            </h2>
-            <div id="detailedAnalysis" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;"></div>
-        </div>
+            <!-- Language Selection -->
+            <div class="mb-5 p-4 bg-gradient-to-br from-purple-50 to-purple-50 rounded-xl border border-purple-200">
+                <label class="block text-xs font-bold text-[#1b4332] mb-2"><i class="fas fa-code-branch mr-1.5 text-purple-600"></i>Ngôn ngữ</label>
+                <select id="languageSelect" class="w-full border border-purple-300 rounded-lg p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white shadow-sm">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="cypress">Cypress</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="other">Khác</option>
+                </select>
+            </div>
 
-        <!-- Improved Code Section -->
-        <div id="improvedCodeSection" style="display: none; margin-bottom: 2rem;">
-            <div class="card-glass">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(82, 183, 136, 0.2);">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-check" style="color: white; font-size: 1rem;"></i>
+            <!-- Quick Actions -->
+            <div class="space-y-2 mb-4">
+                <button onclick="loadExample()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-2.5 px-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition text-sm">
+                    <i class="fas fa-book mr-1.5"></i> Ví dụ
+                </button>
+                <button onclick="clearCode()" class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold py-2.5 px-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition text-sm">
+                    <i class="fas fa-trash mr-1.5"></i> Xóa
+                </button>
+            </div>
+
+            <!-- Info Box -->
+            <div class="p-4 bg-gradient-to-br from-amber-50 to-amber-50 rounded-xl border border-amber-200">
+                <p class="text-xs text-amber-900 font-semibold mb-1"><i class="fas fa-lightbulb mr-1.5"></i>Mẹo</p>
+                <p class="text-xs text-amber-800">Dán test case Cypress để nhận phân tích chi tiết từ AI</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="col-span-9 md:col-span-10 bg-white overflow-y-auto p-8">
+            <!-- Header Section -->
+            <div class="mb-8 animate-in">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-gradient-to-br from-[#52b788] to-[#40916c] w-14 h-14 rounded-xl flex items-center justify-center text-white shadow-lg">
+                            <i class="fas fa-code text-2xl"></i>
                         </div>
                         <div>
-                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Code sau khi cải thiện</h3>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">Phiên bản tối ưu hóa</p>
+                            <h1 class="text-3xl font-bold text-[#1b4332]">Script Review</h1>
+                            <p class="text-sm text-gray-600 mt-1"><i class="fas fa-sparkles mr-1 text-[#52b788]"></i>Phân tích & cải thiện test scripts với AI</p>
                         </div>
                     </div>
-                    <button onclick="copyImprovedCode()" class="btn-secondary">
-                        <i class="fas fa-copy"></i>
-                        <span>Copy</span>
-                    </button>
                 </div>
-                <pre id="improvedCode" class="code-editor" style="max-height: 400px; overflow-x: auto;"></pre>
+                <div class="h-1 w-24 bg-gradient-to-r from-[#52b788] to-[#40916c] rounded-full"></div>
             </div>
-        </div>
 
-        <!-- Follow-up Questions Section -->
-        <div id="followUpSection">
-            <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 1.5rem;">
-                <i class="fas fa-comments" style="margin-right: 0.75rem;"></i>Hỏi thêm chi tiết
-            </h2>
-            <div class="card-glass">
-                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <input type="text" id="followUpQuestion" placeholder="Hỏi về gợi ý hoặc cách cải thiện code của bạn..." style="flex: 1; padding: 1rem; border: 1.5px solid rgba(82, 183, 136, 0.2); border-radius: 12px; font-size: 0.95rem; color: var(--text-main); background: white; transition: all 0.3s;">
-                    <button onclick="askFollowUp()" class="btn-primary">
-                        <i class="fas fa-paper-plane" id="askBtn"></i>
-                        <span>Gửi</span>
-                    </button>
+            <!-- Feature Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                <!-- Syntax Analysis -->
+                <div class="card-hover p-6 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50 shadow-sm">
+                    <div class="flex items-start mb-3">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white mr-3">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 class="font-bold text-[#1b4332] text-lg">Phân tích Syntax</h3>
+                    </div>
+                    <p class="text-sm text-gray-700">Kiểm tra lỗi cú pháp, cấu trúc code và phát hiện issues</p>
+                    <div class="mt-4 text-xs text-blue-600 font-semibold">→ Phát hiện 10+ loại lỗi</div>
                 </div>
-                <div id="followUpContainer" style="space-y: 1rem;"></div>
+
+                <!-- Code Standards -->
+                <div class="card-hover p-6 rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-green-50 shadow-sm">
+                    <div class="flex items-start mb-3">
+                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-white mr-3">
+                            <i class="fas fa-shield"></i>
+                        </div>
+                        <h3 class="font-bold text-[#1b4332] text-lg">Quy chuẩn Code</h3>
+                    </div>
+                    <p class="text-sm text-gray-700">Tuân theo best practices và quy tắc lập trình</p>
+                    <div class="mt-4 text-xs text-green-600 font-semibold">→ Check 15+ standards</div>
+                </div>
+
+                <!-- Complexity -->
+                <div class="card-hover p-6 rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-50 shadow-sm">
+                    <div class="flex items-start mb-3">
+                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white mr-3">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="font-bold text-[#1b4332] text-lg">Độ Phức Tạp</h3>
+                    </div>
+                    <p class="text-sm text-gray-700">Đánh giá cyclomatic complexity và maintainability</p>
+                    <div class="mt-4 text-xs text-purple-600 font-semibold">→ Tối ưu hóa code</div>
+                </div>
+
+                <!-- Warnings -->
+                <div class="card-hover p-6 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-50 shadow-sm">
+                    <div class="flex items-start mb-3">
+                        <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-white mr-3">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                        <h3 class="font-bold text-[#1b4332] text-lg">Cảnh Báo</h3>
+                    </div>
+                    <p class="text-sm text-gray-700">Phát hiện lỗi tiềm ẩn và issues bảo mật</p>
+                    <div class="mt-4 text-xs text-amber-600 font-semibold">→ Kiểm tra 8+ vấn đề</div>
+                </div>
             </div>
-        </div>
-    </main>
+
+            <!-- Stats Section -->
+            <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="p-5 rounded-xl bg-gradient-to-br from-[#52b788] to-[#40916c] text-white shadow-lg">
+                    <p class="text-xs opacity-90 uppercase tracking-wide font-semibold">Ngôn ngữ hỗ trợ</p>
+                    <p class="text-2xl font-bold mt-1">5+</p>
+                </div>
+                <div class="p-5 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg">
+                    <p class="text-xs opacity-90 uppercase tracking-wide font-semibold">Kiểm tra</p>
+                    <p class="text-2xl font-bold mt-1">50+</p>
+                </div>
+                <div class="p-5 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg">
+                    <p class="text-xs opacity-90 uppercase tracking-wide font-semibold">Độ chính xác</p>
+                    <p class="text-2xl font-bold mt-1">99%</p>
+                </div>
+            </div>
+
+            <!-- Getting Started -->
+            <div class="p-6 rounded-2xl border-2 border-dashed border-[#52b788] bg-gradient-to-br from-green-50 to-emerald-50">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-[#52b788] rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                        <i class="fas fa-rocket text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-[#1b4332] text-lg mb-1">Bắt đầu ngay</h3>
+                        <p class="text-sm text-gray-700 mb-3">Dán test script của bạn ở sidebar trái, sau đó nhấn "Phân tích ngay" để nhận kết quả chi tiết</p>
+                        <button onclick="loadExample()" class="text-sm font-semibold text-[#52b788] hover:text-[#40916c] transition">
+                            <i class="fas fa-arrow-right mr-1"></i> Xem ví dụ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script>
         const API_URL = 'http://localhost:3000';
 
-        // Logout function
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'auth.html';
-        }
-
-        // Load example code
-        function loadExample() {
-            const exampleCode = `describe('Verify login success with Admin', () => {
-  it('should login with valid credentials', () => {
-    cy.visit('https://staging.app.com/login')
-    cy.get('input[name="email"]', { timeout: 5000 }).type('admin@test.com', { delay: 100 })
-    cy.get('input[name="password"]').type('Password123', { delay: 100 })
-    cy.get('button[type="submit"]').click()
-    cy.url().should('include', '/dashboard')
-    cy.get('[data-testid="user-profile"]').should('be.visible')
-  })
-  
-  it('should show error for invalid password', () => {
-    cy.visit('https://staging.app.com/login')
-    cy.fillLoginForm('test@example.com', 'wrongpass')
-    cy.contains('Invalid credentials').should('be.visible')
-  })
-  
-  it('should test form navigation', () => {
-    cy.visit('https://staging.app.com/login')
-    cy.checkNavigation()
-  })
-})`;
-            document.getElementById('codeInput').value = exampleCode;
-        }
-
-        // Clear code input
-        function clearCode() {
-            if (confirm('Bạn có chắc chắn muốn xóa tất cả code?')) {
-                document.getElementById('codeInput').value = '';
-            }
-        }
-
-        // Review script with AI
-        async function reviewScript() {
+        function analyzeCode() {
             const code = document.getElementById('codeInput').value.trim();
-            
             if (!code) {
-                showError('Vui lòng nhập test script');
+                alert('⚠️ Vui lòng nhập test script trước');
                 return;
             }
 
-            const reviewBtn = document.getElementById('reviewBtn');
-            reviewBtn.innerHTML = '<i class="fas fa-spinner spinner"></i>';
-            reviewBtn.disabled = true;
-
-            try {
-                console.log('📤 Sending request to:', `${API_URL}/api/review-test-script`);
-                console.log('📝 Code length:', code.length);
-                
-                const response = await fetch(`${API_URL}/api/review-test-script`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ code })
-                });
-
-                console.log('📥 Response status:', response.status);
-                
-                const data = await response.json();
-                console.log('📊 Response data:', data);
-                
-                if (!response.ok) {
-                    throw new Error(data.error || `Server error: ${response.status}`);
+            // Call backend API
+            fetch(`${API_URL}/api/review-test-script`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📊 API Response:', data);
+                if (data.status === 'success' || data.summary) {
+                    displayReviewResults(data);
+                } else {
+                    alert('❌ Lỗi: ' + (data.error || 'Không thể phân tích code'));
                 }
-
-                displayFeedback(data);
-            } catch (error) {
-                console.error('❌ Error:', error);
-                showError('❌ Lỗi: ' + error.message + '<br>Kiểm tra console (F12) để xem chi tiết');
-            } finally {
-                reviewBtn.innerHTML = '<i class="fas fa-magic"></i>';
-                reviewBtn.disabled = false;
-            }
-        }
-
-        // Display feedback from AI
-        function displayFeedback(data) {
-            const container = document.getElementById('feedbackContainer');
-            container.innerHTML = '';
-
-            // Show scoreboard
-            document.getElementById('scoreboard').style.display = 'grid';
-            document.getElementById('scoreQuality').textContent = data.metrics?.quality || '--';
-            document.getElementById('scoreIssues').textContent = data.issues?.length || 0;
-            document.getElementById('scoreScore').textContent = (data.metrics?.score || 0).toFixed(1) + '/10';
-
-            // Add general feedback
-            if (data.summary) {
-                const summaryDiv = document.createElement('div');
-                summaryDiv.className = 'feedback-box info-feedback fade-in-up';
-                summaryDiv.innerHTML = `
-                    <h3 style="font-weight: 700; color: var(--primary-dark); margin-bottom: 0.75rem;">
-                        <i class="fas fa-lightbulb" style="margin-right: 0.75rem;"></i>Tóm tắt
-                    </h3>
-                    <p style="font-size: 0.95rem; color: var(--text-main);">${data.summary}</p>
-                `;
-                container.appendChild(summaryDiv);
-            }
-
-            // Add issues
-            if (data.issues && data.issues.length > 0) {
-                data.issues.forEach((issue, idx) => {
-                    const issueDiv = document.createElement('div');
-                    const classType = `${issue.type.toLowerCase()}-feedback`;
-                    const icons = {
-                        'error': 'times-circle',
-                        'warning': 'exclamation-triangle',
-                        'info': 'info-circle'
-                    };
-                    issueDiv.className = `feedback-box ${classType} fade-in-up`;
-                    issueDiv.style.animationDelay = (idx * 0.1) + 's';
-                    issueDiv.innerHTML = `
-                        <h3 style="font-weight: 700; color: var(--primary-dark); margin-bottom: 0.75rem;">
-                            <i class="fas fa-${icons[issue.type] || 'info-circle'}" style="margin-right: 0.75rem;"></i>
-                            ${issue.type.toUpperCase()}: ${issue.title}
-                        </h3>
-                        <p style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.75rem;">${issue.description}</p>
-                        ${issue.suggestion ? `<p style="font-size: 0.9rem; color: var(--primary); font-weight: 600;"><i class="fas fa-arrow-right" style="margin-right: 0.5rem;"></i>${issue.suggestion}</p>` : ''}
-                    `;
-                    container.appendChild(issueDiv);
-                });
-            }
-
-            // Add recommendations
-            if (data.recommendations && data.recommendations.length > 0) {
-                const recDiv = document.createElement('div');
-                recDiv.className = 'feedback-box success-feedback';
-                recDiv.innerHTML = `
-                    <h3 style="font-weight: 700; color: var(--primary-dark); margin-bottom: 1rem;">
-                        <i class="fas fa-star" style="margin-right: 0.75rem;"></i>Gợi ý cải thiện
-                    </h3>
-                    <ul style="list-style: none; space-y: 0.5rem;">
-                        ${data.recommendations.map(rec => `<li style="margin-bottom: 0.75rem; color: var(--text-main);"><i class="fas fa-check" style="color: var(--primary); margin-right: 0.75rem;"></i>${rec}</li>`).join('')}
-                    </ul>
-                `;
-                container.appendChild(recDiv);
-            }
-
-            // Show detailed analysis
-            if (data.details) {
-                showDetailedAnalysis(data.details);
-            }
-
-            // Show improved code
-            if (data.improvedCode) {
-                showImprovedCode(data.improvedCode);
-            }
-
-            // Store feedback data for follow-up questions
-            window.lastReviewData = data;
-        }
-
-        // Show detailed analysis
-        function showDetailedAnalysis(details) {
-            const section = document.getElementById('analysisSection');
-            const content = document.getElementById('detailedAnalysis');
-            
-            section.style.display = 'block';
-            content.innerHTML = '';
-
-            const categories = {
-                'Cấu trúc': 'fa-cubes',
-                'Lỗi': 'fa-bug',
-                'Hiệu năng': 'fa-tachometer-alt',
-                'Bảo mật': 'fa-shield-alt',
-                'Best Practices': 'fa-thumbs-up'
-            };
-
-            for (const [category, icon] of Object.entries(categories)) {
-                if (details[category]) {
-                    const div = document.createElement('div');
-                    div.className = 'card-glass fade-in-up';
-                    div.innerHTML = `
-                        <h4 style="font-weight: 700; color: var(--primary-dark); margin-bottom: 0.75rem;">
-                            <i class="fas ${icon}" style="margin-right: 0.75rem; color: var(--primary);"></i>${category}
-                        </h4>
-                        <p style="font-size: 0.95rem; color: var(--text-main);">${details[category]}</p>
-                    `;
-                    content.appendChild(div);
-                }
-            }
-        }
-
-        // Show improved code
-        function showImprovedCode(code) {
-            const section = document.getElementById('improvedCodeSection');
-            const codeElement = document.getElementById('improvedCode');
-            
-            section.style.display = 'block';
-            codeElement.textContent = code;
-        }
-
-        // Copy improved code
-        function copyImprovedCode() {
-            const code = document.getElementById('improvedCode').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                alert('✅ Đã copy code!');
+            })
+            .catch(error => {
+                console.error('❌ API Error:', error);
+                alert('❌ Lỗi kết nối: ' + error.message);
             });
         }
 
-        // Show error message
-        function showError(message) {
-            const container = document.getElementById('feedbackContainer');
-            container.innerHTML = `
-                <div class="feedback-box error-feedback" style="text-align: center; padding: 2rem;">
-                    <i class="fas fa-exclamation-circle" style="font-size: 2rem; color: #dc2626; margin-bottom: 1rem; display: block;"></i>
-                    <p style="color: #dc2626; font-weight: 600; margin-bottom: 0.5rem;">${message}</p>
+        function displayReviewResults(data) {
+            // Get results container or create it
+            let resultsContainer = document.getElementById('resultsContainer');
+            if (!resultsContainer) {
+                resultsContainer = document.createElement('div');
+                resultsContainer.id = 'resultsContainer';
+                resultsContainer.className = 'col-span-10 bg-white rounded-lg p-6 shadow-lg border border-gray-200';
+                document.querySelector('main .grid').appendChild(resultsContainer);
+            }
+
+            // Build HTML for results
+            let html = `
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-[#1b4332] mb-2">📊 Kết Quả Phân Tích</h3>
+                    <p class="text-gray-600 mb-4">${data.summary || 'Phân tích hoàn tất'}</p>
+                    
+                    ${data.metrics ? `
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <p class="text-sm text-gray-600">Chất Lượng</p>
+                            <p class="text-2xl font-bold text-blue-600">${data.metrics.quality || 'N/A'}</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                            <p class="text-sm text-gray-600">Điểm Số</p>
+                            <p class="text-2xl font-bold text-green-600">${data.metrics.score || 'N/A'}/10</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <p class="text-sm text-gray-600">Độ Phức Tạp</p>
+                            <p class="text-2xl font-bold text-purple-600">${data.metrics.complexity || 'N/A'}</p>
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
+
+                ${data.issues && data.issues.length > 0 ? `
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-red-600 mb-3">⚠️ Vấn Đề Tìm Thấy (${data.issues.length})</h4>
+                    ${data.issues.map(issue => `
+                        <div class="bg-red-50 p-4 rounded-lg mb-3 border-l-4 border-red-500">
+                            <p class="font-semibold text-red-700">[${issue.type}] ${issue.title}</p>
+                            <p class="text-sm text-gray-700 mt-1">${issue.description}</p>
+                            ${issue.suggestion ? `<p class="text-sm text-gray-600 mt-2 italic">💡 ${issue.suggestion}</p>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                ` : '<div class="mb-6 text-green-600">✅ Không tìm thấy vấn đề lớn</div>'}
+
+                ${data.recommendations && data.recommendations.length > 0 ? `
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-green-600 mb-3">✨ Gợi Ý Cải Thiện (${data.recommendations.length})</h4>
+                    ${data.recommendations.map(rec => `
+                        <div class="bg-green-50 p-4 rounded-lg mb-3 border-l-4 border-green-500">
+                            <p class="text-sm text-gray-700">• ${rec}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${data.improvedCode ? `
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-[#52b788] mb-3">📝 Code Cải Thiện</h4>
+                    <pre class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-xs"><code>${escapeHtml(data.improvedCode)}</code></pre>
+                </div>
+                ` : ''}
             `;
+
+            resultsContainer.innerHTML = html;
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Ask follow-up question
-        async function askFollowUp() {
-            const question = document.getElementById('followUpQuestion').value.trim();
-            
-            if (!question) {
-                alert('Vui lòng nhập câu hỏi');
-                return;
-            }
-
-            if (!window.lastReviewData) {
-                alert('Vui lòng review code trước');
-                return;
-            }
-
-            const askBtn = document.getElementById('askBtn');
-            const originalHTML = askBtn.innerHTML;
-            askBtn.innerHTML = '<i class="fas fa-spinner spinner"></i>';
-            askBtn.disabled = true;
-
-            try {
-                console.log('📤 Sending follow-up question:', question);
-                
-                const response = await fetch(`${API_URL}/api/ask-about-review`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        question: question,
-                        previousReview: window.lastReviewData,
-                        code: document.getElementById('codeInput').value
-                    })
-                });
-
-                console.log('📥 Response status:', response.status);
-                
-                const data = await response.json();
-                console.log('📊 Response data:', data);
-                
-                if (!data.success) {
-                    throw new Error(data.error || `Error: ${response.status}`);
-                }
-
-                displayFollowUpAnswer(question, data.answer);
-                document.getElementById('followUpQuestion').value = '';
-            } catch (error) {
-                console.error('❌ Error:', error);
-                alert('❌ Lỗi: ' + error.message);
-            } finally {
-                askBtn.innerHTML = originalHTML;
-                askBtn.disabled = false;
-            }
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
 
-        // Display follow-up answer
-        function displayFollowUpAnswer(question, answer) {
-            const container = document.getElementById('followUpContainer');
-            
-            // User question
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'feedback-box info-feedback fade-in-up';
-            questionDiv.style.marginBottom = '1rem';
-            questionDiv.innerHTML = `
-                <h4 style="font-weight: 600; color: var(--primary-dark); margin-bottom: 0.5rem; font-size: 0.95rem;">
-                    <i class="fas fa-user-circle" style="margin-right: 0.5rem;"></i>Bạn hỏi:
-                </h4>
-                <p style="color: var(--text-main); font-size: 0.95rem;">${question}</p>
-            `;
-            container.appendChild(questionDiv);
+        function loadExample() {
+            const example = `describe('Login Test Suite', () => {
+  beforeEach(() => {
+    cy.visit('http://localhost:8080/login.html')
+  })
 
-            // AI answer
-            const answerDiv = document.createElement('div');
-            answerDiv.className = 'feedback-box success-feedback fade-in-up';
-            answerDiv.innerHTML = `
-                <h4 style="font-weight: 600; color: var(--primary-dark); margin-bottom: 0.5rem; font-size: 0.95rem;">
-                    <i class="fas fa-robot" style="margin-right: 0.5rem;"></i>AI trả lời:
-                </h4>
-                <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6;">${answer}</p>
-            `;
-            container.appendChild(answerDiv);
+  it('should login with valid credentials', () => {
+    cy.get('input[name=email]').type('user@example.com')
+    cy.get('input[name=password]').type('password123')
+    cy.get('button[type=submit]').click()
+    cy.url().should('include', '/dashboard')
+    cy.get('[data-testid=welcome]').should('be.visible')
+  })
 
-            // Scroll to answer
-            setTimeout(() => {
-                answerDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
+  it('should show error for invalid password', () => {
+    cy.get('input[name=email]').type('user@example.com')
+    cy.get('input[name=password]').type('wrongpass')
+    cy.get('button[type=submit]').click()
+    cy.contains('Invalid credentials').should('be.visible')
+  })
+})`;
+            document.getElementById('codeInput').value = example;
+        }
+
+        function clearCode() {
+            if (confirm('Xóa tất cả code?')) {
+                document.getElementById('codeInput').value = '';
+            }
         }
     </script>
 </body>

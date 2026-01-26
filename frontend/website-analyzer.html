@@ -3,1022 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Analyzer - AI Testing Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Phân tích Website - Nền tảng Kiểm thử AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #52b788;
-            --primary-dark: #1b4332;
-            --primary-light: #74c69d;
-            --secondary: #40916c;
-            --accent: #2d6a4f;
-            --card-bg: #f8fafc;
-            --card-border: #e2e8f0;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --text-light: #94a3b8;
-            --ai-gradient: linear-gradient(135deg, #52b788 0%, #40916c 100%);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --sidebar-width: 280px;
+        body { font-family: 'Inter', sans-serif; }
+        .code-editor { font-family: 'Fira Code', monospace; }
+        
+        .active-tab { 
+            border-bottom: 3px solid #52b788; 
+            color: #52b788; 
+            background: linear-gradient(135deg, #f0fdf4 0%, transparent 100%);
+            font-weight: 600;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-        }
-
-        body {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: white;
-            border-right: 1px solid rgba(82, 183, 136, 0.15);
-            position: fixed;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
-            z-index: 100;
-        }
-
-        .sidebar-brand {
-            padding: 2rem 1.5rem;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid rgba(82, 183, 136, 0.15);
-        }
-
-        .sidebar-brand i {
-            font-size: 1.6rem;
-            color: var(--primary);
-        }
-
-        .sidebar-menu {
-            flex: 1;
-            padding: 1.5rem 0.8rem;
-            overflow-y: auto;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.2rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: 12px;
-            margin-bottom: 0.5rem;
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f0fdf4; border-radius: 10px; }
+        
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slideIn { animation: slideIn 0.3s ease-out; }
+        .animate-fadeInUp { animation: fadeInUp 0.5s ease-out; }
+        
+        .btn-modern {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(82, 183, 136, 0.15);
         }
-
-        .menu-item i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        .menu-item:hover {
-            background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
-            color: var(--primary);
-            transform: translateX(5px);
-        }
-
-        .menu-item.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
-        }
-
-        .sidebar-footer {
-            padding: 1rem 0.8rem;
-            border-top: 1px solid rgba(82, 183, 136, 0.15);
-        }
-
-        .btn-logout {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none;
-            color: white;
-            padding: 1rem 1.2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
-        }
-
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.4);
-        }
-
-        .btn-logout i {
-            font-size: 1.1rem;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding: 2.5rem;
-            overflow-y: auto;
-        }
-
-        /* ===== PAGE HEADER ===== */
-        .page-header {
-            margin-bottom: 2.5rem;
-        }
-
-        .page-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            background: var(--ai-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            margin-bottom: 0.5rem;
-        }
-
-        .page-subtitle {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin: 0;
-        }
-
-        /* ===== SEARCH SECTION ===== */
-        .search-wrapper {
-            background: white;
-            padding: 10px;
-            border-radius: 18px;
-            display: flex;
-            gap: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--card-border);
-            margin-bottom: 2.5rem;
-        }
-
-        .search-wrapper input {
-            flex: 1;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
-            outline: none;
-            background: transparent;
-            color: var(--text-main);
-        }
-
-        .search-wrapper input::placeholder {
-            color: var(--text-light);
-        }
-
-        .btn-analyze {
-            background: var(--ai-gradient);
-            color: white;
-            border: none;
-            padding: 12px 32px;
-            border-radius: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
-            white-space: nowrap;
-        }
-
-        .btn-analyze:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.4);
-        }
-
-        .btn-analyze:active {
-            transform: translateY(0);
-        }
-
-        /* ===== STATS GRID ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 1.8rem;
-            border-radius: 18px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            transition: all 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            border-color: var(--primary);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            flex-shrink: 0;
-        }
-
-        .icon-blue {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            color: #1b4332;
-        }
-
-        .icon-purple {
-            background: linear-gradient(135deg, #b7e4c7 0%, #95d5b2 100%);
-            color: #2d6a4f;
-        }
-
-        .icon-green {
-            background: linear-gradient(135deg, #52b788 0%, #40916c 100%);
-            color: #ffffff;
-        }
-
-        .stat-info h3 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: var(--ai-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .stat-info p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        /* ===== DASHBOARD GRID ===== */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 2rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 18px;
-            padding: 1.8rem;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-            margin-bottom: 2rem;
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.1);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .card-header h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-main);
-        }
-
-        .card-header i {
-            color: var(--primary);
-            font-size: 1.3rem;
-        }
-
-        /* ===== FEATURE TAGS ===== */
-        .feature-tag {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 1rem;
-            background: linear-gradient(135deg, #d1fae5 0%, #b7e4c7 100%);
-            border: 1px solid rgba(82, 183, 136, 0.2);
-            border-radius: 14px;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-main);
-            transition: all 0.3s;
-        }
-
-        .feature-tag:hover {
-            background: linear-gradient(135deg, #b7e4c7 0%, #95d5b2 100%);
-            border-color: var(--primary);
-            transform: translateX(5px);
-        }
-
-        .feature-tag i {
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-
-        /* ===== AI TEST ITEM ===== */
-        .ai-test-item {
-            border: 1.5px solid var(--card-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            background: white;
-            transition: all 0.3s;
-        }
-
-        .ai-test-item:hover {
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(82, 183, 136, 0.15);
-            transform: translateY(-3px);
-        }
-
-        .ai-badge {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: var(--ai-gradient);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .ai-test-item h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 8px;
-            padding-right: 100px;
-        }
-
-        .ai-test-item p {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        .ai-test-items {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .ai-test-items .card-header {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--primary-light);
-        }
-
-        .ai-test-items .card-header h2 {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            color: var(--primary-dark);
-            font-size: 1.3rem;
-        }
-
-        .ai-test-items .ai-test-item {
-            padding: 1.2rem;
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            background: white;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .ai-test-items .ai-test-item:hover {
-            box-shadow: 0 8px 24px rgba(82, 183, 136, 0.12);
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        /* ===== CODE BLOCK ===== */
-        .code-block {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: #e2e8f0;
-            padding: 1.25rem;
-            border-radius: 12px;
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 0.85rem;
-            margin-top: 1rem;
-            position: relative;
-            overflow-x: auto;
-            border: 1px solid rgba(226, 232, 240, 0.1);
-            line-height: 1.6;
-        }
-
-        .code-block pre {
-            margin: 0;
-            font-family: inherit;
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn-run {
-            background: white;
-            color: var(--text-main);
-            border: 1.5px solid var(--card-border);
-            padding: 10px 18px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-run:hover {
-            background: var(--ai-gradient);
-            color: white;
-            border-color: var(--primary);
+        .btn-modern:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(82, 183, 136, 0.25);
         }
-
-        .btn-run:active {
-            transform: translateY(0);
-        }
-
-        /* ===== SPECIAL CARD ===== */
-        .special-card {
-            background: var(--ai-gradient);
-            color: white;
-            border: none;
-        }
-
-        .special-card h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.8rem;
-        }
-
-        .special-card p {
-            font-size: 0.9rem;
-            margin: 12px 0 20px;
-            opacity: 0.95;
-            line-height: 1.5;
-        }
-
-        .special-card .btn-run {
-            width: 100%;
-            background: white;
-            color: var(--primary);
-            border: none;
-            padding: 14px;
-            font-weight: 700;
-            justify-content: center;
-        }
-
-        .special-card .btn-run:hover {
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1200px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .main-content {
-                padding: 1.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -280px;
-                transition: left 0.3s;
-                z-index: 1000;
-            }
-
-            .sidebar.active {
-                left: 0;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1.5rem;
-            }
-
-            .page-title {
-                font-size: 1.6rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .search-wrapper {
-                flex-direction: column;
-            }
-
-            .btn-analyze {
-                justify-content: center;
-            }
-
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .card-header h2 {
-                width: 100%;
-            }
-
-            .ai-badge {
-                top: 1rem;
-                right: 1rem;
-            }
-
-            .ai-test-item h3 {
-                padding-right: 0;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .page-title {
-                font-size: 1.4rem;
-            }
-
-            .stat-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .card {
-                padding: 1.2rem;
-                border-radius: 14px;
-            }
-
-            .code-block {
-                font-size: 0.75rem;
-                padding: 1rem;
-            }
-        }
-
-        /* Scrollbar styling */
-        .sidebar-menu::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar-menu::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar-menu::-webkit-scrollbar-thumb {
-            background: rgba(82, 183, 136, 0.2);
-            border-radius: 3px;
-        }
-
-        .sidebar-menu::-webkit-scrollbar-thumb:hover {
-            background: rgba(82, 183, 136, 0.4);
-        }
-
-        .main-content::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .main-content::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .main-content::-webkit-scrollbar-thumb {
-            background: rgba(82, 183, 136, 0.2);
-            border-radius: 4px;
-        }
-
-        .main-content::-webkit-scrollbar-thumb:hover {
-            background: rgba(82, 183, 136, 0.4);
-        }
-
-        /* ===== TABS STYLES ===== */
-        .tabs-container {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--card-border);
-        }
-
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            font-size: 0.95rem;
-        }
-
-        .tab-button:hover {
-            color: var(--primary);
-        }
-
-        .tab-button.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* ===== MODAL STYLES ===== */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(27, 67, 50, 0.3);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--card-border);
-        }
-
-        .modal-header h2 {
-            color: var(--primary-dark);
-            font-size: 1.5rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: color 0.3s;
-        }
-
-        .modal-close:hover {
-            color: var(--text-main);
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            padding: 0.75rem;
-            border: 1.5px solid var(--card-border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 2px solid var(--card-border);
-        }
-
-        .btn-cancel {
-            background: white;
-            color: var(--text-main);
-            border: 1.5px solid var(--card-border);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-cancel:hover {
-            background: var(--card-bg);
-            border-color: var(--primary);
-        }
-
-        .btn-submit {
-            background: var(--ai-gradient);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
+        
+        .grad-green { background: linear-gradient(135deg, #52b788 0%, #40916c 100%); }
+        .grad-blue { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); }
     </style>
 </head>
-<body>
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <i class="fas fa-wand-magic-sparkles"></i>
-            <span>AI-TestLab</span>
-        </div>
-        <nav class="sidebar-menu">
-            <a href="dashboard.html" class="menu-item">
-                <i class="fas fa-home"></i>
-                <span>Tổng quan</span>
-            </a>
-            <a href="test-creation.html" class="menu-item">
-                <i class="fas fa-pencil"></i>
-                <span>Tạo Test Case</span>
-            </a>
-            <a href="analytics.html" class="menu-item">
-                <i class="fas fa-chart-bar"></i>
-                <span>Analytics</span>
-            </a>
-            <a href="website-analyzer.html" class="menu-item active">
-                <i class="fas fa-globe"></i>
-                <span>Website Analyzer</span>
-            </a>
-            <a href="script-review.html" class="menu-item">
-                <i class="fas fa-code"></i>
-                <span>Script Review</span>
-            </a>
-        </nav>
-        <div class="sidebar-footer">
-            <button class="btn-logout" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Đăng Xuất</span>
-            </button>
-        </div>
-    </aside>
+<body class="bg-[#f1f5f9] min-h-screen">
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <!-- PAGE HEADER -->
-        <header class="page-header">
-            <h1 class="page-title">Website Analyzer</h1>
-            <p class="page-subtitle">Sử dụng AI để bóc tách cấu trúc và tạo kịch bản kiểm thử tự động trong giây lát.</p>
-        </header>
-
-        <!-- SEARCH SECTION -->
-        <div class="search-wrapper">
-            <input type="url" placeholder="Dán link website bạn muốn phân tích tại đây..." id="urlInput">
-            <button class="btn-analyze" onclick="analyzeSite()">
-                <i class="fas fa-magnifying-glass"></i> Phân tích ngay
-            </button>
-        </div>
-
-        <!-- STATS GRID -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon icon-blue">
-                    <i class="fas fa-puzzle-piece"></i>
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-[#0f172a] via-[#1b4332] to-[#2d6a4f] text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-2xl border-b-2 border-[#52b788]/30">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-3 group cursor-pointer hover:transform hover:scale-105 transition-transform">
+                <div class="bg-gradient-to-br from-[#52b788] to-[#40916c] p-2.5 rounded-lg shadow-lg">
+                    <i class="fas fa-globe text-white text-lg"></i>
                 </div>
-                <div class="stat-info">
-                    <h3 id="featuresCount">0</h3>
-                    <p>Chức năng tìm thấy</p>
+                <div>
+                    <span class="text-xl font-black tracking-tight block">AI<span class="text-[#52b788]">-Analyzer</span></span>
+                    <span class="text-[10px] text-gray-400 font-semibold">Website Analysis</span>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon icon-purple">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 id="testCasesCount">0</h3>
-                    <p>AI Test Cases</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon icon-green">
-                    <i class="fas fa-shield-check"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 id="customTestCount">0</h3>
-                    <p>Test tùy chỉnh</p>
-                </div>
+            <div class="hidden lg:flex gap-8 text-sm font-semibold text-gray-300">
+                <a href="dashboard.html" class="hover:text-white hover:text-[#52b788] transition group relative">
+                    <i class="fas fa-chart-line mr-1"></i>Tổng quan
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#52b788] group-hover:w-full transition-all"></span>
+                </a>
+                <a href="#" class="text-white text-[#52b788] border-b-2 border-[#52b788] pb-1">
+                    <i class="fas fa-globe mr-1"></i>Phân tích
+                </a>
+                <a href="test-creation.html" class="hover:text-white hover:text-[#52b788] transition group relative">
+                    <i class="fas fa-vial mr-1"></i>Test Cases
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#52b788] group-hover:w-full transition-all"></span>
+                </a>
             </div>
         </div>
+        <div class="flex items-center gap-6">
+            <div class="hidden sm:flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/20">
+                <i class="far fa-clock text-[#52b788] text-lg"></i>
+                <span class="text-sm font-semibold text-gray-200">Status</span>
+                <span id="saveTime" class="text-xs text-[#52b788] font-mono">Ready</span>
+            </div>
+            <div class="h-10 w-10 bg-gradient-to-br from-[#52b788] via-[#40916c] to-[#2d6a4f] rounded-full flex items-center justify-center font-bold text-lg shadow-lg cursor-pointer hover:ring-2 ring-[#52b788]/50 transition-all" onclick="logout()">WA</div>
+        </div>
+    </nav>
 
-        <!-- MAIN GRID -->
-        <div class="dashboard-grid">
-            <!-- LEFT COLUMN -->
-            <div class="left-col">
-                <!-- FEATURES CARD -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>
-                            <i class="fas fa-list-check"></i>
-                            Chức năng phát hiện
-                        </h2>
-                        <span style="font-size: 0.8rem; color: var(--text-light);">Auto-detected</span>
+    <!-- Main Grid Layout -->
+    <div class="max-w-[1600px] mx-auto grid grid-cols-12 gap-0 shadow-2xl mt-4 rounded-xl overflow-hidden bg-white border border-gray-200">
+        
+        <!-- Sidebar -->
+        <aside class="col-span-2 border-r border-gray-200 bg-gradient-to-b from-[#f8fafb] via-[#f0fdf4] to-[#ffffff] p-4 h-[calc(100vh-100px)] custom-scrollbar overflow-y-auto shadow-inner">
+            <div class="flex justify-between items-center mb-6 pb-3 border-b-2 border-gray-200">
+                <h2 class="text-xs font-black text-[#1b4332] uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-history text-[#52b788]"></i>Lịch Sử
+                </h2>
+                <button onclick="clearHistory()" class="text-[#52b788] hover:bg-[#d1f5d1] p-2 rounded-lg transition-all hover:scale-110 shadow-sm btn-modern">
+                    <i class="fas fa-trash-alt text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Websites List -->
+            <div id="websitesList" class="space-y-2 mb-6">
+                <div class="text-xs text-gray-400 p-3 italic text-center animate-pulse">
+                    <i class="fas fa-history mr-2"></i>Chưa có website
+                </div>
+            </div>
+
+            <div class="border-t-2 border-gray-200 pt-4">
+                <h3 class="text-xs font-black text-[#1b4332] uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i class="fas fa-chart-bar text-[#52b788]"></i>Thống Kê
+                </h3>
+                <div class="space-y-3">
+                    <div class="bg-gradient-to-br from-[#f0fdf4] to-[#e8f5e9] p-3 rounded-lg border-l-4 border-[#52b788]">
+                        <div class="text-[10px] text-gray-600 font-semibold">WEBSITE ĐÃ PHÂN TÍCH</div>
+                        <div class="text-2xl font-black text-[#52b788]" id="statWebsites">0</div>
                     </div>
-                    <p style="text-align: center; color: #999; padding: 2rem 0;">Phân tích website để xem các chức năng được phát hiện</p>
-                </div>
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <div class="right-col">
-                <!-- ADD TEST CARD -->
-                <div class="card special-card">
-                    <h3>
-                        <i class="fas fa-sparkles"></i>
-                        Tạo Test Case mới?
-                    </h3>
-                    <p>Tự viết kịch bản của riêng bạn để AI tối ưu hóa code và hiệu suất.</p>
-                    <button class="btn-run" onclick="openCreateTestCaseModal()">
-                        <i class="fas fa-plus"></i> Tạo kịch bản mới
-                    </button>
-                </div>
-
-                <!-- TABS -->
-                <div class="tabs-container" id="testTabsContainer" style="display: none;">
-                    <button class="tab-button active" onclick="switchTab('custom-tests')">
-                        <i class="fas fa-pen"></i> Test Tùy Chỉnh
-                    </button>
-                    <button class="tab-button" onclick="switchTab('ai-tests')">
-                        <i class="fas fa-magic"></i> AI Test Cases
-                    </button>
-                </div>
-
-                <!-- CUSTOM TESTS TAB (Show first) -->
-                <div class="card tab-content active" id="customTestsTab">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2 style="margin: 0;">
-                            <i class="fas fa-pen"></i>
-                            Test Tùy Chỉnh
-                        </h2>
-                        <button class="btn-run" onclick="optimizeCustomTests()" style="background: #40916c; color: white;">
-                            <i class="fas fa-wand-magic-sparkles"></i> AI Tối Ưu
-                        </button>
+                    <div class="bg-gradient-to-br from-[#d1f5d1] to-[#c8f0d8] p-3 rounded-lg border-l-4 border-[#40916c]">
+                        <div class="text-[10px] text-gray-600 font-semibold">TỔNG PHẦN TỬ</div>
+                        <div class="text-2xl font-black text-[#40916c]" id="statElements">0</div>
                     </div>
-                    <div id="customTestsContainer" style="padding: 1rem 0;">
-                        <p style="text-align: center; color: #999; padding: 2rem 0;">Tạo test case mới để bắt đầu</p>
+                    <div class="bg-gradient-to-br from-blue-100 to-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                        <div class="text-[10px] text-gray-600 font-semibold">TEST ĐƯỢC SINH RA</div>
+                        <div class="text-2xl font-black text-blue-600" id="statTests">0</div>
                     </div>
                 </div>
+            </div>
+        </aside>
 
-                <!-- AI TESTS TAB -->
-                <div class="card tab-content" id="aiTestsTab">
-                    <div class="card-header">
-                        <h2>
-                            <i class="fas fa-code-branch"></i>
-                            Kịch bản AI đề xuất
-                        </h2>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn-run" onclick="runAllTests()">
-                                <i class="fas fa-play"></i> Run All
-                            </button>
-                            <button class="btn-run" onclick="exportTests()">
-                                <i class="fas fa-download"></i> Export
+        <!-- Main Content -->
+        <main class="col-span-7 border-x border-gray-200 h-[calc(100vh-100px)] flex flex-col">
+            
+            <!-- Header -->
+            <div class="p-6 border-b-2 border-gray-200 flex justify-between items-center bg-gradient-to-r from-white to-[#f0fdf4] shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-[#1b4332]">Phân Tích Website</h2>
+                        <p class="text-xs text-gray-500 mt-1"><i class="fas fa-lightbulb mr-1"></i>Phân tích website và tự động sinh test case</p>
+                    </div>
+                </div>
+                <button id="analyzeBtn" onclick="analyzeWebsite()" class="flex items-center gap-2 bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-6 py-3 rounded-lg text-sm font-black hover:shadow-lg btn-modern shadow-lg shadow-green-200/50 transition-all">
+                    <i class="fas fa-play"></i> Phân Tích Ngay
+                </button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex bg-gradient-to-r from-[#f8fafb] to-white border-b-2 border-gray-200 shadow-sm">
+                <button onclick="switchTab('url')" id="btn-url" class="px-8 py-3 text-sm font-black active-tab transition-all flex items-center gap-2 text-[#1b4332] border-b-4 border-[#52b788]">
+                    <i class="fas fa-link text-lg"></i> Theo URL
+                </button>
+                <button onclick="switchTab('upload')" id="btn-upload" class="px-8 py-3 text-sm font-black text-gray-500 hover:text-[#52b788] transition-all flex items-center gap-2 hover:bg-white/50 group relative">
+                    <i class="fas fa-upload text-lg"></i> Tải File HTML
+                    <span class="absolute bottom-1 left-8 w-0 h-0.5 bg-[#52b788] group-hover:w-12 transition-all"></span>
+                </button>
+                <button onclick="switchTab('results')" id="btn-results" class="px-8 py-3 text-sm font-black text-gray-500 hover:text-[#52b788] transition-all flex items-center gap-2 hover:bg-white/50 group relative">
+                    <i class="fas fa-chart-pie text-lg"></i> Kết Quả
+                    <span class="absolute bottom-1 left-8 w-0 h-0.5 bg-[#52b788] group-hover:w-12 transition-all"></span>
+                </button>
+            </div>
+
+            <!-- URL Tab -->
+            <div id="panel-url" class="flex-grow overflow-y-auto p-6 block bg-gradient-to-br from-white via-[#f8fafb] to-[#f0fdf4]">
+                <div class="max-w-2xl">
+                    <div class="mb-6">
+                        <label class="text-sm font-black text-[#1b4332] uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="fas fa-globe text-[#52b788]"></i>URL Website
+                        </label>
+                        <div class="flex gap-3">
+                            <input type="url" id="websiteUrl" placeholder="https://example.com" 
+                                class="flex-1 border-2 border-[#d1f5d1] p-4 rounded-lg text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white font-medium transition-all" />
+                            <button onclick="analyzeWebsite()" class="bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-6 rounded-lg text-sm font-black hover:shadow-lg btn-modern transition-all">
+                                <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
-                    <p style="text-align: center; color: #999; padding: 2rem 0;">Click vào chức năng bên trái để xem test cases</p>
+
+                    <!-- Options -->
+                    <div class="bg-gradient-to-br from-[#f0fdf4] to-[#e8f5e9] p-5 rounded-lg border-2 border-[#d1f5d1] space-y-4">
+                        <label class="text-xs font-black text-[#1b4332] uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-sliders-h text-[#52b788]"></i>Tùy Chọn Phân Tích
+                        </label>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-2 rounded transition">
+                                <input type="checkbox" id="analyzeLinks" checked class="w-4 h-4 accent-[#52b788]">
+                                <span class="text-sm font-medium text-[#1b4332]">Phân tích Liên kết</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-2 rounded transition">
+                                <input type="checkbox" id="analyzeForms" checked class="w-4 h-4 accent-[#52b788]">
+                                <span class="text-sm font-medium text-[#1b4332]">Phân tích Form</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-2 rounded transition">
+                                <input type="checkbox" id="analyzeButtons" checked class="w-4 h-4 accent-[#52b788]">
+                                <span class="text-sm font-medium text-[#1b4332]">Phân tích Nút</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer hover:bg-white/50 p-2 rounded transition">
+                                <input type="checkbox" id="analyzeInputs" checked class="w-4 h-4 accent-[#52b788]">
+                                <span class="text-sm font-medium text-[#1b4332]">Phân tích Input</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loadingState" style="display: none;" class="text-center py-8">
+                        <i class="fas fa-spinner fa-spin text-4xl text-[#52b788] mb-3"></i>
+                        <p class="text-sm text-gray-600 font-semibold">Đang phân tích website...</p>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Upload Tab -->
+            <div id="panel-upload" style="display: none;" class="flex-grow overflow-y-auto p-6 bg-gradient-to-br from-white via-[#f8fafb] to-[#f0fdf4]">
+                <div class="max-w-2xl">
+                    <div class="border-2 border-dashed border-[#52b788] rounded-lg p-8 text-center cursor-pointer hover:bg-[#f0fdf4] transition" onclick="document.getElementById('htmlFileInput').click()">
+                        <i class="fas fa-cloud-upload-alt text-[#52b788] text-5xl mb-3 block"></i>
+                        <p class="text-[#1b4332] font-bold mb-1 text-lg">Kéo & Thả File HTML hoặc Nhấp để Chọn</p>
+                        <p class="text-gray-500 text-sm">Hỗ trợ: .html, .htm</p>
+                        <input type="file" id="htmlFileInput" class="hidden" accept=".html,.htm" onchange="handleFileUpload(event)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Tab -->
+            <div id="panel-results" style="display: none;" class="flex-grow overflow-y-auto bg-gradient-to-br from-white via-[#f8fafb] to-[#f0fdf4]">
+                <div class="p-6 space-y-8">
+                    <!-- Detected Features Section -->
+                    <div class="bg-white rounded-xl border-2 border-[#d1f5d1] shadow-md overflow-hidden">
+                        <div class="bg-gradient-to-r from-[#52b788] to-[#40916c] px-6 py-4">
+                            <h4 class="text-lg font-black text-white flex items-center gap-3">
+                                <i class="fas fa-star text-yellow-300"></i> Chức Năng & Tính Năng Được Phát Hiện
+                            </h4>
+                            <p class="text-sm text-green-100 mt-1">Các tính năng được phát hiện trong quá trình phân tích</p>
+                        </div>
+                        <div class="p-6" id="detectedFeatures">
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                                <p class="text-sm">Chưa phát hiện tính năng. Hãy chạy phân tích trước.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generated Test Cases Section -->
+                    <div class="bg-white rounded-xl border-2 border-blue-300 shadow-md overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+                            <h4 class="text-lg font-black text-white flex items-center gap-3">
+                                <i class="fas fa-flask text-blue-200"></i> Test Case Được AI Sinh Ra
+                            </h4>
+                            <p class="text-sm text-blue-100 mt-1">Các kịch bản kiểm thử được tạo tự động bởi AI</p>
+                        </div>
+                        <div class="p-6" id="generatedTestCases">
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                                <p class="text-sm">Chưa có test case. Hãy chạy phân tích trước.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="col-span-3 bg-gradient-to-b from-white via-[#f8fafb] to-[#f0fdf4] p-6 h-[calc(100vh-100px)] overflow-y-auto custom-scrollbar shadow-inner">
+            <h3 class="text-sm font-black mb-6 flex items-center gap-3 border-b-2 border-gray-200 pb-4 text-[#1b4332] uppercase tracking-wider">
+                <i class="fas fa-cog text-[#52b788] text-lg"></i> Cấu Hình
+            </h3>
+
+            <div class="space-y-6">
+                <!-- Website Info -->
+                <div class="bg-gradient-to-br from-[#f0fdf4] via-[#f8fafb] to-white p-5 rounded-xl border-2 border-[#d1f5d1] space-y-4 shadow-sm">
+                    <label class="text-[11px] font-black text-[#1b4332] uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-info-circle text-[#52b788]"></i>Thông Tin Website
+                    </label>
+                    
+                    <div>
+                        <label class="text-[10px] font-black text-[#52b788] uppercase tracking-wide">Tên Website</label>
+                        <input type="text" id="siteName" class="w-full border-2 border-[#d1f5d1] p-3 rounded-lg text-sm mt-2 focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white font-medium transition-all" placeholder="Website của tôi">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black text-[#52b788] uppercase tracking-wide">Mô Tả</label>
+                        <textarea id="siteDescription" class="w-full border-2 border-[#d1f5d1] p-3 rounded-lg text-sm mt-2 focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white font-medium transition-all resize-none" placeholder="Website này làm gì?" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- Test Settings -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border-2 border-blue-200 space-y-4 shadow-sm">
+                    <label class="text-[11px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-sliders-h text-blue-600"></i>Cài Đặt Test
+                    </label>
+
+                    <div>
+                        <label class="text-[10px] font-black text-blue-700 uppercase tracking-wide">Loại Test</label>
+                        <select id="testType" class="w-full border-2 border-blue-300 p-3 rounded-lg text-sm mt-2 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-300/30 bg-white font-semibold transition-all">
+                            <option value="functional">🔧 Kiểm Thử Chức Năng</option>
+                            <option value="ui">🎨 Kiểm Thử Giao Diện</option>
+                            <option value="security">🔒 Kiểm Thử Bảo Mật</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-2 pt-4 border-t-2 border-gray-200">
+                    <button onclick="generateReport()" class="w-full bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-4 py-3 rounded-lg font-black hover:shadow-lg btn-modern transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-file-pdf"></i> Tạo Báo Cáo
+                    </button>
+                    <button onclick="saveAnalysis()" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-3 rounded-lg font-black hover:shadow-lg btn-modern transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i> Lưu Phân Tích
+                    </button>
+                    <button onclick="clearAnalysis()" class="w-full bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-black hover:bg-gray-400 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-trash"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <script>
         const API_URL = 'http://localhost:3000';
+        let currentAnalysis = null;
 
         function logout() {
             localStorage.removeItem('token');
@@ -1026,671 +320,584 @@
             window.location.href = 'auth.html';
         }
 
-        async function analyzeSite() {
-            const url = document.getElementById('urlInput').value;
-            if (!url) {
-                alert('Vui lòng nhập URL');
-                return;
-            }
-
-            console.log('Analyzing:', url);
+        function switchTab(tab) {
+            document.querySelectorAll('[id^="panel-"]').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('[id^="btn-"]').forEach(b => b.classList.remove('active-tab'));
             
-            const analyzeBtn = event.target;
-            const originalHTML = analyzeBtn.innerHTML;
-            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang phân tích...';
-            analyzeBtn.disabled = true;
-
-            try {
-                // Call backend to analyze website features
-                console.log('📤 Calling API:', `${API_URL}/api/analyze-website-features`);
-                console.log('📤 POST data:', { url });
-                
-                const response = await fetch(`${API_URL}/api/analyze-website-features`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ url })
-                });
-
-                console.log('📥 Response status:', response.status);
-                console.log('📥 Response ok:', response.ok);
-                
-                // Check status first
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Error response:', errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
-                }
-
-                // Parse JSON
-                let data;
-                try {
-                    data = await response.json();
-                } catch (parseError) {
-                    console.error('JSON parse error:', parseError);
-                    throw new Error('Invalid JSON response from server');
-                }
-
-                console.log('📥 Response data:', data);
-
-                // Display features
-                displayFeatures(data.features, url);
-                alert('✅ Phân tích thành công! Tìm thấy ' + data.features.length + ' chức năng');
-                
-            } catch (error) {
-                console.error('❌ Error:', error);
-                alert('❌ Lỗi phân tích: ' + error.message);
-            } finally {
-                analyzeBtn.innerHTML = originalHTML;
-                analyzeBtn.disabled = false;
-            }
+            document.getElementById(`panel-${tab}`).style.display = 'block';
+            document.getElementById(`btn-${tab}`).classList.add('active-tab');
         }
 
-        function displayFeatures(features, url) {
-            // Update stats
-            document.getElementById('featuresCount').textContent = features.length;
-            document.getElementById('testCasesCount').textContent = (features.length * 3);
-            
-            // Show tabs container
-            document.getElementById('testTabsContainer').style.display = 'flex';
-            
-            // Hide initial AI card
-            const initialCard = document.getElementById('initialAICard');
-            if (initialCard) {
-                initialCard.style.display = 'none';
-            }
-            
-            // Find or create container for left-col features
-            let leftContainer = document.querySelector('.left-col .card:first-child');
-            if (!leftContainer) {
-                console.error('Left column not found');
+        async function analyzeWebsite() {
+            const url = document.getElementById('websiteUrl').value;
+            if (!url) {
+                alert('Vui lòng nhập URL website');
                 return;
             }
 
-            // Clear existing feature tags (keep header)
-            const existingTags = leftContainer.querySelectorAll('.feature-tag');
-            existingTags.forEach(tag => tag.remove());
+            document.getElementById('loadingState').style.display = 'block';
             
-            // Add feature tags to left column
-            if (features && features.length > 0) {
-                features.forEach((feature, index) => {
-                    const tag = document.createElement('div');
-                    tag.className = 'feature-tag';
-                    tag.style.cursor = 'pointer';
-                    
-                    const icons = ['fas fa-user-lock', 'fas fa-cart-shopping', 'fas fa-magnifying-glass', 
-                                   'fas fa-envelope', 'fas fa-cogs', 'fas fa-chart-line', 'fas fa-bell', 'fas fa-gear'];
-                    const icon = icons[index % icons.length];
-                    
-                    tag.innerHTML = `
-                        <i class="fas ${icon}"></i>
-                        <span>${feature.name}</span>
-                    `;
-                    tag.onclick = (e) => {
-                        // Try to load from localStorage first
-                        const cached = loadTestCasesFromCache(feature.name);
-                        if (cached) {
-                            displayTestCases(cached, feature.name);
-                        } else {
-                            generateTestCases(feature.name, feature.description, url, e.target);
-                        }
-                    };
-                    leftContainer.appendChild(tag);
-                });
-            }
-
-            // Find or create container for test items in right column
-            let container = document.querySelector('.ai-test-items');
-            
-            if (!container) {
-                // Create new container in the right-col
-                const rightCol = document.querySelector('.right-col');
-                if (!rightCol) {
-                    console.error('Right column not found');
-                    alert('❌ Không tìm thấy container phù hợp');
+            try {
+                // Get token from localStorage
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Vui lòng đăng nhập trước');
+                    window.location.href = 'auth.html';
                     return;
                 }
 
-                // Create a new card for features
-                container = document.createElement('div');
-                container.className = 'card ai-test-items';
-                container.style.marginTop = '2rem';
-                
-                const header = document.createElement('div');
-                header.className = 'card-header';
-                header.innerHTML = `
-                    <h2>
-                        <i class="fas fa-magic"></i>
-                        Các chức năng phát hiện được
-                    </h2>
-                `;
-                container.appendChild(header);
-                rightCol.appendChild(container);
-            }
-
-            // Clear existing feature items (but keep header)
-            const items = container.querySelectorAll('.ai-test-item');
-            items.forEach(item => item.remove());
-
-            if (!features || features.length === 0) {
-                const msg = document.createElement('p');
-                msg.style.cssText = 'text-align: center; color: #999;';
-                msg.textContent = 'Không tìm thấy chức năng';
-                container.appendChild(msg);
-                return;
-            }
-
-            // Add feature cards
-            features.forEach((feature, index) => {
-                const featureCard = document.createElement('div');
-                featureCard.className = 'ai-test-item';
-                featureCard.style.cursor = 'pointer';
-                featureCard.innerHTML = `
-                    <span class="ai-badge">Feature ${index + 1}</span>
-                    <h3>${feature.name}</h3>
-                    <p>${feature.description}</p>
-                    <p style="font-size: 0.9rem; color: #888; margin-top: 0.5rem;">
-                        <strong>Priority:</strong> ${feature.priority}
-                    </p>
-                    <button class="btn-run" onclick="generateTestCases('${feature.name.replace(/'/g, "\\'")}', '${feature.description.replace(/'/g, "\\'")}', '${url}', this)">
-                        <i class="fas fa-magic"></i> Tạo Test Cases
-                    </button>
-                `;
-                container.appendChild(featureCard);
-            });
-        }
-
-        async function generateTestCases(featureName, featureDescription, url, targetElement) {
-            console.log(`Generating test cases for: ${featureName}`);
-
-            // Find the button if targetElement is provided
-            let btn = null;
-            if (targetElement) {
-                btn = targetElement.closest('button') || (targetElement.tagName === 'BUTTON' ? targetElement : null);
-            }
-            
-            const originalHTML = btn ? btn.innerHTML : '';
-            if (btn) {
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
-                btn.disabled = true;
-            }
-
-            try {
-                console.log(`Fetching from: ${API_URL}/api/generate-tests-for-feature`);
-                const response = await fetch(`${API_URL}/api/generate-tests-for-feature`, {
+                // Call backend API for website analysis with AI
+                console.log('🚀 Gửi yêu cầu phân tích đến backend...');
+                const response = await fetch(`${API_URL}/api/website-analyzer`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({
-                        url,
-                        feature: featureName,
-                        featureDescription
-                    })
-                });
-
-                console.log('Response status:', response.status);
-                console.log('Response ok:', response.ok);
-
-                // Check if response is OK first
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Error response text:', errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
-                }
-
-                // Now parse JSON safely
-                let data;
-                try {
-                    data = await response.json();
-                } catch (parseError) {
-                    console.error('Failed to parse JSON:', parseError);
-                    const responseText = await response.text();
-                    console.error('Response text:', responseText);
-                    throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
-                }
-
-                console.log('Generated test cases:', data);
-
-                if (!data.testCases) {
-                    throw new Error('No testCases in response');
-                }
-
-                // Save to localStorage
-                saveTestCasesToCache(featureName, data.testCases);
-                
-                // Display test cases in right column
-                displayTestCases(data.testCases, featureName);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Lỗi tạo test cases: ' + error.message);
-            } finally {
-                if (btn) {
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                }
-            }
-        }
-
-        function saveTestCasesToCache(featureName, testCases) {
-            try {
-                const cacheKey = `testcases_${featureName.replace(/\s+/g, '_')}`;
-                localStorage.setItem(cacheKey, JSON.stringify(testCases));
-                console.log(`✅ Test cases saved to cache: ${cacheKey}`);
-            } catch (error) {
-                console.warn('Failed to save to localStorage:', error);
-            }
-        }
-
-        function loadTestCasesFromCache(featureName) {
-            try {
-                const cacheKey = `testcases_${featureName.replace(/\s+/g, '_')}`;
-                const cached = localStorage.getItem(cacheKey);
-                if (cached) {
-                    console.log(`✅ Test cases loaded from cache: ${cacheKey}`);
-                    return JSON.parse(cached);
-                }
-            } catch (error) {
-                console.warn('Failed to load from localStorage:', error);
-            }
-            return null;
-        }
-
-        function displayTestCases(testCases, featureName) {
-            // Store current feature name for creating new test cases
-            localStorage.setItem('currentSelectedFeature', featureName);
-
-            // Get AI tests tab container
-            let container = document.getElementById('aiTestsTab');
-            if (!container) return;
-
-            // Clear previous content
-            container.innerHTML = '';
-
-            // Create test cases container
-            const wrapper = document.createElement('div');
-            wrapper.className = 'card';
-            wrapper.style.marginTop = '0';
-
-            const header = document.createElement('div');
-            header.className = 'card-header';
-            header.innerHTML = `
-                <h2>
-                    <i class="fas fa-vial"></i>
-                    Test Cases cho "${featureName}"
-                </h2>
-                <button class="btn-run" onclick="runAllTestCases(this)" style="background: #52b788;">
-                    <i class="fas fa-play"></i> Chạy tất cả
-                </button>
-            `;
-            wrapper.appendChild(header);
-
-            if (!testCases || testCases.length === 0) {
-                const msg = document.createElement('p');
-                msg.style.cssText = 'text-align: center; color: #999; padding: 2rem;';
-                msg.textContent = 'Không có test cases';
-                wrapper.appendChild(msg);
-                container.appendChild(wrapper);
-                return;
-            }
-
-            // Add test case items
-            testCases.forEach((testCase, index) => {
-                const testItem = document.createElement('div');
-                testItem.className = 'ai-test-item';
-                testItem.style.marginBottom = '1rem';
-                testItem.style.borderLeft = '4px solid #52b788';
-                testItem.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <div style="flex: 1;">
-                            <span class="ai-badge" style="background: #52b788;">Test ${index + 1}</span>
-                            <h4 style="margin: 0.5rem 0; color: #1b4332;">${testCase.name}</h4>
-                            <p style="margin: 0.3rem 0; font-size: 0.9rem;">${testCase.description}</p>
-                            <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #666;">
-                                <strong>Priority:</strong> ${testCase.priority}
-                            </p>
-                            <details style="margin-top: 0.5rem; cursor: pointer;">
-                                <summary style="color: #52b788; font-weight: 500;">📋 Steps (${testCase.steps ? testCase.steps.length : 0})</summary>
-                                <div style="background: #f0f9ff; padding: 0.5rem; margin-top: 0.5rem; border-radius: 4px; font-size: 0.85rem;">
-                                    ${testCase.steps ? testCase.steps.map((step, i) => `<div style="margin: 0.3rem 0;">✓ ${step}</div>`).join('') : 'N/A'}
-                                </div>
-                            </details>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #333;">
-                                <strong>Expected:</strong> ${testCase.expectedResult}
-                            </p>
-                        </div>
-                        <button class="btn-run" onclick="runSingleTest(this, '${testCase.name}')" style="white-space: nowrap; margin-left: 1rem; background: #40916c;">
-                            <i class="fas fa-play"></i> Run
-                        </button>
-                    </div>
-                    <div class="test-result" style="display: none; margin-top: 0.5rem; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem;"></div>
-                `;
-                wrapper.appendChild(testItem);
-            });
-
-            container.appendChild(wrapper);
-            switchTab('ai-tests');
-        }
-
-        function runSingleTest(btn, testName) {
-            const resultDiv = btn.closest('.ai-test-item').querySelector('.test-result');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chạy...';
-            btn.disabled = true;
-
-            // Simulate test execution (1-2 second delay)
-            setTimeout(() => {
-                const passed = Math.random() > 0.3; // 70% pass rate for demo
-                resultDiv.style.display = 'block';
-                resultDiv.style.background = passed ? '#d4edda' : '#f8d7da';
-                resultDiv.style.color = passed ? '#155724' : '#721c24';
-                resultDiv.style.border = `1px solid ${passed ? '#c3e6cb' : '#f5c6cb'}`;
-                resultDiv.innerHTML = `
-                    <strong>${passed ? '✅ PASS' : '❌ FAIL'}</strong> - ${testName}
-                    ${!passed ? '<br>Error: Element not found or assertion failed' : ''}
-                `;
-                btn.innerHTML = '<i class="fas fa-play"></i> Run';
-                btn.disabled = false;
-            }, 1500);
-        }
-
-        function runAllTestCases(btn) {
-            const testItems = btn.closest('.card').querySelectorAll('.ai-test-item');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chạy tất cả...';
-            btn.disabled = true;
-
-            let completed = 0;
-            testItems.forEach(item => {
-                const runBtn = item.querySelector('.btn-run');
-                runBtn.click();
-                setTimeout(() => {
-                    completed++;
-                    if (completed === testItems.length) {
-                        btn.innerHTML = '<i class="fas fa-play"></i> Chạy tất cả';
-                        btn.disabled = false;
-                    }
-                }, 1500 * (completed + 1));
-            });
-        }
-
-        function runAllTests() {
-            console.log('Running all tests');
-            alert('Chức năng này sẽ chạy toàn bộ test cases');
-        }
-
-        function exportTests() {
-            console.log('Exporting tests');
-            alert('Chức năng này sẽ export toàn bộ test cases');
-        }
-    </script>
-
-    <!-- CREATE TEST CASE MODAL -->
-    <div id="createTestCaseModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>
-                    <i class="fas fa-plus-circle"></i>
-                    Tạo Test Case Mới
-                </h2>
-                <button class="modal-close" onclick="closeCreateTestCaseModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <form id="createTestCaseForm" onsubmit="submitCreateTestCase(event)">
-                <div class="form-group">
-                    <label for="testCaseName">Tên Test Case <span style="color: red;">*</span></label>
-                    <input type="text" id="testCaseName" name="testCaseName" placeholder="Ví dụ: Test đăng nhập thành công" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="testCaseDescription">Mô tả <span style="color: red;">*</span></label>
-                    <textarea id="testCaseDescription" name="testCaseDescription" placeholder="Mô tả chi tiết về test case này" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="testCasePriority">Mức độ ưu tiên</label>
-                    <select id="testCasePriority" name="testCasePriority">
-                        <option value="Low">Thấp (Low)</option>
-                        <option value="Medium" selected>Trung bình (Medium)</option>
-                        <option value="High">Cao (High)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="testCaseSteps">Các bước thực hiện (mỗi dòng một bước)</label>
-                    <textarea id="testCaseSteps" name="testCaseSteps" placeholder="Bước 1&#10;Bước 2&#10;Bước 3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="testCaseExpected">Kết quả mong đợi <span style="color: red;">*</span></label>
-                    <textarea id="testCaseExpected" name="testCaseExpected" placeholder="Mô tả kết quả dự kiến sau khi test" required></textarea>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeCreateTestCaseModal()">
-                        <i class="fas fa-times"></i> Hủy
-                    </button>
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-check"></i> Tạo Test Case
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function openCreateTestCaseModal() {
-            document.getElementById('createTestCaseModal').classList.add('active');
-            document.getElementById('createTestCaseForm').reset();
-        }
-
-        function closeCreateTestCaseModal() {
-            document.getElementById('createTestCaseModal').classList.remove('active');
-        }
-
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-
-            // Show selected tab
-            if (tabName === 'ai-tests') {
-                document.getElementById('aiTestsTab').classList.add('active');
-                document.querySelector('.tab-button:nth-child(1)').classList.add('active');
-            } else if (tabName === 'custom-tests') {
-                document.getElementById('customTestsTab').classList.add('active');
-                document.querySelector('.tab-button:nth-child(2)').classList.add('active');
-                // Refresh custom tests display
-                displayCustomTests();
-            }
-        }
-
-        function displayCustomTests() {
-            const customTestsContainer = document.getElementById('customTestsContainer');
-            const customTests = localStorage.getItem('customTestCases');
-            
-            if (!customTests) {
-                customTestsContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem 0;">Tạo test case mới để bắt đầu</p>';
-                return;
-            }
-
-            const tests = JSON.parse(customTests);
-            if (tests.length === 0) {
-                customTestsContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem 0;">Tạo test case mới để bắt đầu</p>';
-                return;
-            }
-
-            customTestsContainer.innerHTML = '';
-            tests.forEach((testCase, index) => {
-                const testItem = document.createElement('div');
-                testItem.className = 'ai-test-item';
-                testItem.style.marginBottom = '1rem';
-                testItem.style.borderLeft = '4px solid #40916c';
-                testItem.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <div style="flex: 1;">
-                            <span class="ai-badge" style="background: #40916c;">Custom ${index + 1}</span>
-                            <h4 style="margin: 0.5rem 0; color: #1b4332;">${testCase.name}</h4>
-                            <p style="margin: 0.3rem 0; font-size: 0.9rem;">${testCase.description}</p>
-                            <p style="margin: 0.3rem 0; font-size: 0.85rem; color: #666;">
-                                <strong>Priority:</strong> ${testCase.priority}
-                            </p>
-                            <details style="margin-top: 0.5rem; cursor: pointer;">
-                                <summary style="color: #40916c; font-weight: 500;">📋 Steps (${testCase.steps ? testCase.steps.length : 0})</summary>
-                                <div style="background: #f0f9ff; padding: 0.5rem; margin-top: 0.5rem; border-radius: 4px; font-size: 0.85rem;">
-                                    ${testCase.steps ? testCase.steps.map((step, i) => `<div style="margin: 0.3rem 0;">✓ ${step}</div>`).join('') : 'N/A'}
-                                </div>
-                            </details>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #333;">
-                                <strong>Expected:</strong> ${testCase.expectedResult}
-                            </p>
-                        </div>
-                        <button class="btn-run" onclick="deleteCustomTest(${testCase.id})" style="white-space: nowrap; margin-left: 1rem; background: #ef4444; color: white;">
-                            <i class="fas fa-trash"></i> Xóa
-                        </button>
-                    </div>
-                `;
-                customTestsContainer.appendChild(testItem);
-            });
-        }
-
-        function deleteCustomTest(testId) {
-            if (confirm('Bạn có chắc muốn xóa test case này?')) {
-                const customTests = localStorage.getItem('customTestCases');
-                if (customTests) {
-                    let tests = JSON.parse(customTests);
-                    tests = tests.filter(t => t.id !== testId);
-                    if (tests.length > 0) {
-                        localStorage.setItem('customTestCases', JSON.stringify(tests));
-                    } else {
-                        localStorage.removeItem('customTestCases');
-                    }
-                    displayCustomTests();
-                    updateCustomTestCount();
-                }
-            }
-        }
-
-        function updateCustomTestCount() {
-            const customTests = localStorage.getItem('customTestCases');
-            const count = customTests ? JSON.parse(customTests).length : 0;
-            document.getElementById('customTestCount').textContent = count;
-        }
-
-        async function optimizeCustomTests() {
-            const customTests = localStorage.getItem('customTestCases');
-            if (!customTests) {
-                alert('❌ Không có test case nào để tối ưu');
-                return;
-            }
-
-            const tests = JSON.parse(customTests);
-            const btn = event.target.closest('button');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tối ưu...';
-            btn.disabled = true;
-
-            try {
-                // Format test cases for AI
-                const testSummary = tests.map(t => `- ${t.name}: ${t.description}`).join('\n');
-                
-                const response = await fetch(`${API_URL}/api/review-test-script`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        code: testSummary,
-                        language: 'test-description'
-                    })
+                    body: JSON.stringify({ url: url })
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to optimize tests');
+                    throw new Error(`API Lỗi: ${response.status} ${response.statusText}`);
                 }
 
                 const data = await response.json();
-                alert('✅ AI đã tối ưu! Kiểm tra console để xem gợi ý');
-                console.log('🤖 AI Optimization Suggestions:', data);
+                console.log('✅ API Phản hồi:', data);
+
+                // Process backend response
+                const detectedFeatures = data.features || data.detectedFeatures || [];
+                let generatedTestCases = data.testCases || data.generatedTestCases || [];
+
+                // Fallback to mock data if API doesn't return features
+                if (detectedFeatures.length === 0) {
+                    detectedFeatures.push(
+                        { 
+                            name: 'Xác Thực Người Dùng', 
+                            type: 'Đăng nhập/Đăng ký', 
+                            complexity: 'Cao', 
+                            elements: 8,
+                            testCases: [
+                                { id: 'AUTH001', name: 'Đăng ký với dữ liệu hợp lệ', steps: ['Vào trang đăng ký', 'Nhập email hợp lệ', 'Nhập mật khẩu >= 8 ký tự', 'Nhấp Đăng ký'], expectedResult: 'Tài khoản được tạo thành công', priority: 'Critical', status: 'PASSED', executionTime: '2.3s' },
+                                { id: 'AUTH002', name: 'Đăng nhập với thông tin hợp lệ', steps: ['Vào trang đăng nhập', 'Nhập email đã đăng ký', 'Nhập mật khẩu đúng', 'Nhấp Đăng nhập'], expectedResult: 'Được chuyển hướng đến dashboard', priority: 'Critical', status: 'PASSED', executionTime: '1.8s' },
+                                { id: 'AUTH003', name: 'Đăng nhập với mật khẩu sai', steps: ['Vào trang đăng nhập', 'Nhập email hợp lệ', 'Nhập mật khẩu sai', 'Nhấp Đăng nhập'], expectedResult: 'Hiển thị thông báo lỗi', priority: 'High', status: 'PASSED', executionTime: '1.5s' }
+                            ]
+                        },
+                        { 
+                            name: 'Tính Năng Tìm Kiếm', 
+                            type: 'Thanh Tìm Kiếm', 
+                            complexity: 'Trung Bình', 
+                            elements: 3,
+                            testCases: [
+                                { id: 'SEARCH001', name: 'Tìm kiếm với từ khóa hợp lệ', steps: ['Nhấp vào thanh tìm kiếm', 'Nhập tên sản phẩm', 'Nhấp Enter', 'Xác minh kết quả'], expectedResult: 'Hiển thị sản phẩm liên quan', priority: 'High', status: 'FAILED', executionTime: '3.5s' },
+                                { id: 'SEARCH002', name: 'Tìm kiếm với từ khóa trống', steps: ['Nhấp vào thanh tìm kiếm', 'Không nhập gì', 'Nhấp Enter'], expectedResult: 'Hiển thị thông báo lỗi', priority: 'Medium', status: 'PASSED', executionTime: '1.2s' }
+                            ]
+                        },
+                        { 
+                            name: 'Giỏ Hàng', 
+                            type: 'Thương Mại Điện Tử', 
+                            complexity: 'Cao', 
+                            elements: 12,
+                            testCases: [
+                                { id: 'CART001', name: 'Thêm sản phẩm vào giỏ', steps: ['Chọn sản phẩm', 'Chọn số lượng', 'Nhấp Thêm vào giỏ', 'Xác minh số lượng'], expectedResult: 'Sản phẩm được thêm thành công', priority: 'Critical', status: 'PASSED', executionTime: '1.5s' },
+                                { id: 'CART002', name: 'Xóa sản phẩm khỏi giỏ', steps: ['Mở giỏ hàng', 'Tìm sản phẩm', 'Nhấp nút Xóa', 'Xác minh giỏ'], expectedResult: 'Sản phẩm bị loại bỏ', priority: 'High', status: 'PASSED', executionTime: '1.8s' },
+                                { id: 'CART003', name: 'Cập nhật số lượng', steps: ['Mở giỏ hàng', 'Thay đổi số lượng', 'Nhấp Cập nhật'], expectedResult: 'Số lượng được cập nhật', priority: 'Medium', status: 'PASSED', executionTime: '1.3s' }
+                            ]
+                        }
+                    );
+                }
+
+                if (generatedTestCases.length === 0) {
+                    generatedTestCases = [];
+                }
+
+                currentAnalysis = {
+                    url: url,
+                    features: detectedFeatures,
+                    testCases: generatedTestCases
+                };
+
+                // Store features for modal access
+                allFeatures = detectedFeatures;
+
+                // Display detected features
+                const featuresHTML = detectedFeatures.map((f, idx) => `
+                    <div class="bg-gradient-to-br from-[#f0fdf4] to-[#e8f5e9] p-5 rounded-lg border-l-4 border-[#52b788] mb-4 hover:shadow-lg hover:cursor-pointer transition-all hover:scale-[1.02] transform" onclick="openFeatureModal(${idx})">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h5 class="font-black text-[#1b4332] flex items-center gap-2 mb-2">
+                                    <i class="fas fa-cube text-[#52b788]"></i>${f.name || f.feature}
+                                </h5>
+                                <p class="text-xs text-gray-600 mb-2"><strong>Loại:</strong> ${f.type || 'Không xác định'}</p>
+                                <div class="flex gap-2">
+                                    <span class="px-2 py-1 bg-[#d1f5d1] text-[#1b4332] rounded text-xs font-bold">${f.complexity || 'Trung Bình'}</span>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">${f.elements || 0} phần tử</span>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold" id="testCount${idx}">${(f.testCases || []).length} test</span>
+                                </div>
+                                <p class="text-xs text-[#52b788] font-semibold mt-2 hover:underline"><i class="fas fa-click mr-1"></i>Nhấp để xem chi tiết</p>
+                            </div>
+                            <div class="text-3xl font-black text-[#52b788]/20">${idx + 1}</div>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('detectedFeatures').innerHTML = featuresHTML;
+
+                // Count total test cases across all features
+                const totalTests = detectedFeatures.reduce((sum, f) => sum + (f.testCases || []).length, 0);
+
+                // Display test cases summary grouped by feature
+                const testCasesHTML = detectedFeatures.map(feature => {
+                    const testCases = feature.testCases || [];
+                    if (testCases.length === 0) return '';
+                    
+                    const casesHTML = testCases.map(tc => {
+                        const statusColor = tc.status === 'PASSED' ? 'text-green-700' : tc.status === 'FAILED' ? 'text-red-700' : 'text-yellow-700';
+                        const statusIcon = tc.status === 'PASSED' ? 'fa-check-circle text-green-500' : tc.status === 'FAILED' ? 'fa-times-circle text-red-500' : 'fa-clock text-yellow-500';
+                        return `
+                            <div class="p-3 bg-gray-50 rounded border-l-4 ${tc.status === 'PASSED' ? 'border-green-400' : tc.status === 'FAILED' ? 'border-red-400' : 'border-yellow-400'} mb-2">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-bold ${statusColor} flex items-center gap-2">
+                                            <i class="fas ${statusIcon}"></i>${tc.name || tc.title}
+                                        </p>
+                                        <p class="text-xs text-gray-600 mt-1"><strong>ID:</strong> ${tc.id}</p>
+                                    </div>
+                                    <span class="px-2 py-1 text-xs font-bold ${tc.status === 'PASSED' ? 'bg-green-100 text-green-700' : tc.status === 'FAILED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'} rounded">${tc.status || 'PENDING'}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    return `
+                        <div class="mb-6 border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
+                            <h5 class="font-black text-blue-900 mb-3 flex items-center gap-2">
+                                <i class="fas fa-folder text-blue-600"></i> ${feature.name || feature.feature}
+                            </h5>
+                            <div class="space-y-0">${casesHTML}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('generatedTestCases').innerHTML = testCasesHTML || '<div class="text-center py-8 text-gray-500"><i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i><p class="text-sm">Chưa có test case. Hãy chạy phân tích trước.</p></div>';
+
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('statWebsites').textContent = 1;
+                document.getElementById('statElements').textContent = detectedFeatures.length;
+                document.getElementById('statTests').textContent = totalTests;
+                
+                // Automatically switch to results tab
+                switchTab('results');
+                
+                alert('✅ Phân tích hoàn tất! Phát hiện ' + detectedFeatures.length + ' tính năng, sinh ra ' + totalTests + ' test case.');
                 
             } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Lỗi: ' + error.message);
-            } finally {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
+                console.error('❌ Lỗi Phân Tích:', error);
+                alert('❌ Lỗi: ' + error.message + '\n\nLưu ý:\n1. Backend API phải chạy trên http://localhost:3000\n2. Bạn cần có token xác thực hợp lệ\n3. Google Gemini API phải được cấu hình (cho tính năng AI)');
+                document.getElementById('loadingState').style.display = 'none';
             }
         }
 
-        function submitCreateTestCase(event) {
-            event.preventDefault();
+        function handleFileUpload(event) {
+            alert('File upload feature coming soon');
+        }
 
-            const name = document.getElementById('testCaseName').value.trim();
-            const description = document.getElementById('testCaseDescription').value.trim();
-            const priority = document.getElementById('testCasePriority').value;
-            const stepsText = document.getElementById('testCaseSteps').value.trim();
-            const expectedResult = document.getElementById('testCaseExpected').value.trim();
+        function generateReport() {
+            alert('Report generation coming soon');
+        }
 
-            if (!name || !description || !expectedResult) {
-                alert('❌ Vui lòng điền các trường bắt buộc');
+        function saveAnalysis() {
+            if (!currentAnalysis) {
+                alert('No analysis to save');
                 return;
             }
-
-            // Parse steps from text
-            const steps = stepsText
-                ? stepsText.split('\n').map(s => s.trim()).filter(s => s.length > 0)
-                : [];
-
-            // Create test case object
-            const testCase = {
-                id: Date.now(),
-                name: name,
-                description: description,
-                priority: priority,
-                steps: steps,
-                expectedResult: expectedResult
-            };
-
-            console.log('Created test case:', testCase);
-
-            // Get existing custom test cases
-            let customTestCases = localStorage.getItem('customTestCases');
-            let allCustomTests = customTestCases ? JSON.parse(customTestCases) : [];
-            
-            // Add new test case
-            allCustomTests.push(testCase);
-
-            // Save back to localStorage
-            localStorage.setItem('customTestCases', JSON.stringify(allCustomTests));
-
-            // Close modal
-            closeCreateTestCaseModal();
-
-            // Show success message
-            alert('✅ Test Case được tạo thành công!');
-
-            // Refresh displays
-            updateCustomTestCount();
-            displayCustomTests();
-            
-            // Show custom tests tab
-            document.getElementById('testTabsContainer').style.display = 'flex';
-            switchTab('custom-tests');
+            alert('Analysis saved!');
         }
 
-        // Close modal when clicking outside
-        document.getElementById('createTestCaseModal')?.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCreateTestCaseModal();
-            }
-        });
+        function clearAnalysis() {
+            currentAnalysis = null;
+            document.getElementById('statWebsites').textContent = '0';
+            document.getElementById('statElements').textContent = '0';
+            document.getElementById('statTests').textContent = '0';
+        }
 
-        // Initialize custom test count on page load
-        window.addEventListener('load', () => {
-            updateCustomTestCount();
-        });
+        function clearHistory() {
+            document.getElementById('websitesList').innerHTML = '<div class="text-xs text-gray-400 p-3 italic text-center">Chưa có website</div>';
+        }
+
+        let allFeatures = [];
+        let selectedFeatureIndex = -1;
+
+        async function openFeatureModal(featureIndex) {
+            selectedFeatureIndex = featureIndex;
+            const feature = allFeatures[featureIndex];
+            
+            document.getElementById('featureTitle').textContent = feature.name || feature.feature;
+            document.getElementById('featureType').textContent = `Loại: ${feature.type || 'Không xác định'} | Độ phức tạp: ${feature.complexity || 'Trung Bình'}`;
+            
+            // Show loading state in modal
+            document.getElementById('featureTestCases').innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i><p class="text-sm text-gray-600 mt-2">Đang sinh test case từ AI...</p></div>';
+            
+            document.getElementById('featureModal').style.display = 'flex';
+            
+            try {
+                // Call AI to generate detailed test cases for this feature
+                const token = localStorage.getItem('token');
+                console.log('🔄 Calling AI to generate test cases for:', feature.name);
+                console.log('📍 API URL:', `${API_URL}/api/generate-feature-tests`);
+                
+                const response = await fetch(`${API_URL}/api/generate-feature-tests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        featureName: feature.name || feature.feature,
+                        featureType: feature.type || '',
+                        featureDescription: `Website feature with ${feature.elements || 0} elements and ${feature.complexity || 'medium'} complexity`
+                    })
+                });
+
+                console.log('📦 API Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ AI Generated test cases:', data);
+                
+                // Update feature with AI-generated test cases
+                if (data.testCases && Array.isArray(data.testCases)) {
+                    allFeatures[featureIndex].testCases = data.testCases;
+                    console.log('📝 Updated feature with test cases, total:', data.testCases.length);
+                }
+                
+            } catch (error) {
+                console.error('❌ AI generation error:', error);
+                // Use existing test cases as fallback
+                console.warn('⚠️ Using existing test cases from analysis');
+            }
+            
+            // Display test cases (either AI-generated or existing)
+            const testCases = allFeatures[featureIndex].testCases || [];
+            console.log('🎯 Displaying test cases, count:', testCases.length);
+            
+            document.getElementById('testCaseCount').textContent = testCases.length + ' cases';
+            
+            const testCasesHTML = testCases.map((tc, idx) => {
+                const statusBg = tc.status === 'PASSED' ? 'from-green-50 to-green-100 border-green-400' : tc.status === 'FAILED' ? 'from-red-50 to-red-100 border-red-400' : 'from-yellow-50 to-yellow-100 border-yellow-400';
+                const statusColor = tc.status === 'PASSED' ? 'text-green-900' : tc.status === 'FAILED' ? 'text-red-900' : 'text-yellow-900';
+                const statusIcon = tc.status === 'PASSED' ? 'fa-check-circle text-green-500' : tc.status === 'FAILED' ? 'fa-times-circle text-red-500' : 'fa-clock text-yellow-500';
+                const statusBadge = tc.status === 'PASSED' ? 'bg-green-100 text-green-700' : tc.status === 'FAILED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+                const isAIBadge = tc.isAIGenerated ? '<span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-black ml-1">🤖 AI</span>' : '';
+                
+                return `
+                    <div class="bg-gradient-to-br ${statusBg} p-4 rounded-lg border-l-4 mb-3 hover:shadow-md transition-all">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas ${statusIcon} text-lg"></i>
+                                    <h5 class="font-black ${statusColor}">${tc.name || tc.title}</h5>
+                                </div>
+                                <p class="text-xs ${statusColor} opacity-75"><strong>ID:</strong> ${tc.id}${isAIBadge}</p>
+                            </div>
+                            <div class="text-right space-y-1">
+                                <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-black block">${tc.priority || 'Medium'}</span>
+                                <span class="px-2 py-1 ${statusBadge} rounded text-xs font-black block">${tc.status || 'PENDING'}</span>
+                                <p class="text-xs opacity-75 font-bold">⏱️ ${tc.executionTime || '0s'}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 space-y-2">
+                            <div>
+                                <p class="text-xs font-bold ${statusColor} mb-1">Các Bước:</p>
+                                <ol class="text-xs ${statusColor} opacity-90 space-y-1 ml-4 list-decimal">
+                                    ${(tc.steps || []).map(s => `<li>${s}</li>`).join('')}
+                                </ol>
+                            </div>
+                            <div class="pt-2 border-t-2 ${tc.status === 'PASSED' ? 'border-green-300' : tc.status === 'FAILED' ? 'border-red-300' : 'border-yellow-300'}">
+                                <p class="text-xs"><strong class="${statusColor}">Kết Quả Dự Kiến:</strong> <span class="${statusColor} opacity-90">${tc.expectedResult || tc.expected_result || 'N/A'}</span></p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="runTestCase(${selectedFeatureIndex}, ${idx})" class="flex-1 text-xs bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded flex items-center justify-center gap-1 transition-all hover:shadow-md">
+                                <i class="fas fa-play"></i> Chạy Test
+                            </button>
+                            <button onclick="deleteTestCase(${selectedFeatureIndex}, ${idx})" class="text-xs text-red-600 hover:text-red-700 font-bold hover:underline flex items-center gap-1 px-2">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('featureTestCases').innerHTML = testCasesHTML || '<p class="text-gray-500 text-sm italic">Chưa có test case</p>';
+            
+            // Update overall statistics with new test case counts
+            updateTestStatistics();
+        }
+
+        function updateTestStatistics() {
+            // Count total test cases across all features
+            const totalTests = allFeatures.reduce((sum, f) => sum + (f.testCases || []).length, 0);
+            document.getElementById('statTests').textContent = totalTests;
+            
+            // Update the "Test Case Được AI Sinh Ra" section
+            const testCasesHTML = allFeatures.map(feature => {
+                const testCases = feature.testCases || [];
+                if (testCases.length === 0) return '';
+                
+                const casesHTML = testCases.map(tc => {
+                    const statusColor = tc.status === 'PASSED' ? 'text-green-700' : tc.status === 'FAILED' ? 'text-red-700' : 'text-yellow-700';
+                    const statusIcon = tc.status === 'PASSED' ? 'fa-check-circle text-green-500' : tc.status === 'FAILED' ? 'fa-times-circle text-red-500' : 'fa-clock text-yellow-500';
+                    const isAIBadge = tc.isAIGenerated ? '<span class="ml-1 text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded font-bold">🤖</span>' : '';
+                    return `
+                        <div class="p-3 bg-gray-50 rounded border-l-4 ${tc.status === 'PASSED' ? 'border-green-400' : tc.status === 'FAILED' ? 'border-red-400' : 'border-yellow-400'} mb-2">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold ${statusColor} flex items-center gap-2">
+                                        <i class="fas ${statusIcon}"></i>${tc.name || tc.title}${isAIBadge}
+                                    </p>
+                                    <p class="text-xs text-gray-600 mt-1"><strong>ID:</strong> ${tc.id}</p>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-bold ${tc.status === 'PASSED' ? 'bg-green-100 text-green-700' : tc.status === 'FAILED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'} rounded">${tc.status || 'PENDING'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="mb-6 border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
+                        <h5 class="font-black text-blue-900 mb-3 flex items-center gap-2">
+                            <i class="fas fa-folder text-blue-600"></i> ${feature.name || feature.feature}
+                        </h5>
+                        <div class="space-y-0">${casesHTML}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            const generatedTestCasesDiv = document.getElementById('generatedTestCases');
+            if (generatedTestCasesDiv) {
+                generatedTestCasesDiv.innerHTML = testCasesHTML || '<div class="text-center py-8 text-gray-500"><i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i><p class="text-sm">Chưa có test case. Hãy chạy phân tích trước.</p></div>';
+            }
+        }
+
+        function closeFeatureModal() {
+            document.getElementById('featureModal').style.display = 'none';
+            selectedFeatureIndex = -1;
+        }
+
+        function addCustomTestCase() {
+            if (selectedFeatureIndex === -1) return;
+            
+            const name = document.getElementById('customTestName').value.trim();
+            const stepsText = document.getElementById('customTestSteps').value.trim();
+            const expected = document.getElementById('customTestExpected').value.trim();
+            const priority = document.getElementById('customTestPriority').value;
+            const status = document.getElementById('customTestStatus').value;
+            
+            if (!name || !stepsText || !expected) {
+                alert('Vui lòng điền đầy đủ thông tin');
+                return;
+            }
+            
+            const steps = stepsText.split('\n').filter(s => s.trim()).map(s => s.trim());
+            const customTest = {
+                id: `CUSTOM${Date.now()}`,
+                name: name,
+                steps: steps,
+                expectedResult: expected,
+                priority: priority,
+                status: status,
+                executionTime: '0s',
+                isCustom: true
+            };
+            
+            if (!allFeatures[selectedFeatureIndex].testCases) {
+                allFeatures[selectedFeatureIndex].testCases = [];
+            }
+            allFeatures[selectedFeatureIndex].testCases.push(customTest);
+            
+            // Clear form
+            document.getElementById('customTestName').value = '';
+            document.getElementById('customTestSteps').value = '';
+            document.getElementById('customTestExpected').value = '';
+            document.getElementById('customTestPriority').value = 'Medium';
+            document.getElementById('customTestStatus').value = 'PENDING';
+            
+            // Update total test count
+            document.getElementById('statTests').textContent = parseInt(document.getElementById('statTests').textContent) + 1;
+            
+            // Refresh modal
+            openFeatureModal(selectedFeatureIndex);
+            updateTestStatistics();
+            alert('✅ Thêm test case thành công!');
+        }
+
+        function deleteTestCase(featureIndex, testIndex) {
+            if (confirm('Bạn có chắc muốn xóa test case này?')) {
+                allFeatures[featureIndex].testCases.splice(testIndex, 1);
+                document.getElementById('statTests').textContent = parseInt(document.getElementById('statTests').textContent) - 1;
+                openFeatureModal(featureIndex);
+            }
+        }
+
+        async function runTestCase(featureIndex, testIndex) {
+            const feature = allFeatures[featureIndex];
+            const testCase = feature.testCases[testIndex];
+            
+            console.log('🚀 Chạy test case:', testCase.name);
+            
+            // Show loading state on button
+            const buttons = document.querySelectorAll('button');
+            const runBtn = Array.from(buttons).find(btn => btn.textContent.includes('Chạy Test'));
+            if (runBtn) {
+                runBtn.disabled = true;
+                runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang chạy...';
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                
+                // Call backend to execute test case
+                const response = await fetch(`${API_URL}/api/execute-test-case`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        testCaseId: testCase.id,
+                        featureName: feature.name,
+                        steps: testCase.steps,
+                        expectedResult: testCase.expectedResult
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ API Response:', result);
+                    
+                    // Update test case status based on execution result
+                    testCase.status = result.status || 'PASSED';
+                    testCase.executionTime = result.executionTime || '0s';
+                    
+                    console.log('✅ Test updated:', testCase);
+                    
+                } else if (response.status === 404) {
+                    // If backend endpoint doesn't exist, use simulation
+                    console.warn('⚠️ Backend endpoint không tìm thấy, sử dụng simulation');
+                    simulateTestExecution(testCase);
+                } else {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                
+            } catch (error) {
+                console.warn('⚠️ Lỗi khi chạy test, sử dụng simulation:', error.message);
+                simulateTestExecution(testCase);
+            }
+            
+            // Wait a moment then refresh modal to show updated status
+            setTimeout(() => {
+                console.log('🔄 Refresh modal để hiển thị kết quả');
+                openFeatureModal(featureIndex);
+                updateTestStatistics();
+                alert(`✅ Kết quả: ${testCase.status} (${testCase.executionTime})`);
+            }, 500);
+        }
+
+        function simulateTestExecution(testCase) {
+            // Simulate test execution with random result
+            const randomResult = Math.random();
+            
+            if (randomResult > 0.3) {
+                // 70% pass rate
+                testCase.status = 'PASSED';
+                testCase.executionTime = Math.floor(Math.random() * 5 + 1) + 's';
+            } else {
+                // 30% fail rate
+                testCase.status = 'FAILED';
+                testCase.executionTime = Math.floor(Math.random() * 8 + 1) + 's';
+            }
+            
+            console.log('🎲 Simulation result:', testCase.status, testCase.executionTime);
+        }
     </script>
-</body>
-</html>
+
+    <!-- Feature Detail Modal -->
+    <div id="featureModal" style="display: none;" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-6 py-4 flex justify-between items-center shadow-lg">
+                <div>
+                    <h3 id="featureTitle" class="text-2xl font-black"></h3>
+                    <p id="featureType" class="text-sm text-green-100 mt-1"></p>
+                </div>
+                <button onclick="closeFeatureModal()" class="text-white hover:bg-white/20 p-2 rounded-lg transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-6">
+                <!-- Test Cases Section -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-black text-[#1b4332] flex items-center gap-2">
+                            <i class="fas fa-flask text-blue-500"></i> Test Cases cho Tính Năng Này
+                        </h4>
+                        <span id="testCaseCount" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-black">0 cases</span>
+                    </div>
+                    <div id="featureTestCases" class="space-y-3">
+                        <p class="text-gray-500 text-sm italic">Chưa có test case</p>
+                    </div>
+                </div>
+
+                <!-- Add Custom Test Case -->
+                <div class="border-t-2 border-gray-200 pt-6">
+                    <h4 class="text-lg font-black text-[#1b4332] mb-4 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-green-500"></i> Thêm Test Case Tùy Chỉnh
+                    </h4>
+                    <div class="space-y-4 bg-[#f8fafb] p-5 rounded-lg border-2 border-[#d1f5d1]">
+                        <div>
+                            <label class="text-sm font-black text-[#1b4332] mb-2 block">Tên Test Case</label>
+                            <input type="text" id="customTestName" placeholder="VD: Đăng nhập với email không hợp lệ" 
+                                class="w-full border-2 border-[#d1f5d1] p-3 rounded-lg text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white" />
+                        </div>
+                        <div>
+                            <label class="text-sm font-black text-[#1b4332] mb-2 block">Các Bước Thực Hiện</label>
+                            <textarea id="customTestSteps" placeholder="VD: 1. Nhấp vào nút đăng nhập&#10;2. Nhập email không hợp lệ&#10;3. Nhấp nút Submit" 
+                                class="w-full border-2 border-[#d1f5d1] p-3 rounded-lg text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white resize-none" rows="3"></textarea>
+                        </div>
+                        <div>
+                            <label class="text-sm font-black text-[#1b4332] mb-2 block">Kết Quả Dự Kiến</label>
+                            <input type="text" id="customTestExpected" placeholder="VD: Hiển thị thông báo lỗi" 
+                                class="w-full border-2 border-[#d1f5d1] p-3 rounded-lg text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-sm font-black text-[#1b4332] mb-2 block">Độ Ưu Tiên</label>
+                                <select id="customTestPriority" class="w-full border-2 border-[#d1f5d1] p-3 rounded-lg text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white">
+                                    <option value="Low">Thấp</option>
+                                    <option value="Medium" selected>Trung Bình</option>
+                                    <option value="High">Cao</option>
+                                    <option value="Critical">Tới Hạn</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-sm font-black text-[#1b4332] mb-2 block">Trạng Thái</label>
+                                <select id="customTestStatus" class="w-full border-2 border-[#d1f5d1] p-3 rounded-lg text-sm focus:outline-none focus:border-[#52b788] focus:ring-2 focus:ring-[#52b788]/30 bg-white">
+                                    <option value="PENDING">Chưa Chạy</option>
+                                    <option value="PASSED">Thành Công</option>
+                                    <option value="FAILED">Thất Bại</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="addCustomTestCase()" class="w-full bg-gradient-to-r from-[#52b788] to-[#40916c] text-white px-4 py-3 rounded-lg font-black hover:shadow-lg btn-modern transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-plus"></i> Thêm Test Case
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+

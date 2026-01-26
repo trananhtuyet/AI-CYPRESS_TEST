@@ -31,7 +31,7 @@ if (!USE_MOCK && process.env.GEMINI_API_KEY) {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.text({ limit: '50mb' }));
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5500', 'http://localhost:8080'],
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5500', 'http://localhost:8080', 'http://localhost:3001'],
   credentials: true
 }));
 
@@ -54,7 +54,7 @@ if (websiteAnalyzerRoutes.setGenAI) {
   websiteAnalyzerRoutes.setGenAI(genAI);
 }
 
-console.log('📍 Script Review Routes Registered: /api/review-test-script, /api/validate-syntax');
+console.log('📍 Script Review Routes Registered: /api/review-test-script, /api/validate-syntax, /api/ask-about-review');
 console.log('📊 Analytics Routes Registered: /api/analytics/*');
 console.log('🌐 Website Analyzer Routes Registered: /api/website-analyzer, /api/cypress-cheatsheet, /api/analyze-website-features, /api/generate-tests-for-feature');
 console.log('🧪 Cypress Runner Routes Registered: /api/run-cypress-tests, /api/test-history');

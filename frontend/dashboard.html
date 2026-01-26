@@ -348,30 +348,264 @@
             animation: slideUp 0.5s ease;
         }
 
-        .stat-card {
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slide {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(27, 67, 50, 0.25);
+            margin-bottom: 2.5rem;
             background: white;
-            padding: 1.8rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
-            border: 1px solid rgba(82, 183, 136, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 0;
+            padding-right: 0;
+            height: 100%;
+            transition: transform 0.8s ease-in-out;
+        }
+
+        .carousel-track:hover {
+            /* No pause effect for discrete transitions */
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            padding: 3rem 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-size: cover;
+            background-position: right center;
             position: relative;
             overflow: hidden;
         }
 
-        .stat-card::before {
+        .carousel-slide::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, var(--primary), var(--success));
+            bottom: 0;
+            background: linear-gradient(120deg, rgba(27, 67, 50, 0.85) 0%, rgba(27, 67, 50, 0.4) 50%, transparent 100%);
+            z-index: 1;
         }
 
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(27, 67, 50, 0.15);
+        .carousel-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            flex: 1;
+            max-width: 60%;
+        }
+
+        .carousel-slide.slide1 {
+            background-image: url('assets/anh-cntt.jpg');
+            background: linear-gradient(120deg, rgba(27, 67, 50, 0.85) 0%, rgba(27, 67, 50, 0.4) 50%, transparent 100%), url('assets/anh-cntt.jpg');
+            background-size: 150%;
+            background-position: right center;
+        }
+
+        .carousel-slide.slide2 {
+            background: linear-gradient(120deg, rgba(45, 106, 79, 0.85) 0%, rgba(45, 106, 79, 0.4) 50%, transparent 100%), url('assets/tim-hieu-ve-nganh-cong-nghe-thong-tin.jpg');
+            background-size: 150%;
+            background-position: right center;
+        }
+
+        .carousel-slide.slide3 {
+            background: linear-gradient(120deg, rgba(64, 145, 108, 0.85) 0%, rgba(64, 145, 108, 0.4) 50%, transparent 100%), url('assets/tai-sao-nen-hoc-cong-nghe-thong-tin.jpg');
+            background-size: 150%;
+            background-position: right center;
+        }
+
+        .carousel-slide.slide4 {
+            background: linear-gradient(120deg, rgba(82, 183, 136, 0.85) 0%, rgba(82, 183, 136, 0.4) 50%, transparent 100%), url('assets/anh-cntt.jpg');
+            background-size: 150%;
+            background-position: right center;
+        }
+
+        .carousel-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+            letter-spacing: 1px;
+        }
+
+        .carousel-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            color: white;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        .carousel-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 1.8rem;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .carousel-info {
+            display: flex;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .carousel-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .carousel-info-item i {
+            font-size: 1.1rem;
+            color: #b7e4c7;
+        }
+
+        .carousel-btn {
+            background: linear-gradient(135deg, #52b788 0%, #40916c 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
+            box-shadow: 0 8px 20px rgba(82, 183, 136, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: linear-gradient(135deg, #40916c 0%, #2d6a4f 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(82, 183, 136, 0.4);
+        }
+
+        .carousel-btn:hover::before {
+            left: 100%;
+        }
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .carousel-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+        }
+
+        .carousel-info {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .carousel-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .carousel-btn {
+            background: #52b788;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .carousel-btn:hover {
+            background: #40916c;
+            transform: scale(1.05);
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 2rem;
+            right: 2.5rem;
+            display: flex;
+            gap: 0.8rem;
+            z-index: 3;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .dot:hover {
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(1.2);
+        }
+
+        .dot.active {
+            background: white;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
         }
 
         .stat-label {
@@ -832,36 +1066,110 @@
                 <p>Hệ thống kiểm thử AI của bạn đã sẵn sàng</p>
             </header>
 
-            <!-- Stats Grid -->
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-vial"></i></div>
-                    <div class="stat-label">Tổng Test Cases</div>
-                    <div class="stat-value" id="totalTests">0</div>
-                    <div class="stat-change">↑ 12% so với tuần trước</div>
+            <!-- Course Carousel Banner -->
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    <!-- Slide 1 -->
+                    <div class="carousel-slide slide1">
+                        <div class="carousel-content">
+                            <div class="carousel-title">Khóa Cơ Bản Cypress</div>
+                            <div class="carousel-subtitle">Beginner - Bắt đầu hành trình automation testing của bạn</div>
+                            <div class="carousel-info">
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>12 bài học</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>4 giờ</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.8/5 ⭐</span>
+                                </div>
+                            </div>
+                            <button class="carousel-btn" onclick="enrollCourse(1)">Đăng ký ngay</button>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="carousel-slide slide2">
+                        <div class="carousel-content">
+                            <div class="carousel-title">Advanced Automation</div>
+                            <div class="carousel-subtitle">Intermediate - Nâng cao kỹ năng automation của bạn</div>
+                            <div class="carousel-info">
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>18 bài học</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>8 giờ</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.9/5 ⭐</span>
+                                </div>
+                            </div>
+                            <button class="carousel-btn" onclick="enrollCourse(2)">Đăng ký ngay</button>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="carousel-slide slide3">
+                        <div class="carousel-content">
+                            <div class="carousel-title">API Testing & Integration</div>
+                            <div class="carousel-subtitle">Advanced - Làm chủ API testing và integration</div>
+                            <div class="carousel-info">
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>20 bài học</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>10 giờ</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>5.0/5 ⭐</span>
+                                </div>
+                            </div>
+                            <button class="carousel-btn" onclick="enrollCourse(3)">Đăng ký ngay</button>
+                        </div>
+                    </div>
+
+                    <!-- Slide 4 -->
+                    <div class="carousel-slide slide4">
+                        <div class="carousel-content">
+                            <div class="carousel-title">CI/CD & DevOps</div>
+                            <div class="carousel-subtitle">Expert - Thành thạo CI/CD pipeline và DevOps</div>
+                            <div class="carousel-info">
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>15 bài học</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>6 giờ</span>
+                                </div>
+                                <div class="carousel-info-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.7/5 ⭐</span>
+                                </div>
+                            </div>
+                            <button class="carousel-btn" onclick="enrollCourse(4)">Đăng ký ngay</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-label">Tests Passed</div>
-                    <div class="stat-value" id="passedTests" style="color: var(--success);">0</div>
-                    <div class="stat-change">✓ Tỷ lệ thành công cao</div>
+                <!-- Carousel Dots -->
+                <div class="carousel-dots">
+                    <div class="dot active" onclick="currentSlide(1)"></div>
+                    <div class="dot" onclick="currentSlide(2)"></div>
+                    <div class="dot" onclick="currentSlide(3)"></div>
+                    <div class="dot" onclick="currentSlide(4)"></div>
                 </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
-                    <div class="stat-label">Tests Failed</div>
-                    <div class="stat-value" id="failedTests" style="color: var(--danger);">0</div>
-                    <div class="stat-change">↓ Giảm 5% tuần này</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-star"></i></div>
-                    <div class="stat-label">Điểm tích lũy</div>
-                    <div class="stat-value" id="totalPoints">0</div>
-                    <div class="stat-change">🏆 Top 10% người dùng</div>
-                </div>
-            </section>
+            </div>
 
             <!-- Quick Actions -->
             <h2 style="color: var(--primary-dark); margin: 2rem 0 1.5rem; font-size: 1.2rem; font-weight: 700;">Thao tác nhanh</h2>
@@ -1101,6 +1409,57 @@
         function goTo(page) {
             window.location.href = page;
         }
+
+        // Carousel functionality
+        let currentSlideIndex = 1;
+        let carouselInterval;
+
+        function enrollCourse(courseId) {
+            alert('Bạn vừa đăng ký khóa học #' + courseId);
+        }
+
+        function currentSlide(n) {
+            clearInterval(carouselInterval);
+            goToSlide(n);
+            startAutoCarousel();
+        }
+
+        function goToSlide(n) {
+            const track = document.querySelector('.carousel-track');
+            const offset = -(n - 1) * 100;
+            track.style.transform = `translateX(${offset}%)`;
+            updateActiveDot(n);
+            currentSlideIndex = n;
+        }
+
+        function updateActiveDot(n) {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index + 1 === n) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlideIndex++;
+            if (currentSlideIndex > 4) {
+                currentSlideIndex = 1;
+            }
+            goToSlide(currentSlideIndex);
+        }
+
+        function startAutoCarousel() {
+            carouselInterval = setInterval(nextSlide, 5000);
+        }
+
+        // Initialize carousel
+        document.addEventListener('DOMContentLoaded', () => {
+            goToSlide(1);
+            startAutoCarousel();
+        });
 
         checkAuth();
     </script>

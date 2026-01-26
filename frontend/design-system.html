@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System - AI Testing Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ==================== UNIFIED DESIGN SYSTEM ==================== */
+        
+        :root {
+            /* Primary Colors - Green Theme */
+            --primary: #52b788;
+            --primary-dark: #1b4332;
+            --primary-light: #74c69d;
+            --primary-soft: #b7e4c7;
+            --primary-softer: #d1f5d1;
+            --primary-faded: rgba(82, 183, 136, 0.1);
+            
+            /* Secondary Colors */
+            --secondary: #40916c;
+            --accent: #2d6a4f;
+            
+            /* Utility Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            /* Backgrounds */
+            --bg-body: #f7fffb;
+            --bg-card: #ffffff;
+            --bg-hover: rgba(82, 183, 136, 0.05);
+            --bg-light: #f0fdf4;
+            
+            /* Text Colors */
+            --text-primary: #1b4332;
+            --text-secondary: #2d6a4f;
+            --text-main: #1e293b;
+            --text-muted: #6b9080;
+            --text-light: #94a3b8;
+            
+            /* Borders */
+            --border-soft: rgba(82, 183, 136, 0.15);
+            --border-default: #e2e8f0;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            
+            /* Layout */
+            --sidebar-width: 280px;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            /* Transitions */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ==================== RESET & BASE ==================== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-body) 0%, #e6f7f2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* ==================== SIDEBAR ==================== */
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-soft);
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
+            z-index: 100;
+        }
+        
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-soft);
+            transition: all var(--transition-fast);
+        }
+        
+        .sidebar-brand i {
+            font-size: 1.6rem;
+            color: var(--primary);
+        }
+        
+        .sidebar-menu {
+            flex: 1;
+            padding: 1.5rem 0.8rem;
+            overflow-y: auto;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.5rem;
+            transition: all var(--transition-normal);
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        
+        .menu-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-item:hover {
+            background: var(--bg-hover);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* ==================== HEADER ==================== */
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+        
+        .header-brand i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        /* ==================== MAIN CONTENT ==================== */
+        
+        .main-container {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        /* ==================== CARDS ==================== */
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-soft);
+        }
+        
+        .card-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-soft);
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-title i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        /* ==================== BUTTONS ==================== */
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(82, 183, 136, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(82, 183, 136, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-faded);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* ==================== INPUTS & FORMS ==================== */
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+        
+        input, textarea, select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-md);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all var(--transition-fast);
+            color: var(--text-main);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* ==================== TABS ==================== */
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border-soft);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+        
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        /* ==================== BADGES & TAGS ==================== */
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-primary {
+            background: var(--primary-faded);
+            color: var(--primary-dark);
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* ==================== TABLES ==================== */
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table thead th {
+            padding: 1rem;
+            background: var(--bg-light);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--border-soft);
+        }
+        
+        .table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-default);
+            color: var(--text-main);
+        }
+        
+        .table tbody tr:hover {
+            background: var(--bg-light);
+        }
+        
+        /* ==================== MODALS ==================== */
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            animation: fadeIn var(--transition-fast);
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* ==================== ANIMATIONS ==================== */
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn var(--transition-normal) ease-in;
+        }
+        
+        .slide-in {
+            animation: slideIn var(--transition-normal) ease-out;
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* ==================== UTILITIES ==================== */
+        
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-muted { color: var(--text-muted); }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        
+        .flex { display: flex; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        
+        .hidden { display: none !important; }
+        
+        /* ==================== RESPONSIVE ==================== */
+        
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                position: absolute;
+                transition: transform var(--transition-normal);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-container {
+                margin-left: 0;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-flask-vial"></i>
+            <span>AI<span style="color: var(--primary);">-TestLab</span></span>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="website-analyzer.html" class="menu-item active">
+                <i class="fas fa-globe"></i> Website Analyzer
+            </a>
+            <a href="test-creation.html" class="menu-item">
+                <i class="fas fa-pen"></i> Test Creation
+            </a>
+            <a href="script-review.html" class="menu-item">
+                <i class="fas fa-code"></i> Script Review
+            </a>
+            <a href="analytics.html" class="menu-item">
+                <i class="fas fa-chart-line"></i> Analytics
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-brand">
+                <i class="fas fa-flask-vial"></i>
+                <span>AI-TestLab</span>
+            </div>
+            <div style="color: white; font-size: 0.9rem;">
+                <i class="fas fa-clock mr-2"></i>Auto-saved
+            </div>
+        </header>
+        
+        <!-- CONTENT -->
+        <div class="content">
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h1 class="card-title">
+                        <i class="fas fa-palette"></i> Design System
+                    </h1>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 1rem;">Color Palette</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="background: var(--primary); padding: 1.5rem; border-radius: var(--radius-md); color: white;">
+                            Primary<br><small>#52b788</small>
+                        </div>
+                        <div style="background: var(--primary-dark); padding: 1.5rem; border-radius: var(--radius-md); color: white;">
+                            Primary Dark<br><small>#1b4332</small>
+                        </div>
+                        <div style="background: var(--success); padding: 1.5rem; border-radius: var(--radius-md); color: white;">
+                            Success<br><small>#10b981</small>
+                        </div>
+                        <div style="background: var(--danger); padding: 1.5rem; border-radius: var(--radius-md); color: white;">
+                            Danger<br><small>#ef4444</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 1rem;">Buttons</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-check"></i> Primary Button
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-edit"></i> Secondary Button
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-trash"></i> Small Button
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 1rem;">Badges</h3>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <span class="badge badge-primary">Primary</span>
+                        <span class="badge badge-success">Success</span>
+                        <span class="badge badge-warning">Warning</span>
+                        <span class="badge badge-danger">Danger</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

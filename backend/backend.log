@@ -1,0 +1,197 @@
+
+> ai-cypress-backend@1.0.0 start
+> node server.js
+
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ≡ƒöæ add access controls to secrets: https://dotenvx.com/ops
+Γ£à New schema initialized successfully!
+≡ƒôì Script Review Routes Registered: /api/review-test-script, /api/validate-syntax, /api/ask-about-review
+≡ƒôè Analytics Routes Registered: /api/analytics/*
+≡ƒîÉ Website Analyzer Routes Registered: /api/website-analyzer, /api/cypress-cheatsheet, /api/analyze-website-features, /api/generate-tests-for-feature
+≡ƒº¬ Cypress Runner Routes Registered: /api/run-cypress-tests, /api/test-history
+SQLite database connected at: C:\Users\DeLL\Music\AI-Cypress-Project\backend\data\database.db
+Γ£ô Users table created
+Γ£ô Sessions table created
+Γ£ô Test cases table created
+
+Γ£ô All tables initialized successfully!
+Γ£ô test_cases_new table created
+Γ£ô test_steps table created
+Γ£ô Users table created
+Γ£ô Sessions table created
+Γ£ô Test cases table created
+
+Γ£ô All tables initialized successfully!
+Γ£à Server is running on http://localhost:3000
+≡ƒôì Health check: http://localhost:3000/health
+≡ƒôì Auth endpoints: http://localhost:3000/api/auth
+≡ƒñû Test AI: POST http://localhost:3000/api/test-ai
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 3
+  TC ID 3 (vvvv): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 1 (asshs): 1 steps
+Γ£à Returning 3 test cases
+Γ£à Sent response with 3 test cases
+Γ£à Test case created: ID=7, Name="666", Steps=1
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 4
+  TC ID 7 (666): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 1 (asshs): 1 steps
+Γ£à Returning 4 test cases
+Γ£à Sent response with 4 test cases
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 4
+  TC ID 7 (666): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 1 (asshs): 1 steps
+Γ£à Returning 4 test cases
+Γ£à Sent response with 4 test cases
+Γ£à Test case created: ID=8, Name="gtggt", Steps=1
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 5
+  TC ID 8 (gtggt): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 5 test cases
+Γ£à Sent response with 5 test cases
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 5
+  TC ID 8 (gtggt): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 5 test cases
+Γ£à Sent response with 5 test cases
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 5
+  TC ID 8 (gtggt): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 5 test cases
+Γ£à Sent response with 5 test cases
+Γ£à Test case created: ID=9, Name="Test Case", Steps=1
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 6
+  TC ID 9 (Test Case): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 8 (gtggt): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 6 test cases
+Γ£à Sent response with 6 test cases
+≡ƒôí GET /api/v2/testcases - User ID: 1
+Found test cases: 3
+  TC ID 6 (hihihi): 1 steps
+  TC ID 5 (huhh): 1 steps
+  TC ID 4 (gygy): 1 steps
+Γ£à Returning 3 test cases
+Γ£à Sent response with 3 test cases
+≡ƒôí GET /api/v2/testcases - User ID: 1
+Found test cases: 3
+  TC ID 6 (hihihi): 1 steps
+  TC ID 5 (huhh): 1 steps
+  TC ID 4 (gygy): 1 steps
+Γ£à Returning 3 test cases
+Γ£à Sent response with 3 test cases
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 6
+  TC ID 9 (Test Case): 1 steps
+  TC ID 8 (gtggt): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 6 test cases
+Γ£à Sent response with 6 test cases
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'passed', count: 1 }, { status: 'pending', count: 2 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'passed', count: 1 }, { status: 'pending', count: 2 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'passed', count: 1 }, { status: 'pending', count: 2 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'passed', count: 1 }, { status: 'pending', count: 2 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'passed', count: 1 }, { status: 'pending', count: 2 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'passed', count: 1 }, { status: 'pending', count: 2 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'passed', count: 1 }, { status: 'pending', count: 2 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 6
+  TC ID 9 (Test Case): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 8 (gtggt): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 6 test cases
+Γ£à Sent response with 6 test cases
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 6
+  TC ID 9 (Test Case): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 8 (gtggt): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 6 test cases
+Γ£à Sent response with 6 test cases
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 6
+  TC ID 9 (Test Case): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 8 (gtggt): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 6 test cases
+Γ£à Sent response with 6 test cases
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+≡ƒôí GET /api/v2/testcases - User ID: 4
+Found test cases: 6
+  TC ID 9 (Test Case): 1 steps
+  TC ID 2 (ggujsh): 1 steps
+  TC ID 1 (asshs): 1 steps
+  TC ID 3 (vvvv): 1 steps
+  TC ID 8 (gtggt): 1 steps
+  TC ID 7 (666): 1 steps
+Γ£à Returning 6 test cases
+Γ£à Sent response with 6 test cases
+≡ƒôè Analytics - Summary endpoint
+≡ƒôè Status result: [ { status: 'failed', count: 2 }, { status: 'passed', count: 4 } ]
+
