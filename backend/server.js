@@ -15,6 +15,7 @@ const scriptReviewRoutes = require('./routes/script-review');
 const analyticsRoutes = require('./routes/analytics');
 const websiteAnalyzerRoutes = require('./routes/website-analyzer');
 const cypressRunnerRoutes = require('./routes/cypress-runner');
+const chatbotRoutes = require('./routes/chatbot');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -48,16 +49,23 @@ app.use('/api', scriptReviewRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api', websiteAnalyzerRoutes);
 app.use('/api', cypressRunnerRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Pass genAI to website analyzer routes
 if (websiteAnalyzerRoutes.setGenAI) {
   websiteAnalyzerRoutes.setGenAI(genAI);
 }
 
+// Pass genAI to chatbot routes
+if (chatbotRoutes.setGenAI) {
+  chatbotRoutes.setGenAI(genAI);
+}
+
 console.log('📍 Script Review Routes Registered: /api/review-test-script, /api/validate-syntax, /api/ask-about-review');
 console.log('📊 Analytics Routes Registered: /api/analytics/*');
 console.log('🌐 Website Analyzer Routes Registered: /api/website-analyzer, /api/cypress-cheatsheet, /api/analyze-website-features, /api/generate-tests-for-feature');
 console.log('🧪 Cypress Runner Routes Registered: /api/run-cypress-tests, /api/test-history');
+console.log('💬 Chatbot Routes Registered: /api/chatbot/send');
 
 
 // Health check endpoint

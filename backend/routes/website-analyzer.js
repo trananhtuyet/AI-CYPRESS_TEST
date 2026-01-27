@@ -73,9 +73,11 @@ router.post('/website-analyzer', verifyToken, async (req, res) => {
 
         try {
             if (!model) {
+                console.warn('⚠️ AI model not available, using fallback');
                 throw new Error('AI model not available, using fallback');
             }
             
+            console.log('🤖 Using AI model: gemini-2.0-flash');
             const analysisPrompt = `Analyze this website and provide detailed information for creating Cypress test cases.
 
 Website Title: ${pageTitle}
@@ -111,6 +113,9 @@ Please respond in this exact JSON format:
             const result = await model.generateContent(analysisPrompt);
             let analysisText = result.response.text();
 
+            console.log('📝 AI Response length:', analysisText.length);
+            console.log('📝 AI Response preview:', analysisText.substring(0, 300));
+
             // Extract JSON from response
             const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) {
@@ -120,6 +125,7 @@ Please respond in this exact JSON format:
             let analysisData;
             try {
                 analysisData = JSON.parse(jsonMatch[0]);
+                console.log('✅ JSON parsed successfully');
             } catch (parseError) {
                 console.error('❌ JSON parse error:', parseError.message);
                 analysisData = { features: [], testCases: [], recommendations: [] };
@@ -844,7 +850,7 @@ router.post('/generate-feature-tests', verifyToken, async (req, res) => {
         // Try using Google Gemini AI if available
         if (genAI) {
             try {
-                const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+                const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
                 
                 const prompt = `Bạn là chuyên gia kiểm thử phần mềm. Hãy sinh ra 5-7 test cases chi tiết cho tính năng sau:
 
@@ -871,6 +877,8 @@ Chỉ trả về JSON, không text thêm.`;
                 const result = await model.generateContent(prompt);
                 const responseText = result.response.text();
                 
+                console.log('🤖 AI Response:', responseText.substring(0, 200));
+                
                 // Try to parse JSON from response
                 try {
                     // Extract JSON from the response
@@ -887,6 +895,7 @@ Chỉ trả về JSON, không text thêm.`;
                             executionTime: '0s',
                             isAIGenerated: true
                         }));
+                        console.log(`✅ Generated ${testCases.length} test cases via AI`);
                     } else {
                         throw new Error('Could not extract JSON from AI response');
                     }
@@ -901,6 +910,7 @@ Chỉ trả về JSON, không text thêm.`;
             }
         } else {
             // Fallback if no AI available
+            console.warn('⚠️ No AI available, using fallback test cases');
             testCases = generateFallbackTestCases(featureName);
         }
 

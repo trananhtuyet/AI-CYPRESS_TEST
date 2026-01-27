@@ -1256,24 +1256,15 @@
     </div>
 
     <script>
-        // ===== CHATBOX FUNCTIONALITY =====
+        // ===== CHATBOX FUNCTIONALITY WITH AI =====
         const chatbox = document.getElementById('chatbox');
         const chatboxToggle = document.getElementById('chatboxToggle');
         const chatboxClose = document.getElementById('chatboxClose');
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const chatSend = document.getElementById('chatSend');
-
-        // AI Responses Database
-        const aiResponses = {
-            'hello': 'Xin chào! Tôi sẵn sàng giúp bạn. Bạn có thể hỏi tôi về testing, Cypress, hoặc bất kỳ tính năng nào của AI-TestLab!',
-            'test': 'Tôi có thể giúp bạn viết test cases. Hãy nói cho tôi biết website hoặc tính năng nào bạn muốn kiểm thử.',
-            'cypress': 'Cypress là một công cụ testing tuyệt vời! Nó cho phép bạn viết E2E tests một cách dễ dàng. Bạn cần giúp gì về Cypress?',
-            'help': 'Tôi có thể giúp bạn với:\n• Viết test cases\n• Tìm hiểu về Cypress\n• Phân tích website\n• Giải đáp các câu hỏi về QA testing',
-            'tutorial': 'Bạn có thể xem các video hướng dẫn trong phần "Mẹo & Tài liệu" hoặc vào "Khóa học" để tìm hiểu thêm!',
-            'ai': 'AI Assistant của chúng tôi có thể giúp bạn phân tích website và tự động tạo test cases. Hãy thử tính năng "AI Scan" trong "Thao tác nhanh"!',
-            'default': 'Tôi hiểu bạn muốn nói điều đó. Bạn có thể hỏi tôi về:\n• Testing & QA\n• Cypress framework\n• Cách sử dụng AI-TestLab\n• Test case best practices'
-        };
+        const API_BASE = 'http://localhost:3000/api';
+        let conversationHistory = [];
 
         function toggleChatbox() {
             chatbox.classList.toggle('active');
@@ -1291,19 +1282,13 @@
             messageDiv.appendChild(contentDiv);
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function getAIResponse(userMessage) {
-            const lowerMessage = userMessage.toLowerCase();
             
-            // Check for keywords
-            for (let key in aiResponses) {
-                if (lowerMessage.includes(key)) {
-                    return aiResponses[key];
-                }
-            }
-            
-            return aiResponses['default'];
+            // Store in conversation history
+            conversationHistory.push({
+                text: text,
+                isUser: isUser,
+                timestamp: new Date()
+            });
         }
 
         function showTypingIndicator() {
@@ -1332,24 +1317,61 @@
             }
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const message = chatInput.value.trim();
             
             if (!message) return;
             
-            // Add user message
+            // Add user message to UI and history
             addMessage(message, true);
             chatInput.value = '';
             
             // Show typing indicator
             showTypingIndicator();
             
-            // Simulate AI response delay
-            setTimeout(() => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    removeTypingIndicator();
+                    addMessage('❌ Bạn cần đăng nhập để sử dụng AI Assistant', false);
+                    return;
+                }
+
+                // Call AI chatbot API
+                const response = await fetch(`${API_BASE}/chatbot/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversationHistory: conversationHistory
+                    })
+                });
+
                 removeTypingIndicator();
-                const response = getAIResponse(message);
-                addMessage(response, false);
-            }, 1000 + Math.random() * 500);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    addMessage(`❌ Lỗi: ${error.error || 'Không thể kết nối AI'}`, false);
+                    return;
+                }
+
+                const data = await response.json();
+                
+                if (data.success && data.response) {
+                    addMessage(data.response, false);
+                    console.log(`✅ AI Response (${data.isAI ? 'Real AI' : 'Fallback'}):`);
+                } else {
+                    addMessage('❌ Không có phản hồi từ AI Assistant', false);
+                }
+
+            } catch (error) {
+                removeTypingIndicator();
+                console.error('Chatbot Error:', error);
+                addMessage(`❌ Lỗi kết nối: ${error.message}`, false);
+            }
         }
 
         // Event Listeners

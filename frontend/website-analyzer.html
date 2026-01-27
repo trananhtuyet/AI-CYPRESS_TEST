@@ -46,38 +46,22 @@
 <body class="bg-[#f1f5f9] min-h-screen">
 
     <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-[#0f172a] via-[#1b4332] to-[#2d6a4f] text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-2xl border-b-2 border-[#52b788]/30">
+    <nav class="bg-gradient-to-r from-[#1b4332] to-[#2d6a4f] text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-lg">
         <div class="flex items-center gap-8">
-            <div class="flex items-center gap-3 group cursor-pointer hover:transform hover:scale-105 transition-transform">
-                <div class="bg-gradient-to-br from-[#52b788] to-[#40916c] p-2.5 rounded-lg shadow-lg">
-                    <i class="fas fa-globe text-white text-lg"></i>
-                </div>
-                <div>
-                    <span class="text-xl font-black tracking-tight block">AI<span class="text-[#52b788]">-Analyzer</span></span>
-                    <span class="text-[10px] text-gray-400 font-semibold">Website Analysis</span>
-                </div>
+            <div class="flex items-center gap-2">
+                <div class="bg-[#52b788] p-1.5 rounded-lg"><i class="fas fa-leaf text-white"></i></div>
+                <span class="text-lg font-bold tracking-tight">AI<span class="text-[#52b788]">-TestLab</span></span>
             </div>
-            <div class="hidden lg:flex gap-8 text-sm font-semibold text-gray-300">
-                <a href="dashboard.html" class="hover:text-white hover:text-[#52b788] transition group relative">
-                    <i class="fas fa-chart-line mr-1"></i>Tổng quan
-                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#52b788] group-hover:w-full transition-all"></span>
-                </a>
-                <a href="#" class="text-white text-[#52b788] border-b-2 border-[#52b788] pb-1">
-                    <i class="fas fa-globe mr-1"></i>Phân tích
-                </a>
-                <a href="test-creation.html" class="hover:text-white hover:text-[#52b788] transition group relative">
-                    <i class="fas fa-vial mr-1"></i>Test Cases
-                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#52b788] group-hover:w-full transition-all"></span>
-                </a>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-gray-300">
+                <a href="dashboard.html" class="hover:text-white transition">Tổng quan</a>
+                <a href="#" class="text-white border-b-2 border-[#52b788] pb-1">Phân tích</a>
+                <a href="test-creation.html" class="hover:text-white transition">Test Cases</a>
+                <a href="#" class="hover:text-white transition">Báo cáo</a>
             </div>
         </div>
-        <div class="flex items-center gap-6">
-            <div class="hidden sm:flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/20">
-                <i class="far fa-clock text-[#52b788] text-lg"></i>
-                <span class="text-sm font-semibold text-gray-200">Status</span>
-                <span id="saveTime" class="text-xs text-[#52b788] font-mono">Ready</span>
-            </div>
-            <div class="h-10 w-10 bg-gradient-to-br from-[#52b788] via-[#40916c] to-[#2d6a4f] rounded-full flex items-center justify-center font-bold text-lg shadow-lg cursor-pointer hover:ring-2 ring-[#52b788]/50 transition-all" onclick="logout()">WA</div>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-gray-300"><i class="far fa-clock mr-1"></i> Tự động lưu</span>
+            <div class="h-8 w-8 bg-gradient-to-tr from-[#52b788] to-[#40916c] rounded-full flex items-center justify-center font-bold text-xs">WA</div>
         </div>
     </nav>
 
@@ -365,12 +349,16 @@
                 console.log('✅ API Phản hồi:', data);
 
                 // Process backend response
-                const detectedFeatures = data.features || data.detectedFeatures || [];
+                let detectedFeatures = data.features || data.detectedFeatures || [];
                 let generatedTestCases = data.testCases || data.generatedTestCases || [];
+
+                console.log('📊 Received features:', detectedFeatures.length);
+                console.log('📊 Received test cases:', generatedTestCases.length);
 
                 // Fallback to mock data if API doesn't return features
                 if (detectedFeatures.length === 0) {
-                    detectedFeatures.push(
+                    console.warn('⚠️ No features from backend, using mock data');
+                    detectedFeatures = [
                         { 
                             name: 'Xác Thực Người Dùng', 
                             type: 'Đăng nhập/Đăng ký', 
@@ -403,12 +391,36 @@
                                 { id: 'CART003', name: 'Cập nhật số lượng', steps: ['Mở giỏ hàng', 'Thay đổi số lượng', 'Nhấp Cập nhật'], expectedResult: 'Số lượng được cập nhật', priority: 'Medium', status: 'PASSED', executionTime: '1.3s' }
                             ]
                         }
-                    );
+                    ];
                 }
 
                 if (generatedTestCases.length === 0) {
                     generatedTestCases = [];
                 }
+
+                // Ensure all features have elements count and testCases
+                detectedFeatures = detectedFeatures.map(feature => {
+                    // Count elements if not provided
+                    if (!feature.elements) {
+                        const testCases = feature.testCases || [];
+                        feature.elements = testCases.reduce((count, tc) => count + (tc.steps || []).length, 0) || 0;
+                    }
+                    
+                    // Assign test cases if not already present
+                    if (!feature.testCases) {
+                        feature.testCases = [];
+                    }
+                    
+                    // Ensure all test cases have a status field
+                    feature.testCases = feature.testCases.map(tc => ({
+                        ...tc,
+                        status: tc.status || 'PENDING',
+                        executionTime: tc.executionTime || '0s'
+                    }));
+                    
+                    console.log('📋 Feature processed:', feature.name, '- Elements:', feature.elements, '- Tests:', feature.testCases.length);
+                    return feature;
+                });
 
                 currentAnalysis = {
                     url: url,
@@ -533,57 +545,58 @@
             document.getElementById('featureTitle').textContent = feature.name || feature.feature;
             document.getElementById('featureType').textContent = `Loại: ${feature.type || 'Không xác định'} | Độ phức tạp: ${feature.complexity || 'Trung Bình'}`;
             
-            // Show loading state in modal
-            document.getElementById('featureTestCases').innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i><p class="text-sm text-gray-600 mt-2">Đang sinh test case từ AI...</p></div>';
-            
             document.getElementById('featureModal').style.display = 'flex';
             
-            try {
-                // Call AI to generate detailed test cases for this feature
-                const token = localStorage.getItem('token');
-                console.log('🔄 Calling AI to generate test cases for:', feature.name);
-                console.log('📍 API URL:', `${API_URL}/api/generate-feature-tests`);
+            // Only generate test cases if we don't have them yet
+            if (!feature.testCases || feature.testCases.length === 0) {
+                console.log('🆕 No test cases yet, generating from AI...');
+                // Show loading state in modal
+                document.getElementById('featureTestCases').innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i><p class="text-sm text-gray-600 mt-2">Đang sinh test case từ AI...</p></div>';
                 
-                const response = await fetch(`${API_URL}/api/generate-feature-tests`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        featureName: feature.name || feature.feature,
-                        featureType: feature.type || '',
-                        featureDescription: `Website feature with ${feature.elements || 0} elements and ${feature.complexity || 'medium'} complexity`
-                    })
-                });
+                try {
+                    // Call AI to generate detailed test cases for this feature
+                    const token = localStorage.getItem('token');
+                    console.log('🔄 Calling AI to generate test cases for:', feature.name);
+                    console.log('📍 API URL:', `${API_URL}/api/generate-feature-tests`);
+                    
+                    const response = await fetch(`${API_URL}/api/generate-feature-tests`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            featureName: feature.name || feature.feature,
+                            featureType: feature.type || '',
+                            featureDescription: `Website feature with ${feature.elements || 0} elements and ${feature.complexity || 'medium'} complexity`
+                        })
+                    });
 
-                console.log('📦 API Response status:', response.status);
+                    console.log('📦 API Response status:', response.status);
 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('✅ AI Generated test cases:', data);
+                    
+                    // Update feature with AI-generated test cases
+                    if (data.testCases && Array.isArray(data.testCases)) {
+                        allFeatures[featureIndex].testCases = data.testCases;
+                        console.log('📝 Updated feature with test cases, total:', data.testCases.length);
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ AI generation error:', error);
+                    // Use existing test cases as fallback
+                    console.warn('⚠️ Using existing test cases from analysis');
                 }
-
-                const data = await response.json();
-                console.log('✅ AI Generated test cases:', data);
-                
-                // Update feature with AI-generated test cases
-                if (data.testCases && Array.isArray(data.testCases)) {
-                    allFeatures[featureIndex].testCases = data.testCases;
-                    console.log('📝 Updated feature with test cases, total:', data.testCases.length);
-                }
-                
-            } catch (error) {
-                console.error('❌ AI generation error:', error);
-                // Use existing test cases as fallback
-                console.warn('⚠️ Using existing test cases from analysis');
+            } else {
+                console.log('♻️ Test cases already exist, just refreshing display');
             }
             
-            // Display test cases (either AI-generated or existing)
-            const testCases = allFeatures[featureIndex].testCases || [];
-            console.log('🎯 Displaying test cases, count:', testCases.length);
-            
-            document.getElementById('testCaseCount').textContent = testCases.length + ' cases';
-            
+            const testCases = feature.testCases || [];
             const testCasesHTML = testCases.map((tc, idx) => {
                 const statusBg = tc.status === 'PASSED' ? 'from-green-50 to-green-100 border-green-400' : tc.status === 'FAILED' ? 'from-red-50 to-red-100 border-red-400' : 'from-yellow-50 to-yellow-100 border-yellow-400';
                 const statusColor = tc.status === 'PASSED' ? 'text-green-900' : tc.status === 'FAILED' ? 'text-red-900' : 'text-yellow-900';
@@ -637,16 +650,28 @@
         }
 
         function updateTestStatistics() {
+            console.log('📊 ===== UPDATING TEST STATISTICS =====');
+            console.log('📊 Cập nhật thống kê test - allFeatures count:', allFeatures.length);
+            
             // Count total test cases across all features
             const totalTests = allFeatures.reduce((sum, f) => sum + (f.testCases || []).length, 0);
+            console.log('📊 Total tests:', totalTests);
+            
             document.getElementById('statTests').textContent = totalTests;
             
             // Update the "Test Case Được AI Sinh Ra" section
-            const testCasesHTML = allFeatures.map(feature => {
+            const testCasesHTML = allFeatures.map((feature, fIdx) => {
                 const testCases = feature.testCases || [];
-                if (testCases.length === 0) return '';
+                console.log(`\n📋 Feature ${fIdx}: ${feature.name} - ${testCases.length} test cases`);
                 
-                const casesHTML = testCases.map(tc => {
+                if (testCases.length === 0) {
+                    console.log(`   → Skipping (no tests)`);
+                    return '';
+                }
+                
+                const casesHTML = testCases.map((tc, tcIdx) => {
+                    console.log(`   Test ${tcIdx + 1}: ${tc.name} - Status: ${tc.status}`);
+                    
                     const statusColor = tc.status === 'PASSED' ? 'text-green-700' : tc.status === 'FAILED' ? 'text-red-700' : 'text-yellow-700';
                     const statusIcon = tc.status === 'PASSED' ? 'fa-check-circle text-green-500' : tc.status === 'FAILED' ? 'fa-times-circle text-red-500' : 'fa-clock text-yellow-500';
                     const isAIBadge = tc.isAIGenerated ? '<span class="ml-1 text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded font-bold">🤖</span>' : '';
@@ -676,8 +701,15 @@
             }).join('');
             
             const generatedTestCasesDiv = document.getElementById('generatedTestCases');
+            console.log('🎯 generatedTestCasesDiv element:', generatedTestCasesDiv ? 'FOUND' : 'NOT FOUND!!');
+            
             if (generatedTestCasesDiv) {
+                console.log('📝 Setting innerHTML with', testCasesHTML.length, 'characters');
                 generatedTestCasesDiv.innerHTML = testCasesHTML || '<div class="text-center py-8 text-gray-500"><i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i><p class="text-sm">Chưa có test case. Hãy chạy phân tích trước.</p></div>';
+                console.log('✅ HTML updated successfully');
+                console.log('📊 ===== UPDATE COMPLETE =====\n');
+            } else {
+                console.error('❌ Could not find generatedTestCases div!');
             }
         }
 
@@ -746,6 +778,11 @@
             const testCase = feature.testCases[testIndex];
             
             console.log('🚀 Chạy test case:', testCase.name);
+            console.log('📍 Feature Index:', featureIndex, 'Test Index:', testIndex);
+            console.log('📊 allFeatures length:', allFeatures.length);
+            console.log('📊 Current feature:', feature);
+            console.log('📊 Current test case before run:', testCase);
+            console.log('📊 Status before:', testCase.status);
             
             // Show loading state on button
             const buttons = document.querySelectorAll('button');
@@ -776,17 +813,27 @@
                 if (response.ok) {
                     const result = await response.json();
                     console.log('✅ API Response:', result);
+                    console.log('✅ Response status field:', result.status);
                     
                     // Update test case status based on execution result
-                    testCase.status = result.status || 'PASSED';
-                    testCase.executionTime = result.executionTime || '0s';
+                    const newStatus = result.status || 'PASSED';
+                    const newTime = result.executionTime || '0s';
                     
-                    console.log('✅ Test updated:', testCase);
+                    console.log('📝 Setting status to:', newStatus);
+                    console.log('📝 Setting time to:', newTime);
+                    
+                    // Update the actual test case object in allFeatures
+                    allFeatures[featureIndex].testCases[testIndex].status = newStatus;
+                    allFeatures[featureIndex].testCases[testIndex].executionTime = newTime;
+                    
+                    console.log('✅ After update in allFeatures - Status:', allFeatures[featureIndex].testCases[testIndex].status);
+                    console.log('✅ Test case object now:', allFeatures[featureIndex].testCases[testIndex]);
                     
                 } else if (response.status === 404) {
                     // If backend endpoint doesn't exist, use simulation
                     console.warn('⚠️ Backend endpoint không tìm thấy, sử dụng simulation');
                     simulateTestExecution(testCase);
+                    console.log('✅ After simulation - Status:', allFeatures[featureIndex].testCases[testIndex].status);
                 } else {
                     throw new Error(`API Error: ${response.status}`);
                 }
@@ -794,15 +841,22 @@
             } catch (error) {
                 console.warn('⚠️ Lỗi khi chạy test, sử dụng simulation:', error.message);
                 simulateTestExecution(testCase);
+                console.log('✅ After simulation - Status:', allFeatures[featureIndex].testCases[testIndex].status);
             }
             
-            // Wait a moment then refresh modal to show updated status
-            setTimeout(() => {
-                console.log('🔄 Refresh modal để hiển thị kết quả');
-                openFeatureModal(featureIndex);
-                updateTestStatistics();
-                alert(`✅ Kết quả: ${testCase.status} (${testCase.executionTime})`);
-            }, 500);
+            console.log('🔄 Bắt đầu cập nhật hiển thị');
+            console.log('📊 testCase.status:', testCase.status);
+            console.log('📊 allFeatures[' + featureIndex + '].testCases[' + testIndex + '].status:', allFeatures[featureIndex].testCases[testIndex].status);
+            
+            // Update statistics immediately to reflect changes in main view
+            console.log('📝 Gọi updateTestStatistics()');
+            updateTestStatistics();
+            
+            console.log('🔄 Làm mới modal');
+            // Refresh modal to show updated status
+            await openFeatureModal(featureIndex);
+            
+            alert(`✅ Kết quả: ${allFeatures[featureIndex].testCases[testIndex].status} (${allFeatures[featureIndex].testCases[testIndex].executionTime})`);
         }
 
         function simulateTestExecution(testCase) {
@@ -821,6 +875,10 @@
             
             console.log('🎲 Simulation result:', testCase.status, testCase.executionTime);
         }
+
+
+
+
     </script>
 
     <!-- Feature Detail Modal -->
